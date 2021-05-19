@@ -1,0 +1,12 @@
+{
+  "extends": "@tsconfig/node16/tsconfig.json",
+
+  "compilerOptions": {
+    "preserveConstEnums": true,
+    "noFallthroughCasesInSwitch": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowJs": true
+  },
+  "include": ["src"]
+}

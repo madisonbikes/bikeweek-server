@@ -1,0 +1,29 @@
+{
+  "name": "bikeweek2021-importer",
+  "version": "1.0.0",
+  "description": "Imports events from CSV form data into Sched",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "lint": "eslint '**/*.ts' '**/*.js'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/madisonbikes/bikeweek2021-importer.git"
+  },
+  "author": "Ben Sandee",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/madisonbikes/bikeweek2021-importer/issues"
+  },
+  "homepage": "https://github.com/madisonbikes/bikeweek2021-importer#readme",
+  "dependencies": {
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
+  },
+  "devDependencies": {
+    "@tsconfig/node16": "^1.0.1",
+    "@types/node": "^15.3.0",
+    "eslint": "^7.26.0"
+  }
+}
