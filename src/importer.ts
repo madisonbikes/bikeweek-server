@@ -4,7 +4,8 @@ import tempy from "tempy";
 import fs from "fs";
 
 export async function importer() {
-  const data = await superagent.get("https://docs.google.com/spreadsheets/d/19ils5BDZpkBe00H8wsQ2Cj1ANb9ib27iLVbho0k7aeg/export?format=csv&gid=0");
+  // this is the 2019 list
+  const data = await superagent.get("https://docs.google.com/spreadsheets/d/1L4jwv6lg8a95X7AgYNUCIS0uf99XqZlD0WkgP_w9ZMI/export?format=csv&gid=0");
   const tempFile = tempy.file({ name: "events.csv" });
   await fs.promises.writeFile(tempFile, data.text);
   const results = await extractData(tempFile);
