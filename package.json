@@ -19,6 +19,8 @@
   "homepage": "https://github.com/madisonbikes/bikeweek2021-importer#readme",
   "dependencies": {
     "csv-parser": "^3.0.0",
+    "date-fns": "^2.21.3",
+    "dotenv": "^10.0.0",
     "superagent": "^6.1.0",
     "tempy": "^1.0.1",
     "ts-node": "^9.1.1",

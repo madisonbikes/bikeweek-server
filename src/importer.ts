@@ -3,14 +3,30 @@ import csv from "csv-parser";
 import tempy from "tempy";
 import fs from "fs";
 
-export async function importer() {
+export type ImportedEvent = {
+  name: string,
+  event_url: string,
+  description: string,
+  sponsor: string,
+  sponsor_urls: string,
+  maps_description: string,
+  maps_query: string,
+  maps_placeid?: string,
+  location_free?: string
+  type: string,
+  days: string,
+  time: string,
+  outside_of_madison: string,
+}
+
+export async function importer(): Promise<ImportedEvent[]> {
   // this is the 2019 list
-  const data = await superagent.get("https://docs.google.com/spreadsheets/d/1L4jwv6lg8a95X7AgYNUCIS0uf99XqZlD0WkgP_w9ZMI/export?format=csv&gid=0");
+  const data = await superagent.get(`${process.env.SOURCE_URI}/export?format=csv&gid=0`);
   const tempFile = tempy.file({ name: "events.csv" });
   await fs.promises.writeFile(tempFile, data.text);
   const results = await extractData(tempFile);
   await fs.promises.rm(tempFile);
-  console.log(results);
+  return results as ImportedEvent[]
 }
 
 async function extractData(filename: string) {
