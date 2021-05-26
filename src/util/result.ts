@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// noinspection JSUnusedGlobalSymbols
+
 /** adapted from https://medium.com/inato/expressive-error-handling-in-typescript-and-benefits-for-domain-driven-design-70726e061c86 */
 export type Result<K, E> = Ok<K, E> | Error<K, E>;
 

@@ -31,7 +31,7 @@ export async function importer(): Promise<ImportedEvent[]> {
 
 async function extractData(filename: string) {
   return new Promise((resolve, reject) => {
-    const results: any[] = [];
+    const results: unknown[] = [];
 
     fs.createReadStream(filename)
       .pipe(csv())

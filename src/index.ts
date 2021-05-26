@@ -1,11 +1,12 @@
 import dotenv from "dotenv"
 import { ImportedEvent, importer } from "./importer";
 import { addSession, deleteSession, listSessions, modifySession } from "./sched/api";
-import { SessionListResponse } from "./sched/types";
 import crypto from "crypto"
+import converter from "showdown"
 
 dotenv.config()
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 startup().then(_ => {
   // do a thing
 });
@@ -24,7 +25,7 @@ async function startup(): Promise<void> {
     process.exit(1)
   }
 
-  const sessionList: SessionListResponse[] = sessionListResponse.value
+  const sessionList = sessionListResponse.value
   const existingKeys = new Set(sessionList.map((item) => {
     return item.event_key
   }))
@@ -35,14 +36,17 @@ async function startup(): Promise<void> {
 
   for(const event of smaller) {
     const key = generateKey(event)
+    const htmlDescription = new converter.Converter().makeHtml(event.description).replaceAll("\\", "")
 
     const base = {
       session_key: key,
       name: event.name,
-      description: event.description,
+      description: htmlDescription,
+      // format: YYYY-MM-DD HH:MM
       session_start: "8:00 AM",
       session_end: "TBA",
-      session_type: event.type
+      session_type: event.type,
+      media_url: event.event_url
     }
     if(existingKeys.has(key)) {
       const modded = await modifySession(base)
@@ -51,7 +55,6 @@ async function startup(): Promise<void> {
       } else {
         console.log(`${key} modified ok`)
       }
-      handledKeys.add(key)
     } else {
       const modded = await addSession(base)
       if(modded.isError()) {
@@ -59,12 +62,17 @@ async function startup(): Promise<void> {
       } else {
         console.log(`${key} added ok`)
       }
-      handledKeys.add(key)
     }
+    handledKeys.add(key)
   }
+
+  // remove handledkeys from the total key list
   for(const key of handledKeys) {
     existingKeys.delete(key)
   }
+
+  // delete any remaining sessions
+  // FIXME this should probably be removed once the sessions have stabilized
   for(const key of existingKeys) {
     const result = await deleteSession({session_key: key})
     console.log(result)
