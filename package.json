@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/madisonbikes/bikeweek2021-importer#readme",
   "dependencies": {
+    "build-url": "^6.0.1",
     "csv-parser": "^3.0.0",
     "date-fns": "^2.21.3",
     "dotenv": "^10.0.0",
@@ -32,9 +33,9 @@
     "@types/node": "^15.6.1",
     "@types/showdown": "^1.9.3",
     "@types/superagent": "^4.1.11",
-    "eslint": "^7.27.0",
     "@typescript-eslint/eslint-plugin": "^4.14.2",
     "@typescript-eslint/parser": "^4.14.2",
+    "eslint": "^7.27.0",
     "eslint-config-prettier": "^8.0.0",
     "eslint-plugin-no-autofix": "^1.0.2",
     "prettier": "2.3.0"
