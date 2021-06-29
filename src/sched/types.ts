@@ -1,3 +1,5 @@
+/** schema for sched responses */
+
 export interface SessionListRequest {
   since?: number
   format?: string

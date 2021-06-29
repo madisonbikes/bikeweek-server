@@ -21,10 +21,12 @@
     "build-url": "^6.0.1",
     "date-fns": "^2.21.3",
     "dotenv": "^10.0.0",
+    "reflect-metadata": "^0.1.13",
     "showdown": "^1.9.1",
     "superagent": "^6.1.0",
     "tempy": "^1.0.1",
     "ts-node": "^10.0.0",
+    "tsyringe": "^4.5.0",
     "typescript": "^4.3.2"
   },
   "devDependencies": {

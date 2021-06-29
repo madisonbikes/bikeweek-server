@@ -3,58 +3,42 @@ import superagent from "superagent";
 import { EntryResponse, FormResponse } from "./schema";
 
 import { BikeWeekEvent } from "../event_types";
+import { injectable } from "tsyringe";
+import { Configuration } from "../config";
 
+@injectable()
+export class Importer {
+  constructor(private config: Configuration) {
+  }
 
-export async function importer(): Promise<BikeWeekEvent[]> {
-  const [form, entries] = await Promise.all([FormData.create(), EntryData.create()])
+  async import(): Promise<BikeWeekEvent[]> {
+    const [form, entries] = await Promise.all([
+      this.loadForms(),
+      this.loadEntries()
+    ]);
 
-  return Promise.reject();
-}
+    return Promise.reject("not implemented");
+  }
 
-function uri() {
-  return `${process.env.GF_SOURCE_URI}/wp-json/gf/v2`;
-}
-
-function formId() {
-  return process.env.GF_FORM_ID;
-}
-
-class EntryData {
-  public static create = async() => {
-    const entries = new EntryData()
+  async loadEntries(): Promise<EntryResponse> {
     const response = await superagent
-      .get(`${uri()}/entries`)
-      .query({ form_ids: formId() })
+      .get(`${this.config.gravityFormsUri}/entries`)
+      .query({ form_ids: this.config.gravityFormsId })
       .auth(
         `${process.env.GF_CONSUMER_API_KEY}`,
         `${process.env.GF_CONSUMER_SECRET}`
       );
-    entries.data = JSON.parse(response.text)
-    return entries
+    return JSON.parse(response.text);
   }
 
-  private data!: EntryResponse
-  private constructor() {
-    // do nothing
-  }
-}
-
-class FormData {
-  public static create = async() => {
-    const form = new FormData()
+  async loadForms(): Promise<FormResponse> {
     const response = await superagent
-      .get(`${uri()}/forms/${formId()}`)
+      .get(`${this.config.gravityFormsUri}/forms/${this.config.gravityFormsId}`)
       .auth(
         `${process.env.GF_CONSUMER_API_KEY}`,
         `${process.env.GF_CONSUMER_SECRET}`
       );
-    form.data = JSON.parse(response.text)
-    return form
-  }
-
-  private data!: FormResponse
-  private constructor() {
-    // do nothing
+    return JSON.parse(response.text);
   }
 }
 

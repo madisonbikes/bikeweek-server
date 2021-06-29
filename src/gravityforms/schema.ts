@@ -1,3 +1,4 @@
+/** schema for gravity forms responses */
 
 export interface Entry {
   id: number
