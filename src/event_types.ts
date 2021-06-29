@@ -1,6 +1,6 @@
 import { parse } from "date-fns";
 
-export const EVENT_START = "2021-09-10";
+export const EVENT_START = "2021-09-11";
 export const EVENT_START_DATE = parse(EVENT_START, "yyyy-MM-dd", new Date());
 
 export type EventLocation = {

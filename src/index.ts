@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { importer } from "./importer";
+import { importer } from "./gravityforms/importer";
 import {
   addSession,
   deleteSession,
@@ -27,6 +27,7 @@ async function startup(): Promise<void> {
 
   const importedEvents = await importer();
 
+  /*
   const sessionListResponse = await listSessions();
   if (sessionListResponse.isError()) {
     console.error(sessionListResponse.value);
@@ -97,6 +98,7 @@ async function startup(): Promise<void> {
     const result = await deleteSession({ session_key: key });
     console.log(result);
   }
+   */
 }
 
 function generateKey(
@@ -110,7 +112,7 @@ function generateKey(
     .update(day.localDate.getDate().toString())
     .update(time.start)
     .digest("base64")
-    .replaceAll("=", "");
+    .replace(/=/g, "");
 }
 
 function buildDescription(event: BikeWeekEvent): string {
@@ -124,7 +126,7 @@ function buildDescription(event: BikeWeekEvent): string {
 
   description = new converter.Converter()
     .makeHtml(description)
-    .replaceAll("\\", "");
+    .replace(/\\/g, "");
   return description;
 }
 

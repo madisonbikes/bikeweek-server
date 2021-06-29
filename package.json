@@ -19,7 +19,6 @@
   "homepage": "https://github.com/madisonbikes/bikeweek2021-importer#readme",
   "dependencies": {
     "build-url": "^6.0.1",
-    "csv-parser": "^3.0.0",
     "date-fns": "^2.21.3",
     "dotenv": "^10.0.0",
     "showdown": "^1.9.1",
@@ -31,6 +30,7 @@
   "devDependencies": {
     "@tsconfig/node16": "^1.0.1",
     "@types/node": "^15.6.1",
+    "@types/oauth": "^0.9.1",
     "@types/showdown": "^1.9.3",
     "@types/superagent": "^4.1.11",
     "@typescript-eslint/eslint-plugin": "^4.14.2",

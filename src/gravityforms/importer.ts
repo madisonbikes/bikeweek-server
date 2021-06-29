@@ -1,55 +1,64 @@
 import superagent from "superagent";
-import csv from "csv-parser";
-import tempy from "tempy";
-import fs from "fs";
-import { BikeWeekEvent, EVENT_START_DATE, EventDay, EventLocation, EventTime } from "./event_types";
-import add from "date-fns/add"
 
-type ImportedEvent = {
-  name: string,
-  event_url?: string,
-  description: string,
-  sponsor: string,
-  sponsor_urls: string,
-  maps_description: string,
-  maps_query?: string,
-  maps_placeid?: string,
-  location_free?: string,
-  type: string,
-  days: string
-  time: string,
-  outside_of_madison?: string
-}
+import { EntryResponse, FormResponse } from "./schema";
+
+import { BikeWeekEvent } from "../event_types";
+
 
 export async function importer(): Promise<BikeWeekEvent[]> {
-  // this is the 2019 list
-  const data = await superagent.get(`${process.env.SOURCE_URI}/export?format=csv&gid=0`);
-  const tempFile = tempy.file({ name: "events.csv" });
-  await fs.promises.writeFile(tempFile, data.text);
-  const results = await extractData(tempFile);
-  await fs.promises.rm(tempFile);
-  return results
+  const [form, entries] = await Promise.all([FormData.create(), EntryData.create()])
+
+  return Promise.reject();
 }
 
-async function extractData(filename: string): Promise<BikeWeekEvent[]> {
-  return new Promise((resolve, reject) => {
-    const results: BikeWeekEvent[] = [];
-
-    fs.createReadStream(filename)
-      .pipe(csv())
-      .on("data", (data) => {
-        const newData = processData(data)
-        results.push(newData);
-      })
-      .on("end", () => {
-        resolve(results);
-      })
-      .on("error", (e) => {
-        reject(e)
-      })
-  });
+function uri() {
+  return `${process.env.GF_SOURCE_URI}/wp-json/gf/v2`;
 }
 
+function formId() {
+  return process.env.GF_FORM_ID;
+}
+
+class EntryData {
+  public static create = async() => {
+    const entries = new EntryData()
+    const response = await superagent
+      .get(`${uri()}/entries`)
+      .query({ form_ids: formId() })
+      .auth(
+        `${process.env.GF_CONSUMER_API_KEY}`,
+        `${process.env.GF_CONSUMER_SECRET}`
+      );
+    entries.data = JSON.parse(response.text)
+    return entries
+  }
+
+  private data!: EntryResponse
+  private constructor() {
+    // do nothing
+  }
+}
+
+class FormData {
+  public static create = async() => {
+    const form = new FormData()
+    const response = await superagent
+      .get(`${uri()}/forms/${formId()}`)
+      .auth(
+        `${process.env.GF_CONSUMER_API_KEY}`,
+        `${process.env.GF_CONSUMER_SECRET}`
+      );
+    form.data = JSON.parse(response.text)
+    return form
+  }
+
+  private data!: FormResponse
+  private constructor() {
+    // do nothing
+  }
+}
+
+/*
 function processData(data: ImportedEvent): BikeWeekEvent {
   const sponsor = data.sponsor
     .split(",")
@@ -106,3 +115,4 @@ function processData(data: ImportedEvent): BikeWeekEvent {
     eventTimes: times
   }
 }
+*/
