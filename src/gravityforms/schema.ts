@@ -1,6 +1,6 @@
 /** schema for gravity forms responses */
 
-export interface Entry {
+export interface BaseEntry {
   id: number
   form_id: number
   post_id?: number
@@ -9,11 +9,11 @@ export interface Entry {
   status: string
 }
 
-type FullEntry = Entry | unknown
+export type Entry = BaseEntry | any
 
 export interface EntryResponse {
   total_count: number
-  entries: FullEntry[]
+  entries: Entry[]
 }
 export interface Choice {
   text: string
