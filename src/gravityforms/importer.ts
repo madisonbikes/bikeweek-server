@@ -2,7 +2,12 @@ import superagent from "superagent";
 
 import { Entry, EntryResponse, FormResponse } from "./schema";
 
-import { BikeWeekEvent, EventDay, EventLocation, EventTime } from "../event_types";
+import {
+  BikeWeekEvent,
+  EventDay,
+  EventLocation,
+  EventTime
+} from "../event_types";
 import { injectable } from "tsyringe";
 import { Configuration } from "../config";
 
@@ -16,20 +21,31 @@ export class Importer {
       this.loadForms(),
       this.loadEntries()
     ]);
-    const eventHelper = new EventHelper(form, entryResponse)
+    const eventHelper = new EventHelper(form, entryResponse);
 
-    const retval = Array<BikeWeekEvent>()
-    for (const entry of entryResponse.entries ) {
-      const sponsor = eventHelper.requireFieldValue(entry, "sponsor")
-        .split(",")
-        .map(v => v.trim())
+    const retval = Array<BikeWeekEvent>();
+    for (const entry of entryResponse.entries) {
+      const baseSponsorText = eventHelper.requireFieldValue(entry, "sponsors");
+      let separator = ",";
+      if (baseSponsorText.includes(";")) {
+        separator = ";";
+      }
+      const sponsor = baseSponsorText.split(separator).map((v) => v.trim());
+      const sponsor_urls = new Array<string>(sponsor.length);
+      for(const ndx in sponsor) {
+        console.log(ndx)
+      }
+      const location: EventLocation = {};
+      const eventTypes = eventHelper.lookupMultiFieldValue(entry, "event_type");
+      const types = new Set<string>(eventTypes);
 
-      const sponsor_urls: string[] = []
-      const location: EventLocation = {}
-      const types = new Set<string>();
-      const days: EventDay[] = []
-      const times: EventTime[] = []
+      const eventDays = eventHelper.lookupMultiFieldValue(entry, "event_days");
+      const days: EventDay[] = [];
+      const eventStart = eventHelper.lookupFieldValue(entry, "event_start");
+      const eventEnd = eventHelper.lookupFieldValue(entry, "event_end");
+      const times: EventTime[] = [{ start: eventStart, end: eventEnd }];
       retval.push({
+        id: entry.id,
         name: eventHelper.requireFieldValue(entry, "event_name"),
         event_url: eventHelper.lookupFieldValue(entry, "event_url"),
         description: eventHelper.requireFieldValue(entry, "event_description"),
@@ -39,11 +55,10 @@ export class Importer {
         eventTypes: types,
         eventDays: days,
         eventTimes: times
-      })
+      });
     }
     return retval;
   }
-
 
   async loadEntries(): Promise<EntryResponse> {
     const { body } = await superagent
@@ -57,7 +72,7 @@ export class Importer {
   }
 
   async loadForms(): Promise<FormResponse> {
-    const {body} = await superagent
+    const { body } = await superagent
       .get(`${this.config.gravityFormsUri}/forms/${this.config.gravityFormsId}`)
       .auth(
         `${process.env.GF_CONSUMER_API_KEY}`,
@@ -68,14 +83,34 @@ export class Importer {
 }
 
 class EventHelper {
-  constructor(private form: FormResponse, private entries: EntryResponse) {}
+  constructor(private form: FormResponse, private entries: EntryResponse) {
+  }
 
   requireFieldValue(entry: Entry, adminLabel: string): string {
-    const fieldValue = this.lookupFieldValue(entry, adminLabel)
-    if(!fieldValue) {
+    const fieldValue = this.lookupFieldValue(entry, adminLabel);
+    if (!fieldValue) {
       throw new Error(`No entry for admin label ${adminLabel}`);
     }
-    return fieldValue
+    return fieldValue;
+  }
+
+  lookupMultiFieldValue(entry: Entry, adminLabel: string): string[] | undefined {
+    const fieldId = this.lookupFieldId(adminLabel);
+    if (!fieldId) return undefined;
+
+    const inputs = this.form.fields.find((value) => value.id == fieldId)
+      ?.inputs
+      ?.map((input) => input.id);
+    if (!inputs) return undefined;
+
+    const retval = new Array<string>();
+    for (const i of inputs) {
+      const value = entry[i];
+      if (value && value.length > 0) {
+        retval.push(value);
+      }
+    }
+    return retval;
   }
 
   lookupFieldValue(entry: Entry, adminLabel: string): string | undefined {

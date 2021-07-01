@@ -8,6 +8,8 @@ import { parse } from "date-fns";
 export class Configuration {
   public gravityFormsUri = `${process.env.GF_SOURCE_URI}/wp-json/gf/v2`
   public gravityFormsId = process.env.GF_FORM_ID
+  public schedUri = `${process.env.SCHED_URI}/api/`
+  public schedApiKey = process.env.SCHED_API_KEY
 }
 
 export const EVENT_START = "2021-09-11";

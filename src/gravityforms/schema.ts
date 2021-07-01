@@ -21,12 +21,19 @@ export interface Choice {
   isSelected: boolean
 }
 
+export interface Input {
+  id: string
+  label: string
+  name: string
+}
+
 export interface Field {
   type: string
   id: number
   label: string
   adminLabel: string
   choices?: Choice[]
+  inputs?: Input[]
 }
 
 export interface FormResponse {

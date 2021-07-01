@@ -11,11 +11,12 @@ export type EventDay = {
 };
 
 export type EventTime = {
-  start: string;
+  start?: string;
   end?: string;
 };
 
 export type BikeWeekEvent = {
+  id: number;
   name: string;
   event_url?: string;
   description: string;
