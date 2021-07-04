@@ -8,6 +8,7 @@ export class MainProcess {
 
   async start(): Promise<void> {
     const importedEvents = await this.importer.import();
-    //await this.exporter.start(importedEvents)
+    //console.log(JSON.stringify(importedEvents, null, 2))
+    await this.exporter.start(importedEvents)
   }
 }

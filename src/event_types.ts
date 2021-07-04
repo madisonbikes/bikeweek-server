@@ -17,13 +17,14 @@ export type EventTime = {
 
 export type BikeWeekEvent = {
   id: number;
+  approved: boolean;
   name: string;
   event_url?: string;
   description: string;
-  sponsor: string[];
+  sponsors: string[];
   sponsor_urls: string[];
   location: EventLocation;
-  eventTypes: Set<string>;
+  eventTypes: string[];
   eventDays: EventDay[];
   eventTimes: EventTime[];
 };

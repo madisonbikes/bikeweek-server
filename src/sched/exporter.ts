@@ -1,7 +1,6 @@
 import { injectable } from "tsyringe";
 import { format } from "date-fns";
 import { BikeWeekEvent } from "../event_types";
-import converter from "showdown";
 import buildUrl from "build-url";
 import { SchedApi } from "./api";
 
@@ -17,17 +16,24 @@ export class Exporter {
     }
 
     const sessionList = sessionListResponse.value;
-    const existingKeys = new Set<number>(
+    const existingKeys = new Set<string>(
       sessionList.map((item) => {
-        return Number.parseInt(item.event_key)
+        return item.event_key
       })
     );
-    const handledKeys = new Set<number>();
+    const handledKeys = new Set<string>();
 
     for (const event of events) {
       for (const day of event.eventDays) {
-        for (const time of event.eventTimes) {
-          const key = event.id;
+        for (const timeNdx in event.eventTimes) {
+          const time = event.eventTimes[timeNdx]
+          if(!time.start || !time.end) {
+            console.log(`skipping session ${event.name} that has no start/end time`)
+            continue
+          }
+
+          const dayOfYear = format(day.localDate, "DDD")
+          const key = `${event.id}.${dayOfYear}.${timeNdx}`;
           const description = this.buildDescription(event);
 
           const timeBase = format(day.localDate, "yyyy-MM-dd");
@@ -39,30 +45,31 @@ export class Exporter {
             sessionEnd = `${timeBase} ${time.start}`;
           }
           const base = {
-            session_key: key.toString(),
+            session_key: key,
             name: event.name,
             description: description,
             // format: YYYY-MM-DD HH:MM
             session_start: sessionStart,
             session_end: sessionEnd,
-            session_type: Array.from(event.eventTypes).join(","),
+            session_type: event.eventTypes.join(","),
             venue: event.location.mapsDescription,
             address: event.location.mapsDescription,
+            active: event.approved ? "Y" : "N",
+            rsvp_url: this.buildMapsUrl(event)
           };
+          let result;
+          let action;
           if (existingKeys.has(key)) {
-            const modded = await this.sched.modifySession(base);
-            if (modded.isError()) {
-              console.log(`${key} error: ${modded}`);
-            } else {
-              console.log(`${key} modified ok`);
-            }
+            result = await this.sched.modifySession(base);
+            action = "modified"
           } else {
-            const modded = await this.sched.addSession(base);
-            if (modded.isError()) {
-              console.log(`${key} error: ${modded}`);
-            } else {
-              console.log(`${key} added ok`);
-            }
+            result = await this.sched.addSession(base);
+            action = "added"
+          }
+          if (result.isError()) {
+            console.log(`${key} ${action} error: ${result}`);
+          } else {
+            console.log(`${key} ${action} ok active: ${event.approved}`);
           }
           handledKeys.add(key);
         }
@@ -87,13 +94,9 @@ export class Exporter {
 
     let description = event.description;
     if (event.event_url) {
-      description += `\n\n\n[Event Page Link](${event.event_url})`;
+      description += `\n<br><a href="${event.event_url}">Event Page Link</a>`;
     }
-    description += `\n\n\n[Map](${mapsLink})`;
-
-    description = new converter.Converter()
-      .makeHtml(description)
-      .replace(/\\/g, "");
+    description += `\n<br><a href="${mapsLink}">Map</a>`;
     return description;
   }
 

@@ -1,6 +1,7 @@
 import superagent from "superagent";
 
 import { Entry, EntryResponse, FormResponse } from "./schema";
+import { parse} from "date-fns";
 
 import {
   BikeWeekEvent,
@@ -21,40 +22,24 @@ export class Importer {
       this.loadForms(),
       this.loadEntries()
     ]);
-    const eventHelper = new EventHelper(form, entryResponse);
+    const eventHelper = new EventHelper(form, this.config);
 
     const retval = Array<BikeWeekEvent>();
     for (const entry of entryResponse.entries) {
-      const baseSponsorText = eventHelper.requireFieldValue(entry, "sponsors");
-      let separator = ",";
-      if (baseSponsorText.includes(";")) {
-        separator = ";";
-      }
-      const sponsor = baseSponsorText.split(separator).map((v) => v.trim());
-      const sponsor_urls = new Array<string>(sponsor.length);
-      for(const ndx in sponsor) {
-        console.log(ndx)
-      }
-      const location: EventLocation = {};
-      const eventTypes = eventHelper.lookupMultiFieldValue(entry, "event_type");
-      const types = new Set<string>(eventTypes);
+      const [sponsors, sponsor_urls] = eventHelper.getSponsorInfo(entry);
 
-      const eventDays = eventHelper.lookupMultiFieldValue(entry, "event_days");
-      const days: EventDay[] = [];
-      const eventStart = eventHelper.lookupFieldValue(entry, "event_start");
-      const eventEnd = eventHelper.lookupFieldValue(entry, "event_end");
-      const times: EventTime[] = [{ start: eventStart, end: eventEnd }];
       retval.push({
         id: entry.id,
+        approved: eventHelper.lookupFieldValue(entry,"approved") == "Yes",
         name: eventHelper.requireFieldValue(entry, "event_name"),
         event_url: eventHelper.lookupFieldValue(entry, "event_url"),
         description: eventHelper.requireFieldValue(entry, "event_description"),
-        sponsor: sponsor,
-        sponsor_urls: sponsor_urls,
-        location: location,
-        eventTypes: types,
-        eventDays: days,
-        eventTimes: times
+        sponsors,
+        sponsor_urls,
+        location: eventHelper.getLocationInfo(entry),
+        eventTypes: eventHelper.getEventTypes(entry),
+        eventDays: eventHelper.getEventDays(entry),
+        eventTimes: eventHelper.getEventTimes(entry)
       });
     }
     return retval;
@@ -65,8 +50,8 @@ export class Importer {
       .get(`${this.config.gravityFormsUri}/entries`)
       .query({ form_ids: this.config.gravityFormsId })
       .auth(
-        `${process.env.GF_CONSUMER_API_KEY}`,
-        `${process.env.GF_CONSUMER_SECRET}`
+        this.config.gravityFormsConsumerApiKey,
+        this.config.gravityFormsConsumerSecret
       );
     return body;
   }
@@ -75,19 +60,79 @@ export class Importer {
     const { body } = await superagent
       .get(`${this.config.gravityFormsUri}/forms/${this.config.gravityFormsId}`)
       .auth(
-        `${process.env.GF_CONSUMER_API_KEY}`,
-        `${process.env.GF_CONSUMER_SECRET}`
+        this.config.gravityFormsConsumerApiKey,
+        this.config.gravityFormsConsumerSecret
       );
     return body;
   }
 }
 
 class EventHelper {
-  constructor(private form: FormResponse, private entries: EntryResponse) {
+  constructor(private form: FormResponse, private configuration: Configuration) {
+  }
+
+  getLocationInfo(entry: Entry): EventLocation {
+    const firstChoice = this.lookupFieldValue(entry, "location_first")
+    if(firstChoice) {
+      return { mapsQuery: `${firstChoice}, Madison, WI`, mapsDescription: firstChoice }
+    }
+    return {}
+  }
+
+  getEventDays(entry: Entry): EventDay[] {
+    const eventDays = this.requireMultiFieldValue(entry, "event_days");
+    const retval = new Array<EventDay>()
+    for (const day of eventDays) {
+      const parsedDate = parse(day,"EEEE, LLLL d", this.configuration.EVENT_START_DATE)
+      if(Number.isNaN(parsedDate.getTime())) {
+        throw Error(`Invalid date encountered ${day}`)
+      }
+      retval.push({localDate: parsedDate })
+    }
+    return retval;
+  }
+
+  getEventTypes(entry: Entry): string[] {
+    return this.requireMultiFieldValue(entry, "event_type");
+  }
+
+  getEventTimes(entry: Entry): EventTime[] {
+    const eventStart = this.lookupFieldValue(entry, "event_start");
+    const eventEnd = this.lookupFieldValue(entry, "event_end");
+    return [{ start: eventStart, end: eventEnd }]
+  }
+
+  /** return parsed sponsor info from format like this "Madison Bikes (https://www.madisonbikes.org);City of Madison" */
+  getSponsorInfo(entry: Entry) {
+    const baseSponsorText = this.requireFieldValue(entry, "sponsors");
+    let separator = ",";
+    if (baseSponsorText.includes(";")) {
+      separator = ";";
+    }
+    const sponsors = baseSponsorText.split(separator).map((v) => v.trim());
+    const sponsor_urls = new Array<string>(sponsors.length);
+    for (const ndx in sponsors) {
+      const res = sponsors[ndx].match(/(.*)\((.+)\)/);
+      if (!res) {
+        sponsor_urls[ndx] = "";
+      } else {
+        sponsors[ndx] = res[1].trim();
+        sponsor_urls[ndx] = res[2].trim();
+      }
+    }
+    return [sponsors, sponsor_urls];
   }
 
   requireFieldValue(entry: Entry, adminLabel: string): string {
     const fieldValue = this.lookupFieldValue(entry, adminLabel);
+    if (!fieldValue) {
+      throw new Error(`No entry for admin label ${adminLabel}`);
+    }
+    return fieldValue;
+  }
+
+  requireMultiFieldValue(entry: Entry, adminLabel: string): string[] {
+    const fieldValue = this.lookupMultiFieldValue(entry, adminLabel);
     if (!fieldValue) {
       throw new Error(`No entry for admin label ${adminLabel}`);
     }
@@ -132,55 +177,3 @@ class EventHelper {
   }
 }
 
-/*
-function processData(data: ImportedEvent): BikeWeekEvent {
-
-
-  const event_types = data.type
-    .split(",")
-    .map(v => v.trim())
-
-  const days = data.days
-    .split(",")
-    .map(v => +v)
-    .map(dayOffset => {
-      const dayDate = add(EVENT_START_DATE, {days: (dayOffset-1)})
-      const eventDay: EventDay = { localDate: dayDate}
-      return eventDay
-    })
-
-  const times: EventTime[] = data.time
-    .split(",")
-    .map(v => v.trim())
-    .map(timeRange => {
-      const parsed = timeRange.split("-")
-      if(parsed.length <= 0 || parsed.length > 2) {
-        throw new Error(`Time format not recognized ${timeRange}`)
-      }
-      if(parsed.length == 1) {
-        return { start: parsed[0] } as EventTime
-      } else {
-        return { start: parsed[0], end: parsed[1] } as EventTime
-      }
-    })
-
-  const location: EventLocation = {
-    mapsDescription: data.maps_description,
-    mapsQuery: data.maps_query,
-    mapsPlaceId: data.maps_placeid,
-    locationFree: data.location_free
-  }
-
-  return {
-    name: data.name,
-    event_url: data.event_url,
-    description: data.description,
-    sponsor: sponsor,
-    sponsor_urls: sponsor_urls,
-    eventTypes: new Set(event_types),
-    location: location,
-    eventDays: days,
-    eventTimes: times
-  }
-}
-*/
