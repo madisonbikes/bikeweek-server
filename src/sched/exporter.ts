@@ -114,6 +114,8 @@ export class Exporter {
       params = { ...params, query: location.maps_query };
     } else if (location.maps_description && location.maps_description != "") {
       params = { ...params, query: location.maps_description };
+    } else {
+      params = { ...params, query: `${location.id} Madison, WI` }
     }
     if (location.maps_placeid && location.maps_placeid != "") {
       params = { ...params, query_place_id: location.maps_placeid };
