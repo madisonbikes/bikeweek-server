@@ -6,11 +6,11 @@ import { parse} from "date-fns";
 import {
   BikeWeekEvent,
   EventDay,
-  EventLocation,
   EventTime
 } from "../event_types";
 import { injectable } from "tsyringe";
 import { Configuration } from "../config";
+import { EventLocation, locations } from "../locations";
 
 @injectable()
 export class Importer {
@@ -72,12 +72,13 @@ class EventHelper {
   constructor(private form: FormResponse, private configuration: Configuration) {
   }
 
-  getLocationInfo(entry: Entry): EventLocation {
+  getLocationInfo(entry: Entry): EventLocation | undefined {
     const firstChoice = this.lookupFieldValue(entry, "location_first")
-    if(firstChoice) {
-      return { mapsQuery: `${firstChoice}, Madison, WI`, mapsDescription: firstChoice }
+    const mapped = locations.find(value => value.id == firstChoice)
+    if(!mapped && firstChoice != "None") {
+      console.log(`Missing location map for ${firstChoice}`)
     }
-    return {}
+    return mapped;
   }
 
   getEventDays(entry: Entry): EventDay[] {

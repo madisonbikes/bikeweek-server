@@ -1,10 +1,4 @@
-export type EventLocation = {
-  mapsDescription?: string;
-  //freeformMarkdownDescription?: string,
-  mapsQuery?: string;
-  mapsPlaceId?: string;
-  locationFree?: string;
-};
+import { EventLocation } from "./locations";
 
 export type EventDay = {
   localDate: Date;
@@ -24,7 +18,7 @@ export type BikeWeekEvent = {
   eventGraphicUrl?: string;
   sponsors: string[];
   sponsorUrls: string[];
-  location: EventLocation;
+  location?: EventLocation;
   eventTypes: string[];
   eventDays: EventDay[];
   eventTimes: EventTime[];
