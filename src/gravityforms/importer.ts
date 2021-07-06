@@ -40,7 +40,8 @@ export class Importer {
         eventTypes: eventHelper.getEventTypes(entry),
         eventDays: eventHelper.getEventDays(entry),
         eventTimes: eventHelper.getEventTimes(entry),
-        eventGraphicUrl: eventHelper.lookupFieldValue(entry, "event_graphic")
+        eventGraphicUrl: eventHelper.lookupFieldValue(entry, "event_graphic"),
+        modifyDate: entry["date_updated"]
       });
     }
     return retval;

@@ -4,6 +4,7 @@
   "description": "Imports events from CSV form data into Sched",
   "main": "src/index.ts",
   "scripts": {
+    "exec": "ts-node src/index.ts --once",
     "start": "ts-node src/index.ts",
     "lint": "eslint '**/*.ts' '**/*.js'"
   },

@@ -14,6 +14,9 @@ if (require.main === module) {
   Promise.resolve()
     .then(() => {
       const server = container.resolve(MainProcess);
+      if(process.argv.find(v => v == "--once")) {
+        server.once = true
+      }
       return server.start();
     })
     .catch((error) => {
