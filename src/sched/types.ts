@@ -7,6 +7,13 @@ export interface SessionListRequest {
   custom_data?: string;
 }
 
+export interface SessionExportRequest {
+  since?: number;
+  format?: string;
+  status?: string;
+  custom_data?: string;
+}
+
 export interface DeleteSessionRequest {
   session_key: string;
 }
@@ -31,6 +38,11 @@ export interface AddSessionRequest {
 
 export interface SessionListResponse {
   event_key: string;
+}
+
+export interface SessionExportResponse {
+  event_key: string;
+  active: string;
 }
 
 export interface ModifySessionRequest {

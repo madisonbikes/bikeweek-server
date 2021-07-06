@@ -26,20 +26,21 @@ export class Importer {
 
     const retval = Array<BikeWeekEvent>();
     for (const entry of entryResponse.entries) {
-      const [sponsors, sponsor_urls] = eventHelper.getSponsorInfo(entry);
+      const [sponsors, sponsorUrls] = eventHelper.getSponsorInfo(entry);
 
       retval.push({
         id: entry.id,
         approved: eventHelper.lookupFieldValue(entry,"approved") == "Yes",
         name: eventHelper.requireFieldValue(entry, "event_name"),
-        event_url: eventHelper.lookupFieldValue(entry, "event_url"),
+        eventUrl: eventHelper.lookupFieldValue(entry, "event_url"),
         description: eventHelper.requireFieldValue(entry, "event_description"),
         sponsors,
-        sponsor_urls,
+        sponsorUrls,
         location: eventHelper.getLocationInfo(entry),
         eventTypes: eventHelper.getEventTypes(entry),
         eventDays: eventHelper.getEventDays(entry),
-        eventTimes: eventHelper.getEventTimes(entry)
+        eventTimes: eventHelper.getEventTimes(entry),
+        eventGraphicUrl: eventHelper.lookupFieldValue(entry, "event_graphic")
       });
     }
     return retval;

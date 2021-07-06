@@ -10,12 +10,12 @@ export class Exporter {
   }
 
   async start(events: BikeWeekEvent[]): Promise<void> {
-    const sessionListResponse = await this.sched.listSessions();
-    if (sessionListResponse.isError()) {
-      throw new Error(sessionListResponse.value);
+    const sessionsResponse = await this.sched.exportSessions();
+    if (sessionsResponse.isError()) {
+      throw new Error(sessionsResponse.value);
     }
 
-    const sessionList = sessionListResponse.value;
+    const sessionList = sessionsResponse.value;
     const existingKeys = new Set<string>(
       sessionList.map((item) => {
         return item.event_key
@@ -55,7 +55,8 @@ export class Exporter {
             venue: event.location.mapsDescription,
             address: event.location.mapsDescription,
             active: event.approved ? "Y" : "N",
-            rsvp_url: this.buildMapsUrl(event)
+            rsvp_url: this.buildMapsUrl(event),
+            media_url: event.eventGraphicUrl
           };
           let result;
           let action;
@@ -90,13 +91,10 @@ export class Exporter {
   }
 
   buildDescription(event: BikeWeekEvent): string {
-    const mapsLink = this.buildMapsUrl(event);
-
     let description = event.description;
-    if (event.event_url) {
-      description += `\n<br><a href="${event.event_url}">Event Page Link</a>`;
+    if (event.eventUrl) {
+      description += `\n<br><a href="${event.eventUrl}">Event Page Link</a>`;
     }
-    description += `\n<br><a href="${mapsLink}">Map</a>`;
     return description;
   }
 

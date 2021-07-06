@@ -19,10 +19,11 @@ export type BikeWeekEvent = {
   id: number;
   approved: boolean;
   name: string;
-  event_url?: string;
+  eventUrl?: string;
   description: string;
+  eventGraphicUrl?: string;
   sponsors: string[];
-  sponsor_urls: string[];
+  sponsorUrls: string[];
   location: EventLocation;
   eventTypes: string[];
   eventDays: EventDay[];
