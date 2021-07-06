@@ -93,7 +93,7 @@ export class Exporter {
   buildDescription(event: BikeWeekEvent): string {
     let description = event.description;
     if (event.eventUrl) {
-      description += `\n<br><a href="${event.eventUrl}">Event Page Link</a>`;
+      description += `\n<br><a href="${event.eventUrl}">Learn more about this event here!</a>`;
     }
     return description;
   }
