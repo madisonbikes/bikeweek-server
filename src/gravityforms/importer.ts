@@ -1,12 +1,13 @@
 import superagent from "superagent";
 
 import { Entry, EntryResponse, FormResponse } from "./schema";
-import { parse} from "date-fns";
+import { parse } from "date-fns";
 
 import {
   BikeWeekEvent,
   EventDay,
-  EventTime
+  EventStatus,
+  EventTime,
 } from "../event_types";
 import { injectable } from "tsyringe";
 import { Configuration } from "../config";
@@ -14,13 +15,12 @@ import { EventLocation, locations } from "../locations";
 
 @injectable()
 export class Importer {
-  constructor(private config: Configuration) {
-  }
+  constructor(private config: Configuration) {}
 
   async import(): Promise<BikeWeekEvent[]> {
     const [form, entryResponse] = await Promise.all([
       this.loadForms(),
-      this.loadEntries()
+      this.loadEntries(),
     ]);
     const eventHelper = new EventHelper(form, this.config);
 
@@ -28,9 +28,23 @@ export class Importer {
     for (const entry of entryResponse.entries) {
       const [sponsors, sponsorUrls] = eventHelper.getSponsorInfo(entry);
 
+      // this is dumb but TS doesn't seem to have a great way to do this
+      let status: EventStatus;
+      switch (eventHelper.lookupFieldValue(entry, "status")) {
+        case "approved":
+          status = "approved";
+          break;
+        case "cancelled":
+          status = "cancelled";
+          break;
+        default:
+        case "submitted":
+          status = "submitted";
+          break;
+      }
+
       retval.push({
         id: entry.id,
-        approved: eventHelper.lookupFieldValue(entry,"approved") == "Yes",
         name: eventHelper.requireFieldValue(entry, "event_name"),
         eventUrl: eventHelper.lookupFieldValue(entry, "event_url"),
         description: eventHelper.requireFieldValue(entry, "event_description"),
@@ -41,7 +55,8 @@ export class Importer {
         eventDays: eventHelper.getEventDays(entry),
         eventTimes: eventHelper.getEventTimes(entry),
         eventGraphicUrl: eventHelper.lookupFieldValue(entry, "event_graphic"),
-        modifyDate: entry["date_updated"]
+        modifyDate: entry.date_updated,
+        status: status,
       });
     }
     return retval;
@@ -70,27 +85,33 @@ export class Importer {
 }
 
 class EventHelper {
-  constructor(private form: FormResponse, private configuration: Configuration) {
-  }
+  constructor(
+    private form: FormResponse,
+    private configuration: Configuration
+  ) {}
 
   getLocationInfo(entry: Entry): EventLocation | undefined {
-    const firstChoice = this.lookupFieldValue(entry, "location_first")
-    const mapped = locations.find(value => value.id == firstChoice)
-    if(!mapped && firstChoice != "None") {
-      console.log(`Missing location map for ${firstChoice}`)
+    const firstChoice = this.lookupFieldValue(entry, "location_first");
+    const mapped = locations.find((value) => value.id == firstChoice);
+    if (!mapped && firstChoice != "None") {
+      console.log(`Missing location map for ${firstChoice}`);
     }
     return mapped;
   }
 
   getEventDays(entry: Entry): EventDay[] {
     const eventDays = this.requireMultiFieldValue(entry, "event_days");
-    const retval = new Array<EventDay>()
+    const retval = new Array<EventDay>();
     for (const day of eventDays) {
-      const parsedDate = parse(day,"EEEE, LLLL d", this.configuration.EVENT_START_DATE)
-      if(Number.isNaN(parsedDate.getTime())) {
-        throw Error(`Invalid date encountered ${day}`)
+      const parsedDate = parse(
+        day,
+        "EEEE, LLLL d",
+        this.configuration.EVENT_START_DATE
+      );
+      if (Number.isNaN(parsedDate.getTime())) {
+        throw Error(`Invalid date encountered ${day}`);
       }
-      retval.push({localDate: parsedDate })
+      retval.push({ localDate: parsedDate });
     }
     return retval;
   }
@@ -102,7 +123,7 @@ class EventHelper {
   getEventTimes(entry: Entry): EventTime[] {
     const eventStart = this.lookupFieldValue(entry, "event_start");
     const eventEnd = this.lookupFieldValue(entry, "event_end");
-    return [{ start: eventStart, end: eventEnd }]
+    return [{ start: eventStart, end: eventEnd }];
   }
 
   /** return parsed sponsor info from format like this "Madison Bikes (https://www.madisonbikes.org);City of Madison" */
@@ -142,13 +163,16 @@ class EventHelper {
     return fieldValue;
   }
 
-  lookupMultiFieldValue(entry: Entry, adminLabel: string): string[] | undefined {
+  lookupMultiFieldValue(
+    entry: Entry,
+    adminLabel: string
+  ): string[] | undefined {
     const fieldId = this.lookupFieldId(adminLabel);
     if (!fieldId) return undefined;
 
-    const inputs = this.form.fields.find((value) => value.id == fieldId)
-      ?.inputs
-      ?.map((input) => input.id);
+    const inputs = this.form.fields
+      .find((value) => value.id == fieldId)
+      ?.inputs?.map((input) => input.id);
     if (!inputs) return undefined;
 
     const retval = new Array<string>();
@@ -164,7 +188,7 @@ class EventHelper {
   lookupFieldValue(entry: Entry, adminLabel: string): string | undefined {
     const fieldId = this.lookupFieldId(adminLabel);
     if (!fieldId) return undefined;
-    return (entry)[`${fieldId}`];
+    return entry[`${fieldId}`];
   }
 
   requireFieldId(adminLabel: string): number {

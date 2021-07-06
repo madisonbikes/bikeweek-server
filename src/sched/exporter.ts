@@ -1,6 +1,6 @@
 import { injectable } from "tsyringe";
 import { format } from "date-fns";
-import { BikeWeekEvent } from "../event_types";
+import { BikeWeekEvent, EventStatus } from "../event_types";
 import buildUrl from "build-url";
 import { SchedApi } from "./api";
 
@@ -47,7 +47,7 @@ export class Exporter {
           }
           const base = {
             session_key: key,
-            name: event.name,
+            name: (event.status == "cancelled") ? event.name : `CANCELLED - ${event.name}`,
             description: description,
             // format: YYYY-MM-DD HH:MM
             session_start: sessionStart,
@@ -55,7 +55,7 @@ export class Exporter {
             session_type: event.eventTypes.join(","),
             venue: event.location?.sched_venue ?? event.location?.id ?? "",
             address: event.location?.sched_address ?? "",
-            active: event.approved ? "Y" : "N",
+            active: (event.status == "approved") ? "Y" : "N",
             rsvp_url: this.buildMapsUrl(event) ?? "",
             media_url: event.eventGraphicUrl,
           };
@@ -71,7 +71,7 @@ export class Exporter {
           if (result.isError()) {
             console.log(`${key} ${action} error: ${result}`);
           } else {
-            console.log(`${key} ${action} ok active: ${event.approved}`);
+            console.log(`${key} ${action} ok status: ${event.status}`);
           }
           handledKeys.add(key);
         }
@@ -115,7 +115,7 @@ export class Exporter {
     } else if (location.maps_description && location.maps_description != "") {
       params = { ...params, query: location.maps_description };
     } else {
-      params = { ...params, query: `${location.id} Madison, WI` }
+      params = { ...params, query: `${location.id} Madison, WI` };
     }
     if (location.maps_placeid && location.maps_placeid != "") {
       params = { ...params, query_place_id: location.maps_placeid };

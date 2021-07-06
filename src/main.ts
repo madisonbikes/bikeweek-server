@@ -19,10 +19,14 @@ export class MainProcess {
       await this.doImport()
     } else {
       while(this.running) {
-        await this.doImport()
-        console.log("waiting 5 minutes")
-        //await sleep(5 * 60 * 1000)
-        await sleep(30 * 1000)
+        try {
+          await this.doImport()
+          console.log("waiting 5 minutes")
+          //await sleep(5 * 60 * 1000)
+          await sleep(30 * 1000)
+        } catch(e) {
+          console.log(`Error: ${e}`)
+        }
       }
     }
   }

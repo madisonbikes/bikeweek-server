@@ -9,9 +9,10 @@ export type EventTime = {
   end?: string;
 };
 
+export type EventStatus = "submitted" | "approved" | "cancelled"
+
 export type BikeWeekEvent = {
   id: number;
-  approved: boolean;
   name: string;
   eventUrl?: string;
   description: string;
@@ -23,4 +24,5 @@ export type BikeWeekEvent = {
   eventDays: EventDay[];
   eventTimes: EventTime[];
   modifyDate?: string;
+  status: EventStatus;
 };

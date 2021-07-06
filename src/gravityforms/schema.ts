@@ -5,7 +5,7 @@ export interface BaseEntry {
   form_id: number
   post_id?: number
   date_created: string
-  dated_updated: string
+  date_updated: string
   status: string
 }
 
