@@ -1,6 +1,6 @@
 import { injectable } from "tsyringe";
 import { format } from "date-fns";
-import { BikeWeekEvent, EventStatus } from "../event_types";
+import { BikeWeekEvent } from "../event_types";
 import buildUrl from "build-url";
 import { SchedApi } from "./api";
 
@@ -47,7 +47,7 @@ export class Exporter {
           }
           const base = {
             session_key: key,
-            name: (event.status == "cancelled") ? event.name : `CANCELLED - ${event.name}`,
+            name: (event.status != "cancelled") ? event.name : `CANCELLED - ${event.name}`,
             description: description,
             // format: YYYY-MM-DD HH:MM
             session_start: sessionStart,
