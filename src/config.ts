@@ -6,7 +6,7 @@ import { parse } from "date-fns";
 @injectable()
 @singleton()
 export class Configuration {
-  public gravityFormsUri = `${process.env.GF_SOURCE_URI}/wp-json/gf/v2`;
+  public gravityFormsUri = `${process.env.GF_URI}/wp-json/gf/v2`;
   public gravityFormsId = `${process.env.GF_FORM_ID}`
   public gravityFormsConsumerApiKey = `${process.env.GF_CONSUMER_API_KEY}`;
   public gravityFormsConsumerSecret = `${process.env.GF_CONSUMER_SECRET}`;

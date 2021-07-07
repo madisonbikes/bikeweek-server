@@ -1,6 +1,25 @@
 # bikeweek2021-importer
+
+## Information
+
+This tool moves information from a [Gravity Forms](https://www.gravityforms.com/) form hosted on Wordpress and
+creates/updates session on an event in the [Sched](https://sched.com/) platform.
+
+## Command line
+
+`npm run exec` - runs one time
+`npm run start` - runs in daemon mode and polls the GF for changes every 5 minutes
+
 ## Environment
-Two environment variables must be set:
-* SOURCE_URI (set to Google Sheets document url meeting correct format, e.g. https://docs.google.com/spreadsheets/d/1L4jwv6lg8a95X7AgYNUCIS0uf99XqZlD0WkgP_w9ZMI)
-* SCHED_API_KEY (set to your SCHED API key)
-* SCHED_ENDPOINT (set to your base SCHED endpoint, e.g. https://madisonbikeweek2021.sched.com)
+
+Several environment variables must be set, or even better a `.env` file should be created:
+
+* `GF_URI` - set to your base URL for the server where your Gravity Forms is hosted, must be HTTPS (
+  e.g. https://www.madisonbikes.org/)
+* `GF_FORM_ID` - set to the form ID of the form
+* `GF_CONSUMER_API_KEY` - see [Gravity Forms documentation](https://docs.gravityforms.com/rest-api-v2-authentication/),
+  this key is used with basic authentication against the server
+* `GF_CONSUMER_SECRET` - see [Gravity Forms documentation](https://docs.gravityforms.com/rest-api-v2-authentication/),
+  this secret is used with basic authentication against the server
+* `SCHED_API_KEY` (set to your Sched API key)
+* `SCHED_URI` (set to your base Sched endpoint, e.g. https://madisonbikeweek2021.sched.com)
