@@ -5,9 +5,13 @@
 This tool moves information from a [Gravity Forms](https://www.gravityforms.com/) form hosted on Wordpress and
 creates/updates session on an event in the [Sched](https://sched.com/) platform.
 
+The Sched components will automatically throttle API calls to meet [limits defined in their API documentation](https://sched.com/api) (30 calls/minute).
+
+Uses Node 16, Typescript, superagent for HTTP/REST, tsyringe for dependency injection, 
 ## Command line
 
 `npm run exec` - runs one time
+
 `npm run start` - runs in daemon mode and polls the GF for changes every 5 minutes
 
 ## Environment
