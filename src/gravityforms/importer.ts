@@ -8,6 +8,7 @@ import {
   EventDay,
   EventStatus,
   EventTime,
+  reverseMapEventStatus,
 } from "../event_types";
 import { injectable } from "tsyringe";
 import { Configuration } from "../config";
@@ -27,22 +28,9 @@ export class Importer {
     const retval = Array<BikeWeekEvent>();
     for (const entry of entryResponse.entries) {
       const [sponsors, sponsorUrls] = eventHelper.getSponsorInfo(entry);
-
-      // this is dumb but TS doesn't seem to have a great way to do this
-      let status: EventStatus;
-      switch (eventHelper.lookupFieldValue(entry, "status")) {
-        case "approved":
-          status = "approved";
-          break;
-        case "cancelled":
-          status = "cancelled";
-          break;
-        default:
-        case "submitted":
-          status = "submitted";
-          break;
-      }
-
+      const stringStatus = eventHelper.lookupFieldValue(entry, "status");
+      const status =
+        reverseMapEventStatus(stringStatus) ?? EventStatus.SUBMITTED;
       retval.push({
         id: entry.id,
         name: eventHelper.requireFieldValue(entry, "event_name"),
@@ -62,7 +50,7 @@ export class Importer {
     return retval;
   }
 
-  async loadEntries(): Promise<EntryResponse> {
+  private async loadEntries(): Promise<EntryResponse> {
     const { body } = await superagent
       .get(`${this.config.gravityFormsUri}/entries`)
       .query({ form_ids: this.config.gravityFormsId })
@@ -73,7 +61,7 @@ export class Importer {
     return body;
   }
 
-  async loadForms(): Promise<FormResponse> {
+  private async loadForms(): Promise<FormResponse> {
     const { body } = await superagent
       .get(`${this.config.gravityFormsUri}/forms/${this.config.gravityFormsId}`)
       .auth(
@@ -175,13 +163,17 @@ class EventHelper {
       ?.inputs?.map((input) => input.id);
     if (!inputs) return undefined;
 
-    const retval = new Array<string>();
+    const retval: string[] = [];
     for (const i of inputs) {
       const value = entry[i];
-      if(typeof value === "string") {
+      if (typeof value === "string") {
         if (value && value.length > 0) {
           retval.push(value);
         }
+      } else {
+        console.log(
+          `Unexpected non-string value in field ${adminLabel}: ${value}`
+        );
       }
     }
     return retval;
@@ -191,11 +183,13 @@ class EventHelper {
     const fieldId = this.lookupFieldId(adminLabel);
     if (!fieldId) return undefined;
     const value = entry[`${fieldId}`];
-    if(typeof value !== "string") {
-      console.log(`Unexpected non-string value in field ${adminLabel}: ${value}`)
-      return undefined
+    if (typeof value !== "string") {
+      console.log(
+        `Unexpected non-string value in field ${adminLabel}: ${value}`
+      );
+      return undefined;
     }
-    return value
+    return value;
   }
 
   requireFieldId(adminLabel: string): number {

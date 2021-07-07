@@ -9,7 +9,25 @@ export type EventTime = {
   end?: string;
 };
 
-export type EventStatus = "submitted" | "approved" | "cancelled"
+export enum EventStatus {
+  SUBMITTED,
+  APPROVED,
+  CANCELLED,
+}
+
+/** is this really as good as typescript can do? blech! */
+export function reverseMapEventStatus(value: string | undefined): EventStatus | undefined {
+  switch (value?.toLowerCase()) {
+    case "approved":
+      return EventStatus.APPROVED;
+    case "cancelled":
+      return EventStatus.CANCELLED;
+    case "submitted":
+      return EventStatus.SUBMITTED
+    default:
+      return undefined;
+  }
+}
 
 export type BikeWeekEvent = {
   id: number;

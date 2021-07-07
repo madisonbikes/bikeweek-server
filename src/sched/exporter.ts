@@ -1,6 +1,6 @@
 import { injectable } from "tsyringe";
 import { format } from "date-fns";
-import { BikeWeekEvent } from "../event_types";
+import { BikeWeekEvent, EventStatus } from "../event_types";
 import buildUrl from "build-url";
 import { SchedApi } from "./api";
 
@@ -47,7 +47,7 @@ export class Exporter {
           }
           const base = {
             session_key: key,
-            name: (event.status != "cancelled") ? event.name : `CANCELLED - ${event.name}`,
+            name: (event.status !== EventStatus.CANCELLED) ? event.name : `CANCELLED - ${event.name}`,
             description: description,
             // format: YYYY-MM-DD HH:MM
             session_start: sessionStart,
@@ -55,7 +55,7 @@ export class Exporter {
             session_type: event.eventTypes.join(","),
             venue: event.location?.sched_venue ?? event.location?.id ?? "",
             address: event.location?.sched_address ?? "",
-            active: (event.status == "approved") ? "Y" : "N",
+            active: (event.status === EventStatus.APPROVED) ? "Y" : "N",
             rsvp_url: this.buildMapsUrl(event) ?? "",
             media_url: event.eventGraphicUrl,
           };
