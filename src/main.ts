@@ -10,8 +10,10 @@ export class MainProcess {
   constructor(private importer: Importer, private exporter: Exporter) {
   }
 
+  /** flag to set to execute only once (testing) */
   once = false
 
+  /** unused flag to stop the process */
   private running = true
 
   async start(): Promise<void> {
@@ -22,8 +24,7 @@ export class MainProcess {
         try {
           await this.doImport()
           console.log("waiting 5 minutes")
-          //await sleep(5 * 60 * 1000)
-          await sleep(30 * 1000)
+          await sleep(5 * 60 * 1000)
         } catch(e) {
           console.log(`Error: ${e}`)
         }
@@ -31,6 +32,7 @@ export class MainProcess {
     }
   }
 
+  /** perform the import if form data has been updated or if it's the first execution */
   private async doImport(): Promise<void> {
     console.log("running import/export")
     const importedEvents = await this.importer.import();
@@ -44,6 +46,7 @@ export class MainProcess {
   private lastCount = -1
   private lastHash = ""
 
+  /** check if form data is updated by looking at event count + last modified hash */
   private isUpdated(events: BikeWeekEvent[]) {
     const hash = createHash("sha1")
     for(const e of events) {

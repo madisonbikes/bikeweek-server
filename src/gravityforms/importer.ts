@@ -178,8 +178,10 @@ class EventHelper {
     const retval = new Array<string>();
     for (const i of inputs) {
       const value = entry[i];
-      if (value && value.length > 0) {
-        retval.push(value);
+      if(typeof value === "string") {
+        if (value && value.length > 0) {
+          retval.push(value);
+        }
       }
     }
     return retval;
@@ -188,7 +190,12 @@ class EventHelper {
   lookupFieldValue(entry: Entry, adminLabel: string): string | undefined {
     const fieldId = this.lookupFieldId(adminLabel);
     if (!fieldId) return undefined;
-    return entry[`${fieldId}`];
+    const value = entry[`${fieldId}`];
+    if(typeof value !== "string") {
+      console.log(`Unexpected non-string value in field ${adminLabel}: ${value}`)
+      return undefined
+    }
+    return value
   }
 
   requireFieldId(adminLabel: string): number {

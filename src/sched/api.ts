@@ -77,7 +77,7 @@ export class SchedApi {
 
   private async postRequest(
     endpoint: string,
-    requestData: any
+    requestData: Record<string, unknown>
   ) {
     await this.checkThrottle();
 

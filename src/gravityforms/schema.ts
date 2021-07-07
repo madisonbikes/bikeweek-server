@@ -1,6 +1,7 @@
 /** schema for gravity forms responses */
 
 export interface BaseEntry {
+  [key: string]: unknown
   id: number
   form_id: number
   post_id?: number
@@ -9,7 +10,7 @@ export interface BaseEntry {
   status: string
 }
 
-export type Entry = BaseEntry | any
+export type Entry = BaseEntry
 
 export interface EntryResponse {
   total_count: number
