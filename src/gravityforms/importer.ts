@@ -1,6 +1,6 @@
 import superagent from "superagent";
 
-import { Entry, EntryResponse, FormResponse } from "./schema";
+import { Entry, EntryResponse, FormResponse } from "./types";
 import { parse } from "date-fns";
 
 import {
