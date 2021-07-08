@@ -93,8 +93,17 @@ export class SchedApi {
       .send(newRequestData);
   }
 
-  callCount = 0;
+  private callCount = 0;
+  private lastThrottleTime = 0;
+
   private async checkThrottle() {
+    const savelastThrottleTime = this.lastThrottleTime;
+    this.lastThrottleTime = Date.now()
+    if(savelastThrottleTime < (Date.now() - 30000)) {
+      // don't throttle if more than 30 seconds have elapsed
+      this.callCount = 0;
+      return;
+    }
     this.callCount++;
     if (this.callCount % 15 == 0) {
       console.log("throttling api call, waiting 30 seconds");
