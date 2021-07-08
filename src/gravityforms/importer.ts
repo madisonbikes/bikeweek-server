@@ -81,7 +81,7 @@ class EventHelper {
   getLocationInfo(entry: Entry): EventLocation | undefined {
     const firstChoice = this.lookupFieldValue(entry, "location_first");
     const mapped = locations.find((value) => value.id == firstChoice);
-    if (!mapped && firstChoice != "None") {
+    if (!mapped && firstChoice != "N/A" && firstChoice != "None") {
       console.log(`Missing location map for ${firstChoice}`);
     }
     return mapped;
