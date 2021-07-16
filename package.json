@@ -6,7 +6,7 @@
   "scripts": {
     "exec": "ts-node src/index.ts --once",
     "start": "ts-node src/index.ts",
-    "serve": "tsc --project tsconfig-pm2.json && pm2 start dist/index.js",
+    "server": "tsc --project tsconfig-pm2.json && pm2 start dist/index.js",
     "lint": "eslint '**/*.ts' '**/*.js'"
   },
   "repository": {
