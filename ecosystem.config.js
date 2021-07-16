@@ -12,9 +12,9 @@ module.exports = {
       ref: "origin/main",
       repo: "https://github.com/madisonbikes/bikeweek2021-importer",
       path: "/home/madisonbikes/apps/bikeweek2021_importer",
-      "pre-deploy-local": "git pull",
+      "pre-deploy-local": "",
       "post-deploy":
-        "npm install && npm run pm2-start",
+        "git pull && npm install && npm run pm2-start",
       "pre-setup": "",
     },
   },
