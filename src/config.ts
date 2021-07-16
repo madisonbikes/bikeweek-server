@@ -21,5 +21,5 @@ export class Configuration {
 // from dotenv samples:
 // https://github.com/motdotla/dotenv/blob/master/examples/typescript/src/lib/env.ts
 const file = resolve(__dirname, "../.env");
-console.log(`Loading configuration from $file`)
+console.log(`Loading configuration from ${file}`)
 config({ path: file });
