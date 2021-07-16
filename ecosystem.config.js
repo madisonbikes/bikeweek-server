@@ -14,7 +14,7 @@ module.exports = {
       path: "/home/madisonbikes/apps/bikeweek2021_importer",
       "pre-deploy-local": "",
       "post-deploy":
-        "git pull && npm install && npm run pm2-start",
+        "npm install && npm run pm2-start",
       "pre-setup": "",
     },
   },
