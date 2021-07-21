@@ -7,12 +7,14 @@ creates/updates session on an event in the [Sched](https://sched.com/) platform.
 
 The Sched components will automatically throttle API calls to meet [limits defined in their API documentation](https://sched.com/api) (30 calls/minute).
 
-Uses Node 16, Typescript, superagent for HTTP/REST, tsyringe for dependency injection, 
+Uses Node 14 LTS, Typescript, superagent for HTTP/REST, tsyringe for dependency injection, pm2 for daemon/process management
 ## Command line
 
 `npm run exec` - runs one time
 
 `npm run start` - runs in daemon mode and polls the GF for changes every 5 minutes
+`npm run pm2-start` - runs with pm2 process management (for deployment)
+`npm run pm2-stop` - kills pm2-started process
 
 ## Environment
 
