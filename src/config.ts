@@ -14,6 +14,9 @@ export class Configuration {
   public schedUri = `${process.env.SCHED_URI}/api/`;
   public schedApiKey = `${process.env.SCHED_API_KEY}`;
 
+  public dryRun = false
+  public executeOnce = false
+
   public EVENT_START = "2021-09-11";
   public EVENT_START_DATE = parse(this.EVENT_START, "yyyy-MM-dd", new Date());
 }

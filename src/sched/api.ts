@@ -19,22 +19,28 @@ export class SchedApi {
   async addSession(
     session: AddSessionRequest
   ): Promise<Result<unknown, string>> {
+    if(this.configuration.dryRun) {
+      return ok("dryrun")
+    }
     const response = await this.postRequest("session/add", session);
     if (response.error) {
       return error(response.text);
     } else {
-      return ok(response.body);
+      return ok(response.text);
     }
   }
 
   async modifySession(
     session: ModifySessionRequest
   ): Promise<Result<unknown, string>> {
+    if(this.configuration.dryRun) {
+      return ok("dryrun")
+    }
     const response = await this.postRequest("session/mod", session);
     if (response.error) {
       return error(response.text);
     } else {
-      return ok(response.body);
+      return ok(response.text);
     }
   }
 
@@ -67,11 +73,14 @@ export class SchedApi {
   async deleteSession(
     session: DeleteSessionRequest
   ): Promise<Result<unknown, string>> {
+    if(this.configuration.dryRun) {
+      return ok("dryrun")
+    }
     const response = await this.postRequest("session/del", session);
     if (response.error) {
       return error(response.text);
     } else {
-      return ok(response.body);
+      return ok(response.text);
     }
   }
 

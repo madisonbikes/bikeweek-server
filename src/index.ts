@@ -13,7 +13,10 @@ Promise.resolve()
   .then(() => {
     const server = container.resolve(MainProcess);
     if (process.argv.find((v) => v == "--once")) {
-      server.once = true;
+      server.configuration.executeOnce = true;
+    }
+    if(process.argv.find((v) => v == "--dryrun")) {
+      server.configuration.dryRun = true;
     }
     return server.start();
   })

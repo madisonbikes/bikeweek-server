@@ -4,20 +4,18 @@ import { Exporter } from "./sched/exporter";
 import { sleep } from "./util/await-sleep";
 import { createHash } from "crypto";
 import { BikeWeekEvent } from "./event_types";
+import { Configuration } from "./config";
 
 @injectable()
 export class MainProcess {
-  constructor(private importer: Importer, private exporter: Exporter) {
+  constructor(private importer: Importer, private exporter: Exporter, public configuration: Configuration) {
   }
-
-  /** flag to set to execute only once (testing) */
-  once = false
 
   /** unused flag to stop the process */
   private running = true
 
   async start(): Promise<void> {
-    if(this.once) {
+    if(this.configuration.executeOnce) {
       await this.doImport()
     } else {
       while(this.running) {

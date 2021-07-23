@@ -69,9 +69,9 @@ export class Exporter {
             action = "added";
           }
           if (result.isError()) {
-            console.log(`${key} ${action} error: ${result}`);
+            console.log(`${key} ${action} error: ${result.value}`);
           } else {
-            console.log(`${key} ${action} ok status: ${event.status}`);
+            console.log(`${key} ${action} ok(${result.value}) status: ${event.status}`);
           }
           handledKeys.add(key);
         }
