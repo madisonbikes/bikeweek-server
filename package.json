@@ -6,7 +6,8 @@
   "scripts": {
     "exec": "ts-node src/index.ts --once",
     "start": "ts-node src/index.ts",
-    "pm2-start": "tsc --project tsconfig-pm2.json && pm2 startOrRestart ecosystem.config.js",
+    "compile": "tsc --project tsconfig-pm2.json",
+    "pm2-start": "npm run compile && pm2 startOrRestart ecosystem.config.js",
     "pm2-stop": "pm2 stop ecosystem.config.js",
     "lint": "eslint '**/*.ts' '**/*.js'"
   },
