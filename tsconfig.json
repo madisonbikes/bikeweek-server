@@ -6,7 +6,8 @@
     "noFallthroughCasesInSwitch": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "allowJs": true
+    "allowJs": true,
+    "target": "ES2019"
   },
   "include": ["src"]
 }
