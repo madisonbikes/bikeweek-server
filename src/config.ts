@@ -2,7 +2,8 @@ import { config } from "dotenv";
 import { resolve } from "path";
 import { injectable, singleton } from "tsyringe";
 import { parse } from "date-fns";
-import yargs from 'yargs/yargs';
+import yargs from "yargs/yargs";
+import { hideBin } from "yargs/helpers";
 
 @injectable()
 @singleton()
@@ -26,11 +27,12 @@ export class Configuration {
   public EVENT_START_DATE = parse(this.EVENT_START, "yyyy-MM-dd", new Date());
 
   constructor() {
-    const argv = yargs(process.argv.slice(2))
-    if (argv.boolean("once")) {
+    const argv = yargs(hideBin(process.argv)).parseSync();
+
+    if (argv.once) {
       this.executeOnce = true;
     }
-    if (argv.boolean("dryrun")) {
+    if (argv.dryrun) {
       this.dryRun = true;
     }
   }
