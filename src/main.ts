@@ -1,26 +1,29 @@
 import { injectable } from "tsyringe";
 import { Importer } from "./gravityforms/importer";
-import { Exporter } from "./sched/exporter";
+import { SchedExporter } from "./sched/schedExporter";
 import { createHash } from "crypto";
 import { BikeWeekEvent } from "./event_types";
 import { Configuration } from "./config";
 import { setIntervalAsync } from "set-interval-async/dynamic";
+import { DiscountExporter } from "./discountExporter";
 
 @injectable()
 export class MainProcess {
   constructor(
     private importer: Importer,
-    private exporter: Exporter,
+    private schedExporter: SchedExporter,
+    private discountExporter: DiscountExporter,
     public configuration: Configuration
   ) {}
 
   async start(): Promise<void> {
-    if(!this.configuration.executeOnce) {
-      console.log(`Scheduling poll of form data for every ${this.configuration.pollInterval/1000} seconds`)
-      setIntervalAsync(
-        () => this.doImport(),
-        this.configuration.pollInterval
+    if (!this.configuration.executeOnce) {
+      console.log(
+        `Scheduling poll of form data for every ${
+          this.configuration.pollInterval / 1000
+        } seconds`
       );
+      setIntervalAsync(() => this.doImport(), this.configuration.pollInterval);
     }
     return this.doImport();
   }
@@ -30,8 +33,11 @@ export class MainProcess {
     console.log("running import/export");
     const importedEvents = await this.importer.import();
     if (this.isUpdated(importedEvents)) {
-      await this.exporter.start(importedEvents);
-      console.log("done")
+      await Promise.all([
+        await this.schedExporter.start(importedEvents),
+        await this.discountExporter.start(importedEvents),
+      ]);
+      console.log("done");
     } else {
       console.log("done, form data not updated");
     }

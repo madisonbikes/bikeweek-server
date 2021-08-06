@@ -111,7 +111,16 @@ class EventHelper {
   getEventTimes(entry: Entry): EventTime[] {
     const eventStart = this.lookupFieldValue(entry, "event_start");
     const eventEnd = this.lookupFieldValue(entry, "event_end");
-    return [{ start: eventStart, end: eventEnd }];
+    if (!eventEnd || !eventStart) {
+      if (eventEnd || eventStart) {
+        console.log(
+          "Event has a mismatched start/end time. Event will be assumed to all-day."
+        );
+      }
+      return [];
+    } else {
+      return [{ start: eventStart, end: eventEnd }];
+    }
   }
 
   /** return parsed sponsor info from format like this "Madison Bikes (https://www.madisonbikes.org);City of Madison" */

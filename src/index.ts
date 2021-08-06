@@ -2,7 +2,6 @@ import "reflect-metadata";
 
 import { container } from "tsyringe";
 import { MainProcess } from "./main";
-import http from "http";
 
 function main() {
   const server = container.resolve(MainProcess);
@@ -16,9 +15,3 @@ Promise.resolve()
     console.error(error);
     throw error;
   });
-
-const server = http.createServer((req, res) => {
-  res.writeHead(200);
-  res.end(process.argv[0]);
-});
-server.listen();

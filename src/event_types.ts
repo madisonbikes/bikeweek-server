@@ -5,8 +5,8 @@ export type EventDay = {
 };
 
 export type EventTime = {
-  start?: string;
-  end?: string;
+  start: string;
+  end: string;
 };
 
 export enum EventStatus {
@@ -16,17 +16,23 @@ export enum EventStatus {
 }
 
 /** is this really as good as typescript can do? blech! */
-export function reverseMapEventStatus(value: string | undefined): EventStatus | undefined {
+export function reverseMapEventStatus(
+  value: string | undefined
+): EventStatus | undefined {
   switch (value?.toLowerCase()) {
     case "approved":
       return EventStatus.APPROVED;
     case "cancelled":
       return EventStatus.CANCELLED;
     case "submitted":
-      return EventStatus.SUBMITTED
+      return EventStatus.SUBMITTED;
     default:
       return undefined;
   }
+}
+
+export enum EventTypes {
+  DISCOUNT = "discount",
 }
 
 export type BikeWeekEvent = {
@@ -44,3 +50,11 @@ export type BikeWeekEvent = {
   modifyDate?: string;
   status: EventStatus;
 };
+
+export function isDiscountEvent(event: BikeWeekEvent): boolean {
+  return event.eventTypes == [EventTypes.DISCOUNT];
+}
+
+export function isAllDayEvent(event: BikeWeekEvent): boolean {
+  return event.eventTimes.length === 0
+}
