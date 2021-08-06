@@ -44,7 +44,7 @@ export class SchedExporter {
             session_start: sessionStart,
             session_end: sessionEnd,
             session_type: event.eventTypes.join(","),
-            venue: event.location?.sched_venue ?? event.location?.id ?? "",
+            venue: event.location?.sched_venue ?? event.location?.name ?? "",
             address: event.location?.sched_address ?? "",
             active: (event.status === EventStatus.APPROVED) ? "Y" : "N",
             rsvp_url: (event.location) ? buildMapsUrl(event.location) : "",
