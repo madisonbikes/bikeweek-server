@@ -1,6 +1,12 @@
 import { injectable } from "tsyringe";
 import { format } from "date-fns";
-import { BikeWeekEvent, EventStatus, isAllDayEvent, isDiscountEvent } from "../event_types";
+import {
+  BikeWeekEvent,
+  EventStatus,
+  EventTypes,
+  isAllDayEvent,
+  isDiscountEvent,
+} from "../event_types";
 import { SchedApi } from "./api";
 import { buildMapsUrl } from "../locations";
 
@@ -38,16 +44,21 @@ export class SchedExporter {
           const sessionEnd = `${timeBase} ${time.end}`;
           const base = {
             session_key: key,
-            name: (event.status !== EventStatus.CANCELLED) ? event.name : `CANCELLED - ${event.name}`,
+            name:
+              event.status !== EventStatus.CANCELLED
+                ? event.name
+                : `CANCELLED - ${event.name}`,
             description: description,
             // format: YYYY-MM-DD HH:MM
             session_start: sessionStart,
             session_end: sessionEnd,
-            session_type: event.eventTypes.join(","),
+            session_type: event.eventTypes
+              .filter((value) => value != EventTypes.ENDOFWEEKPARTY)
+              .join(","),
             venue: event.location?.sched_venue ?? event.location?.name ?? "",
             address: event.location?.sched_address ?? "",
-            active: (event.status === EventStatus.APPROVED) ? "Y" : "N",
-            rsvp_url: (event.location) ? buildMapsUrl(event.location) : "",
+            active: event.status === EventStatus.APPROVED ? "Y" : "N",
+            rsvp_url: event.location ? buildMapsUrl(event.location) : "",
             media_url: event.eventGraphicUrl,
           };
           let result;
@@ -62,7 +73,9 @@ export class SchedExporter {
           if (result.isError()) {
             console.log(`${key} ${action} error: ${result.value}`);
           } else {
-            console.log(`${key} ${action} ok(${result.value}) status: ${event.status}`);
+            console.log(
+              `${key} ${action} ok(${result.value}) status: ${event.status}`
+            );
           }
           handledKeys.add(key);
         }
@@ -85,10 +98,44 @@ export class SchedExporter {
   }
 
   buildDescription(event: BikeWeekEvent): string {
-    let description = event.description;
+    let description = "";
+    const sponsor = this.buildSponsor(event);
+    if (sponsor) {
+      description += `<strong>${sponsor}</strong><br>\n`;
+    }
+
+    description += event.description;
+
     if (event.eventUrl) {
       description += `\n<br><a href="${event.eventUrl}">Learn more about this event here!</a>`;
     }
     return description;
+  }
+
+  buildSponsor(event: BikeWeekEvent): string | undefined {
+    let sponsorText = "";
+    if (event.sponsors.length > 0) {
+      sponsorText += "Sponsors: ";
+      event.sponsors.forEach((value, index) => {
+        if (index > 0) {
+          if (index == event.sponsors.length - 1) {
+            sponsorText += " and ";
+          } else {
+            sponsorText += ", ";
+          }
+        }
+        const url = event.sponsorUrls[index];
+        if (url && url.length > 0) {
+          sponsorText += `<a href="${url}">${event.sponsors[index]}</a>`;
+        } else {
+          sponsorText += event.sponsors[index];
+        }
+      });
+    }
+    if (sponsorText.length > 0) {
+      return sponsorText;
+    } else {
+      return undefined;
+    }
   }
 }

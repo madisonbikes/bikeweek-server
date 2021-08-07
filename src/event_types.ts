@@ -32,7 +32,7 @@ export function reverseMapEventStatus(
 }
 
 export enum EventTypes {
-  DISCOUNT = "discount",
+  DISCOUNT = "discount", ENDOFWEEKPARTY = "endofweekparty"
 }
 
 export type BikeWeekEvent = {
