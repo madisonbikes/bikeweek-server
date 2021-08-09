@@ -1,0 +1,9 @@
+#!/bin/bash
+REPO_PATH= #local path on your server
+GIT_BRANCH=origin/main
+cd "$REPO_PATH" || exit
+git reset --hard $GIT_BRANCH
+git pull
+npm i
+npm prune
+pm2 reload ecosystem.config.js

@@ -115,7 +115,7 @@ export class SchedExporter {
   buildSponsor(event: BikeWeekEvent): string | undefined {
     let sponsorText = "";
     if (event.sponsors.length > 0) {
-      sponsorText += "Sponsors: ";
+      sponsorText += "Hosted by ";
       event.sponsors.forEach((value, index) => {
         if (index > 0) {
           if (index == event.sponsors.length - 1) {
