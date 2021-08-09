@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# make a copy of this sample script somewhere on your server
+
 REPO_PATH= #local path on your server
 GIT_BRANCH=origin/main
 cd "$REPO_PATH" || exit
