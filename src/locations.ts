@@ -90,7 +90,8 @@ export const locations: EventLocation[] = [
   },
   {
     name: "Brittingham Park",
-    maps_query: "43.06365600662153, -89.39757271957343",
+    sched_address: "829 W. Washington Ave, Madison, WI",
+    maps_query: "43.06333805116272, -89.39780739339082",
   },
   {
     name: "Starkweather Creek Path @ Commercial Avenue",
