@@ -105,8 +105,12 @@ export class SchedExporter {
     }
 
     let modified = event.description;
-    modified = modified.replace(/\n/g, "<br>\n")
+
+    // ditch any carriage returns, how archaic
     modified = modified.replace(/\r/g, "")
+
+    // replace double breaks with a real HTML break
+    modified = modified.replace(/\n\n/g, "<br>\n")
 
     description += modified;
 
