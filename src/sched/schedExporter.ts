@@ -104,7 +104,11 @@ export class SchedExporter {
       description += `<strong>${sponsor}</strong><br>\n`;
     }
 
-    description += event.description;
+    let modified = event.description;
+    modified = modified.replace(/\n/g, "<br>\n")
+    modified = modified.replace(/\r/g, "")
+
+    description += modified;
 
     if (event.eventUrl) {
       description += `\n<br><a href="${event.eventUrl}">Learn more about this event here!</a>`;
