@@ -13,6 +13,7 @@ import {
 import { injectable } from "tsyringe";
 import { Configuration } from "../config";
 import { EventLocation, locations } from "../locations";
+import { overrideEventData } from "./localoverrides";
 
 @injectable()
 export class Importer {
@@ -31,7 +32,7 @@ export class Importer {
       const stringStatus = eventHelper.lookupFieldValue(entry, "status");
       const status =
         reverseMapEventStatus(stringStatus) ?? EventStatus.SUBMITTED;
-      retval.push({
+      const newEntry = {
         id: entry.id,
         name: eventHelper.requireFieldValue(entry, "event_name"),
         eventUrl: eventHelper.lookupFieldValue(entry, "event_url"),
@@ -45,7 +46,9 @@ export class Importer {
         eventGraphicUrl: eventHelper.lookupFieldValue(entry, "event_graphic"),
         modifyDate: entry.date_updated,
         status: status,
-      });
+      };
+      overrideEventData(newEntry)
+      retval.push(newEntry);
     }
     return retval;
   }
@@ -82,11 +85,11 @@ class EventHelper {
     const override = this.lookupFieldValue(entry, "admin_location_override");
     if (override && override !== "") {
       try {
-        return JSON.parse(override)
-      } catch(e) {
+        return JSON.parse(override);
+      } catch (e) {
         console.log(`Error parsing location override JSON: ${override}`);
-        console.log(e)
-        return undefined
+        console.log(e);
+        return undefined;
       }
     } else {
       const firstChoice = this.lookupFieldValue(entry, "location_first");
