@@ -96,6 +96,7 @@ export const locations: EventLocation[] = [
   {
     name: "Starkweather Creek Path @ Commercial Avenue",
     maps_query: "43.106834977626036, -89.34179850073251",
+    sched_address: "2994 Commercial Ave, Madison, WI"
   },
   {
     name: "Cap City @ Dempsey Road",
