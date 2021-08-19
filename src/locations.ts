@@ -95,7 +95,7 @@ export const locations: EventLocation[] = [
   },
   {
     name: "Starkweather Creek Path @ Commercial Avenue",
-    maps_query: "43.106834039270574, -89.3256283203315",
+    maps_query: "43.106834977626036, -89.34179850073251",
   },
   {
     name: "Cap City @ Dempsey Road",
