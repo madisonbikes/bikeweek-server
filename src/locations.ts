@@ -96,7 +96,7 @@ export const locations: EventLocation[] = [
   {
     name: "Starkweather Creek Path @ Commercial Avenue",
     maps_query: "43.106834977626036, -89.34179850073251",
-    sched_address: "2994 Commercial Ave, Madison, WI"
+    sched_address: "2994 Commercial Ave, Madison, WI",
   },
   {
     name: "Cap City @ Dempsey Road",
@@ -109,6 +109,7 @@ export const locations: EventLocation[] = [
   {
     name: "Lussier Community Education Center",
     maps_query: "43.06630758865517, -89.50196921513945",
+    sched_address: "55 S Gammon Rd, Madison, WI 53717",
   },
   {
     name: "North Paterson Street & East Mifflin Street (Reynolds Park)",
@@ -189,5 +190,5 @@ export const locations: EventLocation[] = [
   {
     name: "Slow Street: Darbo Dr",
     maps_query: "43.103530, -89.340504",
-  }
+  },
 ];
