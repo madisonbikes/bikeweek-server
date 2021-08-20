@@ -57,6 +57,7 @@ export class Importer {
     const { body } = await superagent
       .get(`${this.config.gravityFormsUri}/entries`)
       .query({ form_ids: this.config.gravityFormsId })
+      .query("paging[page_size]=100")
       .auth(
         this.config.gravityFormsConsumerApiKey,
         this.config.gravityFormsConsumerSecret
