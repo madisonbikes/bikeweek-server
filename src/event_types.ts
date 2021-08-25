@@ -13,6 +13,7 @@ export enum EventStatus {
   SUBMITTED,
   APPROVED,
   CANCELLED,
+  PENDING
 }
 
 /** is this really as good as typescript can do? blech! */
@@ -24,6 +25,8 @@ export function reverseMapEventStatus(
       return EventStatus.APPROVED;
     case "cancelled":
       return EventStatus.CANCELLED;
+    case "pending":
+      return EventStatus.PENDING;
     case "submitted":
       return EventStatus.SUBMITTED;
     default:

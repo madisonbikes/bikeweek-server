@@ -13,11 +13,11 @@ import {
 import { injectable } from "tsyringe";
 import { Configuration } from "../config";
 import { EventLocation, locations } from "../locations";
-import { overrideEventData } from "./localoverrides";
 
 @injectable()
 export class Importer {
-  constructor(private config: Configuration) {}
+  constructor(private config: Configuration) {
+  }
 
   async import(): Promise<BikeWeekEvent[]> {
     const [form, entryResponse] = await Promise.all([
@@ -32,6 +32,10 @@ export class Importer {
       const stringStatus = eventHelper.lookupFieldValue(entry, "status");
       const status =
         reverseMapEventStatus(stringStatus) ?? EventStatus.SUBMITTED;
+      if (status == EventStatus.SUBMITTED) {
+        // skipping events that have just been submitted
+        continue;
+      }
       const newEntry = {
         id: entry.id,
         name: eventHelper.requireFieldValue(entry, "event_name"),
@@ -47,12 +51,12 @@ export class Importer {
         modifyDate: entry.date_updated,
         status: status,
       };
-      overrideEventData(newEntry)
       retval.push(newEntry);
     }
     return retval;
   }
 
+  // FIXME support pagination for > 100 entries
   private async loadEntries(): Promise<EntryResponse> {
     const { body } = await superagent
       .get(`${this.config.gravityFormsUri}/entries`)
@@ -80,7 +84,8 @@ class EventHelper {
   constructor(
     private form: FormResponse,
     private configuration: Configuration
-  ) {}
+  ) {
+  }
 
   getLocationInfo(entry: Entry): EventLocation | undefined {
     const override = this.lookupFieldValue(entry, "admin_location_override");
