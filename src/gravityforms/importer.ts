@@ -7,8 +7,8 @@ import {
   BikeWeekEvent,
   EventDay,
   EventStatus,
-  EventTime,
-  reverseMapEventStatus,
+  EventTime, EventTypes,
+  reverseMapEventStatus
 } from "../event_types";
 import { injectable } from "tsyringe";
 import { Configuration } from "../config";
@@ -32,10 +32,7 @@ export class Importer {
       const stringStatus = eventHelper.lookupFieldValue(entry, "status");
       const status =
         reverseMapEventStatus(stringStatus) ?? EventStatus.SUBMITTED;
-      if (status == EventStatus.SUBMITTED) {
-        // skipping events that have just been submitted
-        continue;
-      }
+
       const newEntry = {
         id: entry.id,
         name: eventHelper.requireFieldValue(entry, "event_name"),
@@ -49,8 +46,17 @@ export class Importer {
         eventTimes: eventHelper.getEventTimes(entry),
         eventGraphicUrl: eventHelper.lookupFieldValue(entry, "event_graphic"),
         modifyDate: entry.date_updated,
-        status: status,
+        status,
       };
+      if (status == EventStatus.SUBMITTED) {
+        console.log(`skipping unapproved entry ${newEntry.name}`)
+        continue;
+
+      }
+      if(newEntry.eventTypes === [EventTypes.ENDOFWEEKPARTY]) {
+        console.log(`skipping end of week party entry ${newEntry.name}`)
+        continue;
+      }
       retval.push(newEntry);
     }
     return retval;
