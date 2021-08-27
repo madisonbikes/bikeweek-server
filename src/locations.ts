@@ -86,6 +86,7 @@ export const locations: EventLocation[] = [
   },
   {
     name: "Madison Municipal Building",
+    sched_address: "215 Martin Luther King Jr Blvd, Madison, WI 53703",
     maps_query: "43.073056383370364, -89.38155318859431",
   },
   {
