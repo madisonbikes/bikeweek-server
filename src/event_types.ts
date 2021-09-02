@@ -35,7 +35,7 @@ export function reverseMapEventStatus(
 }
 
 export enum EventTypes {
-  DISCOUNT = "discount", ENDOFWEEKPARTY = "endofweekparty"
+  DISCOUNT = "discount", ENDOFWEEKPARTY = "endofweekparty", PAID = "paid", FREE = "free"
 }
 
 export type BikeWeekEvent = {
@@ -55,7 +55,11 @@ export type BikeWeekEvent = {
 };
 
 export function isDiscountEvent(event: BikeWeekEvent): boolean {
-  return event.eventTypes == [EventTypes.DISCOUNT];
+  return event.eventTypes.includes(EventTypes.DISCOUNT);
+}
+
+export function isEndOfWeekParty(event: BikeWeekEvent): boolean {
+  return event.eventTypes.includes(EventTypes.ENDOFWEEKPARTY);
 }
 
 export function isAllDayEvent(event: BikeWeekEvent): boolean {

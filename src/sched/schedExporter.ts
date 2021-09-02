@@ -5,7 +5,7 @@ import {
   EventStatus,
   EventTypes,
   isAllDayEvent,
-  isDiscountEvent,
+  isEndOfWeekParty
 } from "../event_types";
 import { SchedApi } from "./api";
 import { buildMapsUrl } from "../locations";
@@ -29,7 +29,25 @@ export class SchedExporter {
     const handledKeys = new Set<string>();
     const events = [...allEvents]
       .sort((a, b) => a.name.localeCompare(b.name))
-      .filter((event) => !isDiscountEvent(event) && !isAllDayEvent(event));
+      .filter((event) => {
+        if (isEndOfWeekParty(event)) {
+          console.log(`Skipping ${event.name} (end of week party tabling)`);
+          return false;
+        }
+        if(isAllDayEvent(event)) {
+          console.log(`Skipping ${event.name} (all day, no time)`)
+          return false;
+        }
+        if(event.eventDays.length == 0) {
+          console.log(`Skipping ${event.name} (no days)`)
+          return false;
+        }
+        if (event.status != EventStatus.APPROVED) {
+          console.log(`Skipping ${event.name} (unapproved)`);
+          return false;
+        }
+        return true;
+      })
 
     for (const event of events) {
       for (const day of event.eventDays) {

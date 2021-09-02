@@ -7,8 +7,9 @@ import {
   BikeWeekEvent,
   EventDay,
   EventStatus,
-  EventTime, EventTypes,
-  reverseMapEventStatus
+  EventTime,
+  EventTypes,
+  reverseMapEventStatus,
 } from "../event_types";
 import { injectable } from "tsyringe";
 import { Configuration } from "../config";
@@ -16,8 +17,7 @@ import { EventLocation, locations } from "../locations";
 
 @injectable()
 export class Importer {
-  constructor(private config: Configuration) {
-  }
+  constructor(private config: Configuration) {}
 
   async import(): Promise<BikeWeekEvent[]> {
     const [form, entryResponse] = await Promise.all([
@@ -48,14 +48,12 @@ export class Importer {
         modifyDate: entry.date_updated,
         status,
       };
-      if (status == EventStatus.SUBMITTED) {
-        console.log(`skipping unapproved entry ${newEntry.name}`)
-        continue;
-
-      }
-      if(newEntry.eventTypes === [EventTypes.ENDOFWEEKPARTY]) {
-        console.log(`skipping end of week party entry ${newEntry.name}`)
-        continue;
+      // promote non-PAID and non-DISCOUNT items to FREE
+      if (
+        !newEntry.eventTypes.includes(EventTypes.PAID) &&
+        !newEntry.eventTypes.includes(EventTypes.DISCOUNT)
+      ) {
+        newEntry.eventTypes.push(EventTypes.FREE);
       }
       retval.push(newEntry);
     }
@@ -90,8 +88,7 @@ class EventHelper {
   constructor(
     private form: FormResponse,
     private configuration: Configuration
-  ) {
-  }
+  ) {}
 
   getLocationInfo(entry: Entry): EventLocation | undefined {
     const override = this.lookupFieldValue(entry, "admin_location_override");
