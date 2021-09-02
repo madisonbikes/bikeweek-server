@@ -20,7 +20,7 @@ export class Configuration {
   public executeOnce = false;
   public pollInterval = parseIntWithDefault(
     process.env.POLLINTERVAL,
-    5 * 60 * 1000
+    10 * 60 * 1000
   );
 
   public EVENT_START = "2021-09-11";
