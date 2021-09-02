@@ -51,7 +51,8 @@ export class Importer {
       // promote non-PAID and non-DISCOUNT items to FREE
       if (
         !newEntry.eventTypes.includes(EventTypes.PAID) &&
-        !newEntry.eventTypes.includes(EventTypes.DISCOUNT)
+        !newEntry.eventTypes.includes(EventTypes.DISCOUNT) &&
+        !newEntry.eventTypes.includes(EventTypes.FREE)
       ) {
         newEntry.eventTypes.push(EventTypes.FREE);
       }
