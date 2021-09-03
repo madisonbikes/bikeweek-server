@@ -66,6 +66,7 @@ export const locations: EventLocation[] = [
   },
   {
     name: "Crazylegs Plaza",
+    sched_address: "1605 Regent St, Madison, WI 53726",
     maps_query: "43.067625512497706, -89.41344863570794",
   },
   {
