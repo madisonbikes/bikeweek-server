@@ -135,6 +135,7 @@ export const locations: EventLocation[] = [
   },
   {
     name: "Capital City Path @ Amoth Ct",
+    sched_address: "Eastwood Dr & Amoth Ct, Madison, WI",
     maps_query: "43.09104576170086, -89.35365142809567",
   },
   {

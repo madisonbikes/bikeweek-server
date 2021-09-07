@@ -111,7 +111,9 @@ export class SchedExporter {
       const result = await this.sched.deleteSession({
         session_key: key.toString(),
       });
-      console.log(result);
+      if (result.isError()) {
+        console.log(`delete $key error: ${result.value}`);
+      }
     }
   }
 
