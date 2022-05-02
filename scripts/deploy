@@ -1,6 +1,6 @@
 # simple deploy script, adjust accordingly
-HOSTNAME=mbi
+HOSTNAME=mb_obl
 
 # resets git branch and pulls new code, install/removes packages as necessary and reloads the pm2 process
 # adjust this sample to reflect your server script path
-ssh -t $HOSTNAME "cd ~/apps/bikeweek2021_importer; ./redeploy"
+ssh -t $HOSTNAME "cd ~/apps/bikeweekadmin; ./redeploy"

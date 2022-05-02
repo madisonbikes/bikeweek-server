@@ -14,7 +14,6 @@ export class DiscountExporter {
       const location = event.location;
 
       const link = createLink(event.name, event.eventUrl);
-      const itemList = new Array<string>();
 
       buffer += `<h2>${link}</h2>\n`;
       if (location?.maps_description) {
