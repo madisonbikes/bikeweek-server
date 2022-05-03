@@ -1,13 +1,15 @@
-# bikeweek2021-importer
+# bikeweek-server
 
 ## Information
 
-This tool moves information from a [Gravity Forms](https://www.gravityforms.com/) form hosted on Wordpress and
+This server moves information from a [Gravity Forms](https://www.gravityforms.com/) form hosted on Wordpress and
 creates/updates session on an event in the [Sched](https://sched.com/) platform.
+
+It provides APIs for use in the administration web UI.
 
 The Sched components will automatically throttle API calls to meet [limits defined in their API documentation](https://sched.com/api) (30 calls/minute).
 
-Uses Node 14 LTS, Typescript, superagent for HTTP/REST, tsyringe for dependency injection, pm2 for daemon/process management
+Uses Node 16 LTS, Typescript, superagent for HTTP/REST, tsyringe for dependency injection, pm2 for daemon/process management
 ## Command line
 
 `npm run exec` - runs one time
@@ -30,4 +32,4 @@ Several environment variables must be set, or even better a `.env` file should b
 * `GF_CONSUMER_SECRET` - see [Gravity Forms documentation](https://docs.gravityforms.com/rest-api-v2-authentication/),
   this secret is used with basic authentication against the server
 * `SCHED_API_KEY` (set to your Sched API key)
-* `SCHED_URI` (set to your base Sched endpoint, e.g. https://madisonbikeweek2021.sched.com)
+* `SCHED_URI` (set to your base Sched endpoint, e.g. https://madisonbikeweek2022.sched.com)
