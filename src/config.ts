@@ -23,9 +23,6 @@ export class Configuration {
     10 * 60 * 1000
   );
 
-  public EVENT_START = "2021-09-11";
-  public EVENT_START_DATE = parse(this.EVENT_START, "yyyy-MM-dd", new Date());
-
   constructor() {
     const argv = yargs(hideBin(process.argv)).parseSync();
 

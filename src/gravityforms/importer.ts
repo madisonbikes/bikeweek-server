@@ -115,11 +115,7 @@ class EventHelper {
     const eventDays = this.requireMultiFieldValue(entry, "event_days");
     const retval = new Array<EventDay>();
     for (const day of eventDays) {
-      const parsedDate = parse(
-        day,
-        "EEEE, LLLL d",
-        this.configuration.EVENT_START_DATE
-      );
+      const parsedDate = parse(day, "MM-dd-yyyy", new Date());
       if (Number.isNaN(parsedDate.getTime())) {
         throw Error(`Invalid date encountered ${day}`);
       }
