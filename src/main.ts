@@ -6,6 +6,8 @@ import { BikeWeekEvent } from "./event_types";
 import { Configuration } from "./config";
 import { setIntervalAsync } from "set-interval-async/dynamic";
 import { DiscountExporter } from "./discountExporter";
+import { Database } from "./database";
+import { ApiServer } from "./server";
 
 @injectable()
 export class MainProcess {
@@ -13,11 +15,17 @@ export class MainProcess {
     private importer: Importer,
     private schedExporter: SchedExporter,
     private discountExporter: DiscountExporter,
-    public configuration: Configuration
+    private configuration: Configuration,
+    private database: Database,
+    private server: ApiServer,
   ) {}
 
   async start(): Promise<void> {
+    await this.database.start()
+    await this.server.start()
+
     if (!this.configuration.executeOnce) {
+      // defaults to every hour
       console.log(
         `Scheduling poll of form data for every ${
           this.configuration.pollInterval / 1000

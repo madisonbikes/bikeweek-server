@@ -1,4 +1,4 @@
-# bikeweek-server
+# bikeweek-backend
 
 ## Information
 

@@ -1,7 +1,5 @@
-import { config } from "dotenv";
-import { resolve } from "path";
+import dotenv from "dotenv";
 import { injectable, singleton } from "tsyringe";
-import { parse } from "date-fns";
 import yargs from "yargs/yargs";
 import { hideBin } from "yargs/helpers";
 
@@ -16,9 +14,14 @@ export class Configuration {
   public schedUri = `${process.env.SCHED_URI}/api/`;
   public schedApiKey = `${process.env.SCHED_API_KEY}`;
 
+  public mongoDbUri = `${process.env.MONGODB_URI}`;
+
+  public apiPort = this.parseIntWithDefault(process.env.API_PORT, 3000);
+
   public dryRun = process.env.DRYRUN === "true";
   public executeOnce = false;
-  public pollInterval = parseIntWithDefault(
+
+  public pollInterval = this.parseIntWithDefault(
     process.env.POLLINTERVAL,
     10 * 60 * 1000
   );
@@ -32,25 +35,24 @@ export class Configuration {
     if (argv.dryrun) {
       this.dryRun = true;
     }
-  }
-}
 
-// from dotenv samples:
-// https://github.com/motdotla/dotenv/blob/master/examples/typescript/src/lib/env.ts
-const file = resolve(__dirname, "../.env");
-console.log(`Loading configuration from ${file}`);
-config({ path: file });
-
-function parseIntWithDefault(
-  value: string | undefined,
-  defaultValue: number
-): number {
-  let retval = defaultValue;
-  if (value) {
-    retval = Number(defaultValue);
-    if (isNaN(retval)) {
-      retval = defaultValue;
+    const result = dotenv.config();
+    if (result.error) {
+      throw result.error;
     }
   }
-  return retval;
+
+  private parseIntWithDefault(
+    value: string | undefined,
+    defaultValue: number
+  ): number {
+    let retval = defaultValue;
+    if (value) {
+      retval = Number(defaultValue);
+      if (isNaN(retval)) {
+        retval = defaultValue;
+      }
+    }
+    return retval;
+  }
 }
