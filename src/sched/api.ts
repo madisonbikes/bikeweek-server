@@ -1,9 +1,11 @@
 import {
   AddSessionRequest,
   DeleteSessionRequest,
-  ModifySessionRequest, SessionExportRequest, SessionExportResponse,
+  ModifySessionRequest,
+  SessionExportRequest,
+  SessionExportResponse,
   SessionListRequest,
-  SessionListResponse
+  SessionListResponse,
 } from "./types";
 import superagent from "superagent";
 import { error, ok, Result } from "../util/result";
@@ -13,15 +15,11 @@ import { Configuration } from "../config";
 
 @injectable()
 export class SchedApi {
-  constructor(private configuration: Configuration) {
-  }
+  constructor(private configuration: Configuration) {}
 
   async addSession(
     session: AddSessionRequest
   ): Promise<Result<unknown, string>> {
-    if(this.configuration.dryRun) {
-      return ok("dryrun")
-    }
     const response = await this.postRequest("session/add", session);
     if (response.error) {
       return error(response.text);
@@ -33,9 +31,6 @@ export class SchedApi {
   async modifySession(
     session: ModifySessionRequest
   ): Promise<Result<unknown, string>> {
-    if(this.configuration.dryRun) {
-      return ok("dryrun")
-    }
     const response = await this.postRequest("session/mod", session);
     if (response.error) {
       return error(response.text);
@@ -73,9 +68,6 @@ export class SchedApi {
   async deleteSession(
     session: DeleteSessionRequest
   ): Promise<Result<unknown, string>> {
-    if(this.configuration.dryRun) {
-      return ok("dryrun")
-    }
     const response = await this.postRequest("session/del", session);
     if (response.error) {
       return error(response.text);
@@ -107,8 +99,8 @@ export class SchedApi {
 
   private async checkThrottle() {
     const savelastThrottleTime = this.lastThrottleTime;
-    this.lastThrottleTime = Date.now()
-    if(savelastThrottleTime < (Date.now() - 30000)) {
+    this.lastThrottleTime = Date.now();
+    if (savelastThrottleTime < Date.now() - 30000) {
       // don't throttle if more than 30 seconds have elapsed
       this.callCount = 0;
       return;
@@ -120,6 +112,3 @@ export class SchedApi {
     }
   }
 }
-
-
-

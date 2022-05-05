@@ -1,7 +1,5 @@
 import dotenv from "dotenv";
 import { injectable, singleton } from "tsyringe";
-import yargs from "yargs/yargs";
-import { hideBin } from "yargs/helpers";
 
 @injectable()
 @singleton()
@@ -18,29 +16,10 @@ export class Configuration {
 
   public apiPort = this.parseIntWithDefault(process.env.API_PORT, 3000);
 
-  public dryRun = process.env.DRYRUN === "true";
-  public executeOnce = false;
-
   public pollInterval = this.parseIntWithDefault(
     process.env.POLLINTERVAL,
     10 * 60 * 1000
   );
-
-  constructor() {
-    const argv = yargs(hideBin(process.argv)).parseSync();
-
-    if (argv.once) {
-      this.executeOnce = true;
-    }
-    if (argv.dryrun) {
-      this.dryRun = true;
-    }
-
-    const result = dotenv.config();
-    if (result.error) {
-      throw result.error;
-    }
-  }
 
   private parseIntWithDefault(
     value: string | undefined,
@@ -55,4 +34,10 @@ export class Configuration {
     }
     return retval;
   }
+}
+
+// this has to run first outside of constructor
+const result = dotenv.config();
+if (result.error) {
+  throw result.error;
 }

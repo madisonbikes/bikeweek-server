@@ -1,10 +1,14 @@
-import { injectable } from "tsyringe";
+import { injectable, singleton } from "tsyringe";
 import { Configuration } from "./config";
 import { Collection, Db, MongoClient } from "mongodb";
 
 @injectable()
+@singleton()
 export class Database {
-  public testCollection!: Collection;
+  public users!: Collection;
+  public gfFormFields!: Collection;
+  public gfResponses!: Collection;
+
   public database!: Db;
 
   constructor(private configuration: Configuration) {}
@@ -14,6 +18,8 @@ export class Database {
     await client.connect();
 
     this.database = client.db("bikeweek");
-    this.testCollection = this.database.collection("testCollection");
+    this.users = this.database.collection("users");
+    this.gfFormFields = this.database.collection("gfFormFields");
+    this.gfResponses = this.database.collection("gfResponses");
   }
 }
