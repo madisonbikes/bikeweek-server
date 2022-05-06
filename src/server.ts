@@ -1,30 +1,36 @@
 import { injectable } from "tsyringe";
-import Koa from "koa";
-import KoaRouter from "@koa/router";
-import koaBody from "koa-body";
 import { Configuration } from "./config";
-import koaPassport from "koa-passport";
-import koaSession from "koa-session";
+import express from "express";
+import passport from "passport";
+import cookieParser from "cookie-parser";
+import session from "express-session";
 
 @injectable()
 export class ApiServer {
   constructor(private configuration: Configuration) {}
 
   async start(): Promise<void> {
-    const app = new Koa();
+    const app = express();
 
-    app.use(koaBody());
+    app.use(express.json());
+    app.use(cookieParser());
 
-    app.use(koaSession(app));
+    app.use(
+      session({
+        secret: "bikeweeksecretcode",
+        resave: true,
+        saveUninitialized: true,
+      })
+    );
 
-    app.use(koaPassport.initialize());
-    app.use(koaPassport.session());
+    app.use(passport.initialize());
+    app.use(passport.session());
 
-    const router = new KoaRouter();
-    router.get("/", (ctx) => {
-      ctx.response.body = "Hello World";
+    const router = express.Router();
+    router.get("/", (req, res) => {
+      res.json({ message: "Hello World" });
     });
-    app.use(router.routes());
+    app.use(router);
 
     app.listen(this.configuration.apiPort, () => {
       console.log(
