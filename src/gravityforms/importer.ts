@@ -4,7 +4,7 @@ import { EntryResponse, FormResponse } from "./types";
 
 import { injectable } from "tsyringe";
 import { Configuration } from "../config";
-import { Database } from "../database";
+import { Database } from "../database/database";
 
 /** pull data out of GF REST service and dump into mongo */
 @injectable()

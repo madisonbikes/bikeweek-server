@@ -12,7 +12,7 @@ import {
 import { Configuration } from "../config";
 import { EventLocation, locations } from "../locations";
 import { injectable } from "tsyringe";
-import { Database } from "../database";
+import { Database } from "../database/database";
 
 /** take data from mongo GF dump and load into structured event info */
 @injectable()

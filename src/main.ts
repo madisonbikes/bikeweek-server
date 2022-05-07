@@ -1,5 +1,5 @@
 import { injectable } from "tsyringe";
-import { Database } from "./database";
+import { Database } from "./database/database";
 import { ApiServer } from "./server";
 import { EventPoller } from "./eventPoller";
 
@@ -14,6 +14,7 @@ export class MainProcess {
   async start(): Promise<void> {
     await this.database.start();
     await this.server.start();
-    await this.eventPoller.start();
+    // FIXME temporary disable event polling
+    //await this.eventPoller.start();
   }
 }

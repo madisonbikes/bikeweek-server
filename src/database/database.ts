@@ -1,5 +1,5 @@
 import { injectable, singleton } from "tsyringe";
-import { Configuration } from "./config";
+import { Configuration } from "../config";
 import { Collection, Db, MongoClient } from "mongodb";
 
 @injectable()

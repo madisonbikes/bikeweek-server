@@ -2,35 +2,23 @@ import { injectable } from "tsyringe";
 import { Configuration } from "./config";
 import express from "express";
 import passport from "passport";
-import cookieParser from "cookie-parser";
-import session from "express-session";
+import { ApiRoutes } from "./routes";
 
 @injectable()
 export class ApiServer {
-  constructor(private configuration: Configuration) {}
+  constructor(
+    private configuration: Configuration,
+    private routes: ApiRoutes
+  ) {}
 
   async start(): Promise<void> {
     const app = express();
 
     app.use(express.json());
-    app.use(cookieParser());
-
-    app.use(
-      session({
-        secret: "bikeweeksecretcode",
-        resave: true,
-        saveUninitialized: true,
-      })
-    );
 
     app.use(passport.initialize());
-    app.use(passport.session());
 
-    const router = express.Router();
-    router.get("/", (req, res) => {
-      res.json({ message: "Hello World" });
-    });
-    app.use(router);
+    app.use("/api/v1", this.routes.routes);
 
     app.listen(this.configuration.apiPort, () => {
       console.log(
