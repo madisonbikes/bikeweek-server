@@ -1,11 +1,15 @@
 import express from "express";
 import { injectable } from "tsyringe";
-
+import jwt from "jsonwebtoken";
 import { UserModel } from "../database/user";
+import { Configuration } from "../config";
 
 @injectable()
 export class LoginRoutes {
-  constructor(private userModel: UserModel) {}
+  constructor(
+    private userModel: UserModel,
+    private configuration: Configuration
+  ) {}
   routes = express.Router().post("/login", async (request, response) => {
     const { username, password } = request.body;
     if (!username || !password) {
@@ -18,10 +22,11 @@ export class LoginRoutes {
     if (user) {
       success = await this.userModel.checkPassword(password, user);
     }
-    if (!success) {
+    if (!success || !user) {
       response.status(404).send("invalid username and/or password");
     } else {
-      response.send(user);
+      const token = jwt.sign(user, this.configuration.jsonWebTokenSecret);
+      response.send(token);
     }
   });
 }

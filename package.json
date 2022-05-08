@@ -45,6 +45,7 @@
     "@types/bcryptjs": "^2.4.2",
     "@types/cookie-parser": "^1.4.3",
     "@types/express": "^4.17.13",
+    "@types/jsonwebtoken": "^8.5.8",
     "@types/node": "^16.11.33",
     "@types/passport": "^1.0.7",
     "@types/set-interval-async": "^1.0.0",

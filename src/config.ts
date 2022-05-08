@@ -16,6 +16,9 @@ export class Configuration {
 
   public apiPort = this.parseIntWithDefault(process.env.API_PORT, 3000);
 
+  public jsonWebTokenSecret =
+    process.env.JSONWEBTOKEN_SECRET || "defaultsecretnotsecure";
+
   public pollInterval = this.parseIntWithDefault(
     process.env.POLLINTERVAL,
     10 * 60 * 1000
