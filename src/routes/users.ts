@@ -1,7 +1,7 @@
 import express from "express";
 import { injectable } from "tsyringe";
 import { User, UserModel } from "../database/user";
-import passport from "passport";
+import { jwtMiddleware } from "../security/authentication";
 
 @injectable()
 export class UserRoutes {
@@ -9,23 +9,19 @@ export class UserRoutes {
 
   readonly routes = express
     .Router()
-    .post(
-      "/create",
-      passport.authenticate("jwt", { session: false }),
-      async (request, response) => {
-        const user: User = request.body;
-        if (!user.username || !user.password) {
-          response.status(500).send("error");
-          return;
-        }
-
-        if (await this.userModel.findUser(user.username)) {
-          response.status(500).send("user already exists");
-          return;
-        }
-
-        const newUser = await this.userModel.addUser(user);
-        response.send(newUser);
+    .post("/create", jwtMiddleware, async (request, response) => {
+      const newUser = request.body as User;
+      if (!newUser.username || !newUser.password) {
+        response.status(500).send("error");
+        return;
       }
-    );
+
+      if (await this.userModel.findUser(newUser.username)) {
+        response.status(500).send("user already exists");
+        return;
+      }
+
+      const createdUser = await this.userModel.addUser(newUser);
+      response.send(createdUser);
+    });
 }

@@ -3,14 +3,14 @@ import { Configuration } from "./config";
 import express from "express";
 import passport from "passport";
 import { ApiRoutes } from "./routes";
-import { AuthenticationHelper } from "./security/authentication";
+import { Strategies } from "./security/authentication";
 
 @injectable()
 export class ApiServer {
   constructor(
     private configuration: Configuration,
     private apiRoutes: ApiRoutes,
-    private authenticationHelper: AuthenticationHelper
+    private strategies: Strategies
   ) {}
 
   async start(): Promise<void> {
@@ -19,10 +19,10 @@ export class ApiServer {
     app.use(express.json());
 
     // used for login method
-    passport.use(this.authenticationHelper.localStrategy);
+    passport.use(this.strategies.local);
 
-    // used for sec
-    passport.use(this.authenticationHelper.jwtStrategy);
+    // used for securing most api endpoints
+    passport.use(this.strategies.jwt);
 
     app.use(passport.initialize());
 

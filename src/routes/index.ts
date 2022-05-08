@@ -1,5 +1,6 @@
 import express from "express";
 import { injectable } from "tsyringe";
+import { InfoRoutes } from "./info";
 import { LoginRoutes } from "./login";
 import { UserRoutes } from "./users";
 
@@ -7,11 +8,13 @@ import { UserRoutes } from "./users";
 export class ApiRoutes {
   constructor(
     private userRoutes: UserRoutes,
-    private loginRoutes: LoginRoutes
+    private loginRoutes: LoginRoutes,
+    private infoRoutes: InfoRoutes
   ) {}
 
-  routes = express
+  readonly routes = express
     .Router()
     .use(this.loginRoutes.routes)
+    .use(this.infoRoutes.routes)
     .use("/users", this.userRoutes.routes);
 }
