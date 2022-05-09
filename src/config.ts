@@ -14,7 +14,7 @@ export class Configuration {
 
   public mongoDbUri = `${process.env.MONGODB_URI}`;
 
-  public apiPort = this.parseIntWithDefault(process.env.API_PORT, 3000);
+  public apiPort = this.parseIntWithDefault(process.env.API_PORT, 3001);
 
   public jsonWebTokenSecret =
     process.env.JSONWEBTOKEN_SECRET || "defaultsecretnotsecure";

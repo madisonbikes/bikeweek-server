@@ -4,6 +4,7 @@ import express from "express";
 import passport from "passport";
 import { ApiRoutes } from "./routes";
 import { Strategies } from "./security/authentication";
+import cors from "cors";
 
 @injectable()
 export class ApiServer {
@@ -17,6 +18,7 @@ export class ApiServer {
     const app = express();
 
     app.use(express.json());
+    app.use(cors());
 
     // used for login method
     passport.use(this.strategies.local);
