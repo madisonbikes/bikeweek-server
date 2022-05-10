@@ -7,6 +7,7 @@ export type EventLocation = {
   maps_query?: string;
   maps_description?: string;
   maps_placeid?: string;
+  detailed_location_description?: string;
 };
 
 export function buildMapsUrl(location: EventLocation): string {
@@ -193,5 +194,8 @@ export const locations: EventLocation[] = [
   {
     name: "Slow Street: Darbo Dr",
     maps_query: "43.103530, -89.340504",
+  },
+  {
+    name: "Other (describe below)",
   },
 ];

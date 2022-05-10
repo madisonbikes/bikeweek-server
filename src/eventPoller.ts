@@ -5,8 +5,6 @@ import { Importer } from "./gravityforms/importer";
 import { Processor } from "./gravityforms/processor";
 import { createHash } from "crypto";
 import { BikeWeekEvent, EventModel, EventStatus } from "./database/event";
-import { SchedExporter } from "./sched/schedExporter";
-import { DiscountExporter } from "./discountExporter";
 
 @injectable()
 export class EventPoller {
@@ -14,9 +12,7 @@ export class EventPoller {
     private configuration: Configuration,
     private importer: Importer,
     private processor: Processor,
-    private eventModel: EventModel,
-    private schedExporter: SchedExporter,
-    private discountExporter: DiscountExporter
+    private eventModel: EventModel
   ) {}
 
   async start() {

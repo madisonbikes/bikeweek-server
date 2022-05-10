@@ -73,23 +73,23 @@ class EventHelper {
   constructor(private fields: Field[], private configuration: Configuration) {}
 
   getLocationInfo(entry: Entry): EventLocation | undefined {
-    const override = this.lookupFieldValue(entry, "admin_location_override");
-    if (override && override !== "") {
-      try {
-        return JSON.parse(override);
-      } catch (e) {
-        console.log(`Error parsing location override JSON: ${override}`);
-        console.log(e);
-        return undefined;
-      }
-    } else {
-      const firstChoice = this.lookupFieldValue(entry, "location_first");
-      const mapped = locations.find((value) => value.name == firstChoice);
-      if (!mapped && firstChoice != "N/A" && firstChoice != "None") {
-        console.log(`Missing location map for ${firstChoice}`);
-      }
-      return mapped;
+    const firstChoice = this.lookupFieldValue(entry, "location_first");
+    let mapped = locations.find((value) => value.name == firstChoice);
+    if (!mapped && firstChoice != "N/A" && firstChoice != "None") {
+      console.log(
+        `ERROR: Missing location map for location name: ${firstChoice}`
+      );
     }
+    if (mapped) {
+      mapped = { ...mapped };
+    } else {
+      mapped = { name: "" };
+    }
+    mapped.detailed_location_description = this.lookupFieldValue(
+      entry,
+      "location_other"
+    );
+    return mapped;
   }
 
   getEventDays(entry: Entry): EventDay[] {

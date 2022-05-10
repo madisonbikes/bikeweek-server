@@ -9,7 +9,7 @@ export interface User {
 
 @injectable()
 export class UserModel {
-  private BCRYPT_HASH_SIZE = 10;
+  private readonly BCRYPT_HASH_SIZE = 10;
 
   constructor(private database: Database) {}
 
