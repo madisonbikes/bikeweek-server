@@ -8,7 +8,7 @@ import {
   EventTime,
   EventTypes,
   reverseMapEventStatus,
-} from "../event_types";
+} from "../database/event";
 import { Configuration } from "../config";
 import { EventLocation, locations } from "../locations";
 import { injectable } from "tsyringe";
@@ -40,8 +40,8 @@ export class Processor {
       const status =
         reverseMapEventStatus(stringStatus) ?? EventStatus.SUBMITTED;
 
-      const newEntry = {
-        id: entry.id,
+      const newEntry: BikeWeekEvent = {
+        id: entry.id.valueOf(),
         name: eventHelper.requireFieldValue(entry, "event_name"),
         eventUrl: eventHelper.lookupFieldValue(entry, "event_url"),
         description: eventHelper.requireFieldValue(entry, "event_description"),

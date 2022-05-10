@@ -1,5 +1,9 @@
 import { injectable } from "tsyringe";
-import { BikeWeekEvent, isAllDayEvent, isDiscountEvent } from "./event_types";
+import {
+  BikeWeekEvent,
+  isAllDayEvent,
+  isDiscountEvent,
+} from "./database/event";
 import fs from "fs/promises";
 
 @injectable()

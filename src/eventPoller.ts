@@ -1,10 +1,10 @@
-import { setIntervalAsync } from "set-interval-async/dynamic";
 import { injectable } from "tsyringe";
+import { setIntervalAsync } from "set-interval-async/dynamic";
 import { Configuration } from "./config";
 import { Importer } from "./gravityforms/importer";
 import { Processor } from "./gravityforms/processor";
 import { createHash } from "crypto";
-import { BikeWeekEvent } from "./event_types";
+import { BikeWeekEvent, EventModel, EventStatus } from "./database/event";
 import { SchedExporter } from "./sched/schedExporter";
 import { DiscountExporter } from "./discountExporter";
 
@@ -14,6 +14,7 @@ export class EventPoller {
     private configuration: Configuration,
     private importer: Importer,
     private processor: Processor,
+    private eventModel: EventModel,
     private schedExporter: SchedExporter,
     private discountExporter: DiscountExporter
   ) {}
@@ -35,7 +36,10 @@ export class EventPoller {
   private async doImport(): Promise<void> {
     console.log("running import/export");
     await this.importer.import();
+
     const importedEvents = await this.processor.extractEvents();
+    this.eventModel.setAllEvents(importedEvents);
+
     if (this.isUpdated(importedEvents)) {
       //await Promise.all([
       //await this.schedExporter.start(importedEvents),

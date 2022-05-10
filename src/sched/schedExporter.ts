@@ -5,8 +5,8 @@ import {
   EventStatus,
   EventTypes,
   isAllDayEvent,
-  isEndOfWeekParty
-} from "../event_types";
+  isEndOfWeekParty,
+} from "../database/event";
 import { SchedApi } from "./api";
 import { buildMapsUrl } from "../locations";
 
@@ -34,12 +34,12 @@ export class SchedExporter {
           console.log(`Skipping ${event.name} (end of week party tabling)`);
           return false;
         }
-        if(isAllDayEvent(event)) {
-          console.log(`Skipping ${event.name} (all day, no time)`)
+        if (isAllDayEvent(event)) {
+          console.log(`Skipping ${event.name} (all day, no time)`);
           return false;
         }
-        if(event.eventDays.length == 0) {
-          console.log(`Skipping ${event.name} (no days)`)
+        if (event.eventDays.length == 0) {
+          console.log(`Skipping ${event.name} (no days)`);
           return false;
         }
         if (event.status != EventStatus.APPROVED) {
@@ -47,7 +47,7 @@ export class SchedExporter {
           return false;
         }
         return true;
-      })
+      });
 
     for (const event of events) {
       for (const day of event.eventDays) {
@@ -127,10 +127,10 @@ export class SchedExporter {
     let modified = event.description;
 
     // ditch any carriage returns, how archaic
-    modified = modified.replace(/\r/g, "")
+    modified = modified.replace(/\r/g, "");
 
     // replace double breaks with a real HTML break
-    modified = modified.replace(/\n\n/g, "<br>\n")
+    modified = modified.replace(/\n\n/g, "<br>\n");
 
     description += modified;
 

@@ -14,7 +14,6 @@ export class MainProcess {
   async start(): Promise<void> {
     await this.database.start();
     await this.server.start();
-    // FIXME temporary disable event polling
-    //await this.eventPoller.start();
+    await this.eventPoller.start();
   }
 }

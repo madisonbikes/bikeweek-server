@@ -1,4 +1,6 @@
-import { EventLocation } from "./locations";
+import { injectable } from "tsyringe";
+import { EventLocation } from "../locations";
+import { Database } from "./database";
 
 export type EventDay = {
   localDate: Date;
@@ -13,7 +15,7 @@ export enum EventStatus {
   SUBMITTED,
   APPROVED,
   CANCELLED,
-  PENDING
+  PENDING,
 }
 
 /** is this really as good as typescript can do? blech! */
@@ -35,7 +37,10 @@ export function reverseMapEventStatus(
 }
 
 export enum EventTypes {
-  DISCOUNT = "discount", ENDOFWEEKPARTY = "endofweekparty", PAID = "paid", FREE = "free"
+  DISCOUNT = "discount",
+  ENDOFWEEKPARTY = "endofweekparty",
+  PAID = "paid",
+  FREE = "free",
 }
 
 export type BikeWeekEvent = {
@@ -63,5 +68,44 @@ export function isEndOfWeekParty(event: BikeWeekEvent): boolean {
 }
 
 export function isAllDayEvent(event: BikeWeekEvent): boolean {
-  return event.eventTimes.length === 0
+  return event.eventTimes.length === 0;
+}
+
+@injectable()
+export class EventModel {
+  constructor(private database: Database) {}
+
+  setAllEvents = async (events: BikeWeekEvent[]): Promise<void> => {
+    await this.database.events.deleteMany({});
+    await this.database.events.insertMany(events);
+  };
+
+  events = async (): Promise<BikeWeekEvent[]> => {
+    return (await this.database.events
+      .find({})
+      .toArray()) as unknown as BikeWeekEvent[];
+  };
+
+  findEvent = async (id: number): Promise<BikeWeekEvent | undefined> => {
+    return (await this.database.events.findOne({
+      id: `${id}`,
+    })) as unknown as BikeWeekEvent | undefined;
+  };
+
+  updateEvent = async (
+    id: number,
+    data: Partial<BikeWeekEvent>
+  ): Promise<BikeWeekEvent | undefined> => {
+    delete data["id"];
+    const result = await this.database.events.updateOne(
+      {
+        id: `${id}`,
+      },
+      { $set: data }
+    );
+    if (!result.acknowledged || result.matchedCount == 0) {
+      return undefined;
+    }
+    return this.findEvent(id);
+  };
 }

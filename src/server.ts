@@ -5,6 +5,7 @@ import passport from "passport";
 import { ApiRoutes } from "./routes";
 import { Strategies } from "./security/authentication";
 import cors from "cors";
+import helmet from "helmet";
 
 @injectable()
 export class ApiServer {
@@ -17,7 +18,12 @@ export class ApiServer {
   async start(): Promise<void> {
     const app = express();
 
+    // security
+    app.use(helmet());
+
     app.use(express.json());
+
+    // TODO really only for development
     app.use(cors());
 
     // used for login method

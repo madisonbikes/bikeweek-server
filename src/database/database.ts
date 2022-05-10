@@ -5,11 +5,28 @@ import { Collection, Db, MongoClient } from "mongodb";
 @injectable()
 @singleton()
 export class Database {
-  public users!: Collection;
-  public gfFormFields!: Collection;
-  public gfResponses!: Collection;
+  private _users!: Collection;
+  private _gfFormFields!: Collection;
+  private _gfResponses!: Collection;
+  private _events!: Collection;
 
-  public database!: Db;
+  private _database!: Db;
+
+  public get users() {
+    return this._users;
+  }
+
+  public get events() {
+    return this._events;
+  }
+
+  public get gfFormFields() {
+    return this._gfFormFields;
+  }
+
+  public get gfResponses() {
+    return this._gfResponses;
+  }
 
   constructor(private configuration: Configuration) {}
 
@@ -20,21 +37,22 @@ export class Database {
     );
     await client.connect();
 
-    this.database = client.db("bikeweek");
+    this._database = client.db("bikeweek");
 
-    const collectionList = this.database.listCollections(
+    const collectionList = this._database.listCollections(
       { name: "users" },
       { nameOnly: true }
     );
     if (!(await collectionList.hasNext())) {
-      this.database.createCollection("users");
+      this._database.createCollection("users");
       console.log("creating collection");
     }
     collectionList.close();
 
-    this.users = this.database.collection("users");
-    this.users.createIndex({ username: 1 });
-    this.gfFormFields = this.database.collection("gfFormFields");
-    this.gfResponses = this.database.collection("gfResponses");
+    this._users = this._database.collection("users");
+    this._users.createIndex({ username: 1 });
+    this._events = this._database.collection("events");
+    this._gfFormFields = this._database.collection("gfFormFields");
+    this._gfResponses = this._database.collection("gfResponses");
   }
 }
