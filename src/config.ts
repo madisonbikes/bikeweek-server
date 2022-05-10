@@ -27,7 +27,7 @@ export class Configuration {
     10 * 60 * 1000
   );
 
-  public readonly dev = process.env.NODE_ENV === "dev";
+  public readonly dev = process.env.NODE_ENV === "development";
 
   private parseIntWithDefault(
     value: string | undefined,
