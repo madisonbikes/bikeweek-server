@@ -23,8 +23,10 @@ export class ApiServer {
 
     app.use(express.json());
 
-    // TODO really only for development
-    app.use(cors());
+    if (this.configuration.dev) {
+      // cors only used for development -- production serves from same server/port
+      app.use(cors());
+    }
 
     // used for login method
     passport.use(this.strategies.local);

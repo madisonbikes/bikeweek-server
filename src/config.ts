@@ -4,25 +4,30 @@ import { injectable, singleton } from "tsyringe";
 @injectable()
 @singleton()
 export class Configuration {
-  public gravityFormsUri = `${process.env.GF_URI}/wp-json/gf/v2`;
-  public gravityFormsId = `${process.env.GF_FORM_ID}`;
-  public gravityFormsConsumerApiKey = `${process.env.GF_CONSUMER_API_KEY}`;
-  public gravityFormsConsumerSecret = `${process.env.GF_CONSUMER_SECRET}`;
+  public readonly gravityFormsUri = `${process.env.GF_URI}/wp-json/gf/v2`;
+  public readonly gravityFormsId = `${process.env.GF_FORM_ID}`;
+  public readonly gravityFormsConsumerApiKey = `${process.env.GF_CONSUMER_API_KEY}`;
+  public readonly gravityFormsConsumerSecret = `${process.env.GF_CONSUMER_SECRET}`;
 
-  public schedUri = `${process.env.SCHED_URI}/api/`;
-  public schedApiKey = `${process.env.SCHED_API_KEY}`;
+  public readonly schedUri = `${process.env.SCHED_URI}/api/`;
+  public readonly schedApiKey = `${process.env.SCHED_API_KEY}`;
 
-  public mongoDbUri = `${process.env.MONGODB_URI}`;
+  public readonly mongoDbUri = `${process.env.MONGODB_URI}`;
 
-  public apiPort = this.parseIntWithDefault(process.env.API_PORT, 3001);
+  public readonly apiPort = this.parseIntWithDefault(
+    process.env.API_PORT,
+    3001
+  );
 
-  public jsonWebTokenSecret =
+  public readonly jsonWebTokenSecret =
     process.env.JSONWEBTOKEN_SECRET || "defaultsecretnotsecure";
 
-  public pollInterval = this.parseIntWithDefault(
+  public readonly pollInterval = this.parseIntWithDefault(
     process.env.POLLINTERVAL,
     10 * 60 * 1000
   );
+
+  public readonly dev = process.env.NODE_ENV === "dev";
 
   private parseIntWithDefault(
     value: string | undefined,
