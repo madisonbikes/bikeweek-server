@@ -1,14 +1,5 @@
 import buildUrl from "build-url";
-
-export type EventLocation = {
-  name: string;
-  sched_venue?: string; // defaults to name
-  sched_address?: string; // required for specific address info
-  maps_query?: string;
-  maps_description?: string;
-  maps_placeid?: string;
-  detailed_location_description?: string;
-};
+import { EventLocation } from "./database/types";
 
 export function buildMapsUrl(location: EventLocation): string {
   let params: { [name: string]: string | string[] } = {

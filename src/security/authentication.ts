@@ -1,7 +1,7 @@
 import { injectable } from "tsyringe";
 import { Configuration } from "../config";
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
-import { User, UserModel } from "../database/user";
+import { User, UserModel } from "../database/users";
 import { Strategy as LocalStrategy } from "passport-local";
 import passport from "passport";
 

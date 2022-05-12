@@ -1,14 +1,9 @@
 import { injectable } from "tsyringe";
 import { format } from "date-fns";
-import {
-  BikeWeekEvent,
-  EventStatus,
-  EventTypes,
-  isAllDayEvent,
-  isEndOfWeekParty,
-} from "../database/event";
+import { isAllDayEvent, isEndOfWeekParty } from "../database/events";
 import { SchedApi } from "./api";
 import { buildMapsUrl } from "../locations";
+import { BikeWeekEvent, EventStatus, EventTypes } from "../database/types";
 
 @injectable()
 export class SchedExporter {

@@ -1,22 +1,6 @@
 import { injectable } from "tsyringe";
-import { EventLocation } from "../locations";
 import { Database } from "./database";
-
-export type EventDay = {
-  localDate: Date;
-};
-
-export type EventTime = {
-  start: string;
-  end: string;
-};
-
-export enum EventStatus {
-  SUBMITTED,
-  APPROVED,
-  CANCELLED,
-  PENDING,
-}
+import { BikeWeekEvent, EventStatus, EventTypes } from "./types";
 
 /** is this really as good as typescript can do? blech! */
 export function reverseMapEventStatus(
@@ -35,29 +19,6 @@ export function reverseMapEventStatus(
       return undefined;
   }
 }
-
-export enum EventTypes {
-  DISCOUNT = "discount",
-  ENDOFWEEKPARTY = "endofweekparty",
-  PAID = "paid",
-  FREE = "free",
-}
-
-export type BikeWeekEvent = {
-  id: number;
-  name: string;
-  eventUrl?: string;
-  description: string;
-  eventGraphicUrl?: string;
-  sponsors: string[];
-  sponsorUrls: string[];
-  location?: EventLocation;
-  eventTypes: string[];
-  eventDays: EventDay[];
-  eventTimes: EventTime[];
-  modifyDate?: string;
-  status: EventStatus;
-};
 
 export function isDiscountEvent(event: BikeWeekEvent): boolean {
   return event.eventTypes.includes(EventTypes.DISCOUNT);

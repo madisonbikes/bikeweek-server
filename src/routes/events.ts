@@ -1,6 +1,7 @@
 import express from "express";
 import { injectable } from "tsyringe";
-import { BikeWeekEvent, EventModel } from "../database/event";
+import { EventModel } from "../database/events";
+import { BikeWeekEvent } from "../database/types";
 import { jwtMiddleware } from "../security/authentication";
 
 @injectable()

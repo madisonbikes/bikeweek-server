@@ -1,18 +1,20 @@
 import { Entry, Field } from "./types";
 import { parse } from "date-fns";
 
+import { reverseMapEventStatus } from "../database/events";
+import { Configuration } from "../config";
+import { locations } from "../locations";
+import { injectable } from "tsyringe";
+import { Database } from "../database/database";
 import {
   BikeWeekEvent,
   EventDay,
+  EventLocation,
+  EventSponsor,
   EventStatus,
   EventTime,
   EventTypes,
-  reverseMapEventStatus,
-} from "../database/event";
-import { Configuration } from "../config";
-import { EventLocation, locations } from "../locations";
-import { injectable } from "tsyringe";
-import { Database } from "../database/database";
+} from "../database/types";
 
 /** take data from mongo GF dump and load into structured event info */
 @injectable()
@@ -35,7 +37,7 @@ export class Processor {
 
     const retval = Array<BikeWeekEvent>();
     for (const entry of responses) {
-      const [sponsors, sponsorUrls] = eventHelper.getSponsorInfo(entry);
+      const sponsors = eventHelper.getSponsorInfo(entry);
       const stringStatus = eventHelper.lookupFieldValue(entry, "status");
       const status =
         reverseMapEventStatus(stringStatus) ?? EventStatus.SUBMITTED;
@@ -46,7 +48,6 @@ export class Processor {
         eventUrl: eventHelper.lookupFieldValue(entry, "event_url"),
         description: eventHelper.requireFieldValue(entry, "event_description"),
         sponsors,
-        sponsorUrls,
         location: eventHelper.getLocationInfo(entry),
         eventTypes: eventHelper.getEventTypes(entry),
         eventDays: eventHelper.getEventDays(entry),
@@ -125,24 +126,23 @@ class EventHelper {
   }
 
   /** return parsed sponsor info from format like this "Madison Bikes (https://www.madisonbikes.org);City of Madison" */
-  getSponsorInfo(entry: Entry) {
+  getSponsorInfo(entry: Entry): EventSponsor[] {
     const baseSponsorText = this.requireFieldValue(entry, "sponsors");
     let separator = ",";
     if (baseSponsorText.includes(";")) {
       separator = ";";
     }
     const sponsors = baseSponsorText.split(separator).map((v) => v.trim());
-    const sponsor_urls = new Array<string>(sponsors.length);
+    const retval = new Array<EventSponsor>(sponsors.length);
     for (const ndx in sponsors) {
       const res = sponsors[ndx].match(/(.*)\((.+)\)/);
       if (!res) {
-        sponsor_urls[ndx] = "";
+        retval[ndx] = { name: sponsors[ndx], url: "" };
       } else {
-        sponsors[ndx] = res[1].trim();
-        sponsor_urls[ndx] = res[2].trim();
+        retval[ndx] = { name: res[1].trim(), url: res[2].trim() };
       }
     }
-    return [sponsors, sponsor_urls];
+    return retval;
   }
 
   requireFieldValue(entry: Entry, adminLabel: string): string {

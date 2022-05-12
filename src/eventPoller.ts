@@ -4,7 +4,8 @@ import { Configuration } from "./config";
 import { Importer } from "./gravityforms/importer";
 import { Processor } from "./gravityforms/processor";
 import { createHash } from "crypto";
-import { BikeWeekEvent, EventModel, EventStatus } from "./database/event";
+import { EventModel } from "./database/events";
+import { BikeWeekEvent } from "./database/types";
 
 @injectable()
 export class EventPoller {

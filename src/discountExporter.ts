@@ -3,7 +3,7 @@ import {
   BikeWeekEvent,
   isAllDayEvent,
   isDiscountEvent,
-} from "./database/event";
+} from "./database/events";
 import fs from "fs/promises";
 
 @injectable()

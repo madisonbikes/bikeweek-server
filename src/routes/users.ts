@@ -1,6 +1,6 @@
 import express from "express";
 import { injectable } from "tsyringe";
-import { User, UserModel } from "../database/user";
+import { User, UserModel } from "../database/users";
 import { jwtMiddleware } from "../security/authentication";
 
 @injectable()
