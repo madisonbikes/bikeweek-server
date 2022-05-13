@@ -19,6 +19,10 @@ export function isAllDayEvent(event: BikeWeekEvent): boolean {
 export class EventModel {
   constructor(private database: Database) {}
 
+  addEvent = async (event: BikeWeekEvent): Promise<void> => {
+    await this.database.events.insertOne(event);
+  };
+
   setAllEvents = async (events: BikeWeekEvent[]): Promise<void> => {
     await this.database.events.deleteMany({});
     await this.database.events.insertMany(events);
@@ -31,9 +35,16 @@ export class EventModel {
   };
 
   findEvent = async (id: number): Promise<BikeWeekEvent | undefined> => {
-    return (await this.database.events.findOne({
+    const retval = (await this.database.events.findOne({
       id: `${id}`,
-    })) as unknown as BikeWeekEvent | undefined;
+    })) as unknown;
+    if (!retval) return undefined;
+    return retval as BikeWeekEvent;
+  };
+
+  deleteEvent = async (id: number): Promise<boolean> => {
+    const result = await this.database.events.deleteOne({ id: `${id}` });
+    return result.deletedCount != 0;
   };
 
   updateEvent = async (

@@ -36,7 +36,8 @@ export type BikeWeekEvent = {
   eventTypes: string[];
   eventDays: Date[];
   eventTimes: EventTime[];
-  modifyDate?: string;
   status: EventStatus;
   comments?: string;
+  modifyDate: Date;
+  createDate: Date;
 };

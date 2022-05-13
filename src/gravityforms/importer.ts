@@ -16,6 +16,7 @@ export class Importer {
       this.loadForms(),
       this.loadEntries(),
     ]);
+
     await this.database.gfFormFields.deleteMany({});
     await this.database.gfFormFields.insertMany(formFields.fields);
 

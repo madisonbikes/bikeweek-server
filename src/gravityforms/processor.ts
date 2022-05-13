@@ -21,6 +21,8 @@ export enum EventTypes {
   FREE = "free",
 }
 
+const GF_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
 /** take data from mongo GF dump and load into structured event info */
 @injectable()
 export class Processor {
@@ -46,6 +48,8 @@ export class Processor {
       const stringStatus = eventHelper.lookupFieldValue(entry, "status");
       const status: EventStatus =
         (stringStatus as EventStatus) ?? EventStatus.SUBMITTED;
+      const createDate = parse(entry.date_created, GF_DATE_FORMAT, new Date());
+      const modifyDate = parse(entry.date_updated, GF_DATE_FORMAT, new Date());
 
       const newEntry: BikeWeekEvent = {
         id: entry.id.valueOf(),
@@ -58,7 +62,8 @@ export class Processor {
         eventDays: eventHelper.getEventDays(entry),
         eventTimes: eventHelper.getEventTimes(entry),
         eventGraphicUrl: eventHelper.lookupFieldValue(entry, "event_graphic"),
-        modifyDate: entry.date_updated,
+        modifyDate,
+        createDate,
         status,
         comments: eventHelper.lookupFieldValue(entry, "comments"),
       };

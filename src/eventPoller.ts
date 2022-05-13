@@ -35,17 +35,22 @@ export class EventPoller {
     await this.importer.import();
 
     const importedEvents = await this.processor.extractEvents();
-    this.eventModel.setAllEvents(importedEvents);
-
-    if (this.isUpdated(importedEvents)) {
-      //await Promise.all([
-      //await this.schedExporter.start(importedEvents),
-      //await this.discountExporter.start(importedEvents),
-      //]);
-      console.log("done");
-    } else {
-      console.log("done, form data not updated");
+    let skipCount = 0,
+      addCount = 0;
+    for (const event of importedEvents) {
+      const eventExists =
+        (await this.eventModel.findEvent(event.id)) != undefined;
+      if (!eventExists) {
+        addCount++;
+        console.log(
+          `Importing new event ${event.id}: "${event.name}" from remote`
+        );
+        await this.eventModel.addEvent(event);
+      } else {
+        skipCount++;
+      }
     }
+    console.log(`Finished import, skipped ${skipCount} added ${addCount}`);
   }
 
   private lastCount = -1;
@@ -55,7 +60,7 @@ export class EventPoller {
   private isUpdated(events: BikeWeekEvent[]) {
     const hash = createHash("sha1");
     for (const e of events) {
-      hash.update(e.modifyDate ?? "");
+      hash.update(e.modifyDate.toUTCString() ?? "");
     }
     const calculatedHash = hash.digest("base64");
     const updated =

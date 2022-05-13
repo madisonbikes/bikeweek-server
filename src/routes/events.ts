@@ -30,11 +30,25 @@ export class EventRoutes {
       try {
         const eventData: Partial<BikeWeekEvent> = request.body;
         const id = parseInt(request.params.eventId);
+        eventData.modifyDate = new Date();
         const event = await this.eventModel.updateEvent(id, eventData);
         if (!event) {
           response.status(404).send("not found");
         } else {
           response.send(event);
+        }
+      } catch (err) {
+        response.status(400).send("invalid request");
+      }
+    })
+    .delete("/:eventId", jwtMiddleware, async (request, response) => {
+      try {
+        const id = parseInt(request.params.eventId);
+        const event = await this.eventModel.deleteEvent(id);
+        if (!event) {
+          response.status(404).send("not found");
+        } else {
+          response.send("ok");
         }
       } catch (err) {
         response.status(400).send("invalid request");
