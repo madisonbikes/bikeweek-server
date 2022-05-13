@@ -1,25 +1,7 @@
 import { injectable } from "tsyringe";
 import { EventTypes } from "../gravityforms/processor";
 import { Database } from "./database";
-import { BikeWeekEvent, EventStatus } from "./types";
-
-/** is this really as good as typescript can do? blech! */
-export function reverseMapEventStatus(
-  value: string | undefined
-): EventStatus | undefined {
-  switch (value?.toLowerCase()) {
-    case "approved":
-      return EventStatus.APPROVED;
-    case "cancelled":
-      return EventStatus.CANCELLED;
-    case "pending":
-      return EventStatus.PENDING;
-    case "submitted":
-      return EventStatus.SUBMITTED;
-    default:
-      return undefined;
-  }
-}
+import { BikeWeekEvent } from "./types";
 
 export function isDiscountEvent(event: BikeWeekEvent): boolean {
   return event.eventTypes.includes(EventTypes.DISCOUNT);

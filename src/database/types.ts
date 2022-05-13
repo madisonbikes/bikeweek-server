@@ -4,10 +4,10 @@ export type EventTime = {
 };
 
 export enum EventStatus {
-  SUBMITTED,
-  APPROVED,
-  CANCELLED,
-  PENDING,
+  SUBMITTED = "submitted",
+  APPROVED = "approved",
+  CANCELLED = "cancelled",
+  PENDING = "pending",
 }
 
 export type EventSponsor = {
@@ -38,4 +38,5 @@ export type BikeWeekEvent = {
   eventTimes: EventTime[];
   modifyDate?: string;
   status: EventStatus;
+  comments?: string;
 };

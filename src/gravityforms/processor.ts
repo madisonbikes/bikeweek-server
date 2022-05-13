@@ -1,7 +1,6 @@
 import { Entry, Field } from "./types";
 import { parse } from "date-fns";
 
-import { reverseMapEventStatus } from "../database/events";
 import { Configuration } from "../config";
 import { locations } from "../locations";
 import { injectable } from "tsyringe";
@@ -45,8 +44,8 @@ export class Processor {
     for (const entry of responses) {
       const sponsors = eventHelper.getSponsorInfo(entry);
       const stringStatus = eventHelper.lookupFieldValue(entry, "status");
-      const status =
-        reverseMapEventStatus(stringStatus) ?? EventStatus.SUBMITTED;
+      const status: EventStatus =
+        (stringStatus as EventStatus) ?? EventStatus.SUBMITTED;
 
       const newEntry: BikeWeekEvent = {
         id: entry.id.valueOf(),
@@ -61,6 +60,7 @@ export class Processor {
         eventGraphicUrl: eventHelper.lookupFieldValue(entry, "event_graphic"),
         modifyDate: entry.date_updated,
         status,
+        comments: eventHelper.lookupFieldValue(entry, "comments"),
       };
       // promote non-PAID and non-DISCOUNT items to FREE
       if (
