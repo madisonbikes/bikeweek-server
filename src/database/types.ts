@@ -19,13 +19,6 @@ export type EventSponsor = {
   url: string;
 };
 
-export enum EventTypes {
-  DISCOUNT = "discount",
-  ENDOFWEEKPARTY = "endofweekparty",
-  PAID = "paid",
-  FREE = "free",
-}
-
 export type EventLocation = {
   name: string;
   sched_venue?: string; // defaults to name

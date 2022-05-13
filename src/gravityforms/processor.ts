@@ -13,8 +13,15 @@ import {
   EventSponsor,
   EventStatus,
   EventTime,
-  EventTypes,
 } from "../database/types";
+
+/** this list is NOT exhaustive, just used for conditional behaviors in the backend */
+export enum EventTypes {
+  DISCOUNT = "discount",
+  ENDOFWEEKPARTY = "endofweekparty",
+  PAID = "paid",
+  FREE = "free",
+}
 
 /** take data from mongo GF dump and load into structured event info */
 @injectable()

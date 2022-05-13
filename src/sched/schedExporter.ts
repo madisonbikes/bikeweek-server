@@ -3,7 +3,8 @@ import { format } from "date-fns";
 import { isAllDayEvent, isEndOfWeekParty } from "../database/events";
 import { SchedApi } from "./api";
 import { buildMapsUrl } from "../locations";
-import { BikeWeekEvent, EventStatus, EventTypes } from "../database/types";
+import { BikeWeekEvent, EventStatus } from "../database/types";
+import { EventTypes } from "../gravityforms/processor";
 
 @injectable()
 export class SchedExporter {
@@ -147,11 +148,11 @@ export class SchedExporter {
             sponsorText += ", ";
           }
         }
-        const url = event.sponsorUrls[index];
+        const url = value.url;
         if (url && url.length > 0) {
-          sponsorText += `<a href="${url}">${event.sponsors[index]}</a>`;
+          sponsorText += `<a href="${url}">${value.name}</a>`;
         } else {
-          sponsorText += event.sponsors[index];
+          sponsorText += value.name;
         }
       });
     }
