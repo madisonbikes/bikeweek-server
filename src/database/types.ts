@@ -1,7 +1,3 @@
-export type EventDay = {
-  localDate: Date;
-};
-
 export type EventTime = {
   start: string;
   end: string;
@@ -38,7 +34,7 @@ export type BikeWeekEvent = {
   sponsors: EventSponsor[];
   location?: EventLocation;
   eventTypes: string[];
-  eventDays: EventDay[];
+  eventDays: Date[];
   eventTimes: EventTime[];
   modifyDate?: string;
   status: EventStatus;

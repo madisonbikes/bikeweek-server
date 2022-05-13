@@ -8,7 +8,6 @@ import { injectable } from "tsyringe";
 import { Database } from "../database/database";
 import {
   BikeWeekEvent,
-  EventDay,
   EventLocation,
   EventSponsor,
   EventStatus,
@@ -100,15 +99,15 @@ class EventHelper {
     return mapped;
   }
 
-  getEventDays(entry: Entry): EventDay[] {
+  getEventDays(entry: Entry): Date[] {
     const eventDays = this.requireMultiFieldValue(entry, "event_days");
-    const retval = new Array<EventDay>();
+    const retval = new Array<Date>();
     for (const day of eventDays) {
       const parsedDate = parse(day, "MM-dd-yyyy", new Date());
       if (Number.isNaN(parsedDate.getTime())) {
         throw Error(`Invalid date encountered ${day}`);
       }
-      retval.push({ localDate: parsedDate });
+      retval.push(parsedDate);
     }
     return retval;
   }

@@ -1,6 +1,7 @@
 import { injectable } from "tsyringe";
+import { EventTypes } from "../gravityforms/processor";
 import { Database } from "./database";
-import { BikeWeekEvent, EventStatus, EventTypes } from "./types";
+import { BikeWeekEvent, EventStatus } from "./types";
 
 /** is this really as good as typescript can do? blech! */
 export function reverseMapEventStatus(
