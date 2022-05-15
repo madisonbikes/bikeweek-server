@@ -11,7 +11,8 @@ export class EventRoutes {
   readonly routes = express
     .Router()
     .get("/", jwtMiddleware, async (request, response) => {
-      response.send(await this.eventModel.events());
+      const events = await this.eventModel.events();
+      response.send(events);
     })
     .get("/:eventId", jwtMiddleware, async (request, response) => {
       try {

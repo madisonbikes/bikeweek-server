@@ -49,11 +49,11 @@ export class SchedExporter {
       for (const day of event.eventDays) {
         for (const timeNdx in event.eventTimes) {
           const time = event.eventTimes[timeNdx];
-          const dayOfYear = format(day.localDate, "DDD");
+          const dayOfYear = format(day, "DDD");
           const key = `${event.id}.${dayOfYear}.${timeNdx}`;
           const description = this.buildDescription(event);
 
-          const timeBase = format(day.localDate, "yyyy-MM-dd");
+          const timeBase = format(day, "yyyy-MM-dd");
           const sessionStart = `${timeBase} ${time.start}`;
           const sessionEnd = `${timeBase} ${time.end}`;
           const base = {
