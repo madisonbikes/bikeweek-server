@@ -10,20 +10,30 @@ import { EventTypes } from "../gravityforms/processor";
 export class SchedExporter {
   constructor(private sched: SchedApi) {}
 
-  async start(allEvents: BikeWeekEvent[]): Promise<void> {
+  async start(updatedEvents: BikeWeekEvent[]): Promise<void> {
+    // get complete session list so we can build a complete key list
     const sessionsResponse = await this.sched.exportSessions();
     if (sessionsResponse.isError()) {
       throw new Error(sessionsResponse.value);
     }
 
     const sessionList = sessionsResponse.value;
-    const existingKeys = new Set<string>(
-      sessionList.map((item) => {
+
+    const relevantExistingKeys = sessionList
+      .map((item) => {
         return item.event_key;
       })
-    );
+      // filter out event entries not tied to the supplied events
+      .filter((key) => {
+        return (
+          updatedEvents.find((event) => {
+            return key.startsWith(`${event.id}.`);
+          }) != undefined
+        );
+      });
+
     const handledKeys = new Set<string>();
-    const events = [...allEvents]
+    const events = [...updatedEvents]
       .sort((a, b) => a.name.localeCompare(b.name))
       .filter((event) => {
         if (isEndOfWeekParty(event)) {
@@ -77,7 +87,7 @@ export class SchedExporter {
           };
           let result;
           let action;
-          if (existingKeys.has(key)) {
+          if (relevantExistingKeys.indexOf(key) != -1) {
             result = await this.sched.modifySession(base);
             action = "modified";
           } else {
@@ -96,14 +106,15 @@ export class SchedExporter {
       }
     }
 
-    // remove handledKeys from the total key list
+    const unpublishCandidates = new Set<string>(relevantExistingKeys);
+
+    // remove handledKeys from the key list
     for (const key of handledKeys) {
-      existingKeys.delete(key);
+      unpublishCandidates.delete(key);
     }
 
-    // delete any remaining sessions
-    // FIXME this should probably be removed once the sessions have stabilized
-    for (const key of existingKeys) {
+    // remaining keys should be unpublished
+    for (const key of unpublishCandidates) {
       const result = await this.sched.deleteSession({
         session_key: key.toString(),
       });
