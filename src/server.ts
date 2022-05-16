@@ -28,6 +28,10 @@ export class ApiServer {
       app.use(cors());
     }
 
+    if (this.configuration.reactStaticRootDir) {
+      app.use("/", express.static(this.configuration.reactStaticRootDir));
+    }
+
     // used for login method
     passport.use(this.strategies.local);
 

@@ -12,6 +12,8 @@ export class Configuration {
   public readonly schedUri = `${process.env.SCHED_URI}/api/`;
   public readonly schedApiKey = `${process.env.SCHED_API_KEY}`;
 
+  public readonly reactStaticRootDir = process.env.STATIC_ROOT_DIR;
+
   public readonly mongoDbUri = `${process.env.MONGODB_URI}`;
 
   public readonly apiPort = this.parseIntWithDefault(
