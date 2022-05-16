@@ -49,7 +49,7 @@ export const locations: EventLocation[] = [
     maps_query: "43.09362734540651, -89.3487495229572",
   },
   {
-    name: "Cap City @ E. Wilson/Ingersoll",
+    name: "Cap City @ E Wilson/Ingersoll",
     maps_query: "43.08226898474152, -89.36764332963402",
   },
   {
