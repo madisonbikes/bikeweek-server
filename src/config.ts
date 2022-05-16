@@ -36,7 +36,7 @@ export class Configuration {
   ): number {
     let retval = defaultValue;
     if (value) {
-      retval = Number(defaultValue);
+      retval = Number(value);
       if (isNaN(retval)) {
         retval = defaultValue;
       }
