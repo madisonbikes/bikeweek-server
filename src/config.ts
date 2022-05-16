@@ -1,6 +1,8 @@
 import dotenv from "dotenv";
 import { injectable, singleton } from "tsyringe";
 
+const isDev = process.env.NODE_ENV === "development";
+
 @injectable()
 @singleton()
 export class Configuration {
@@ -16,10 +18,7 @@ export class Configuration {
 
   public readonly mongoDbUri = `${process.env.MONGODB_URI}`;
 
-  public readonly apiPort = this.parseIntWithDefault(
-    process.env.API_PORT,
-    3001
-  );
+  public readonly serverPort = this.parseIntWithDefault(process.env.PORT, 3001);
 
   public readonly jsonWebTokenSecret =
     process.env.JSONWEBTOKEN_SECRET || "defaultsecretnotsecure";
@@ -29,7 +28,7 @@ export class Configuration {
     10 * 60 * 1000
   );
 
-  public readonly dev = process.env.NODE_ENV === "development";
+  public readonly dev = isDev;
 
   private parseIntWithDefault(
     value: string | undefined,
@@ -48,6 +47,6 @@ export class Configuration {
 
 // this has to run first outside of constructor
 const result = dotenv.config();
-if (result.error) {
-  throw result.error;
+if (result.error && isDev) {
+  console.log(result.error);
 }

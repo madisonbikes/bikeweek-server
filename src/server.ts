@@ -42,9 +42,9 @@ export class ApiServer {
 
     app.use("/api/v1", this.apiRoutes.routes);
 
-    app.listen(this.configuration.apiPort, () => {
+    app.listen(this.configuration.serverPort, () => {
       console.log(
-        `Server listening on http://localhost:${this.configuration.apiPort}`
+        `Server listening on http://localhost:${this.configuration.serverPort}`
       );
     });
   }
