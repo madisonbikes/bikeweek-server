@@ -2,6 +2,10 @@ import { injectable, singleton } from "tsyringe";
 import { Configuration } from "../config";
 import { Collection, Db, MongoClient } from "mongodb";
 
+export type Status = {
+  lastSchedSync?: Date;
+};
+
 @injectable()
 @singleton()
 export class Database {
@@ -9,6 +13,7 @@ export class Database {
   private _gfFormFields!: Collection;
   private _gfResponses!: Collection;
   private _events!: Collection;
+  private _status!: Collection;
 
   private _database!: Db;
 
@@ -26,6 +31,22 @@ export class Database {
 
   public get gfResponses() {
     return this._gfResponses;
+  }
+
+  public async getStatus(): Promise<Status> {
+    const status = (await this._database
+      .collection("status")
+      .findOne()) as unknown as Status;
+    if (!status) {
+      return {};
+    } else {
+      return status;
+    }
+  }
+
+  public async setStatus(status: Status) {
+    await this._status.deleteMany({});
+    await this._status.insertOne(status);
   }
 
   constructor(private configuration: Configuration) {}
@@ -54,5 +75,6 @@ export class Database {
     this._events = this._database.collection("events");
     this._gfFormFields = this._database.collection("gfFormFields");
     this._gfResponses = this._database.collection("gfResponses");
+    this._status = this._database.collection("status");
   }
 }

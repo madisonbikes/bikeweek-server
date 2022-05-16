@@ -31,7 +31,7 @@ export class EventPoller {
 
   /** perform the import if form data has been updated or if it's the first execution */
   private async doImport(): Promise<void> {
-    console.log("running import/export");
+    console.log("running remote forms import");
     await this.importer.import();
 
     const importedEvents = await this.processor.extractEvents();
@@ -43,14 +43,16 @@ export class EventPoller {
       if (!eventExists) {
         addCount++;
         console.log(
-          `Importing new event ${event.id}: "${event.name}" from remote`
+          `Importing new event ${event.id}: "${event.name}" from remote forms`
         );
         await this.eventModel.addEvent(event);
       } else {
         skipCount++;
       }
     }
-    console.log(`Finished import, skipped ${skipCount} added ${addCount}`);
+    console.log(
+      `Finished remote forms import, skipped ${skipCount} added ${addCount}`
+    );
   }
 
   private lastCount = -1;
