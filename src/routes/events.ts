@@ -81,6 +81,32 @@ export class EventRoutes {
       event.modifyDate = parseISO(event.modifyDate as unknown as string);
     }
 
+    if (event.location) {
+      if (event.location.sched_address?.trim() === "") {
+        event.location.sched_address = undefined;
+      }
+      if (event.location.sched_venue?.trim() === "") {
+        event.location.sched_venue = undefined;
+      }
+      if (event.location.maps_query?.trim() === "") {
+        event.location.maps_query = undefined;
+      }
+      if (event.location.maps_placeid?.trim() === "") {
+        event.location.maps_placeid = undefined;
+      }
+      if (event.location.maps_description?.trim() === "") {
+        event.location.maps_description = undefined;
+      }
+    }
+
+    if (event.eventUrl?.trim() === "") {
+      event.eventUrl = undefined;
+    }
+
+    if (event.eventGraphicUrl?.trim() === "") {
+      event.eventGraphicUrl = undefined;
+    }
+
     // days come as array of strings, we want array of dates
     if (event.eventDays) {
       const days = event.eventDays as unknown as string[];

@@ -28,7 +28,7 @@ export class DiscountExporter {
 }
 
 function createLink(text: string, url: string | undefined) {
-  if (!url || url.trim().length == 0) {
+  if (url?.trim() === "") {
     return text;
   } else {
     return `<a href="${url}">${text}</a>`;
