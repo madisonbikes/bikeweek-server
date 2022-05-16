@@ -11,8 +11,8 @@ export class Configuration {
   public readonly gravityFormsConsumerApiKey = `${process.env.GF_CONSUMER_API_KEY}`;
   public readonly gravityFormsConsumerSecret = `${process.env.GF_CONSUMER_SECRET}`;
 
-  public readonly schedUri = `${process.env.SCHED_URI}/api/`;
-  public readonly schedApiKey = `${process.env.SCHED_API_KEY}`;
+  public readonly schedUri: string | undefined;
+  public readonly schedApiKey: string | undefined;
 
   public readonly reactStaticRootDir = process.env.STATIC_ROOT_DIR;
 
@@ -28,7 +28,22 @@ export class Configuration {
     10 * 60 * 1000
   );
 
+  public readonly enableCors = process.env.ENABLE_CORS === "true";
+
   public readonly dev = isDev;
+
+  constructor() {
+    if (process.env.SCHED_URI) {
+      this.schedUri = `${process.env.SCHED_URI}/api/`;
+    } else {
+      this.schedUri = undefined;
+    }
+    if (process.env.SCHED_API_KEY) {
+      this.schedApiKey = `${process.env.SCHED_API_KEY}`;
+    } else {
+      this.schedApiKey = undefined;
+    }
+  }
 
   private parseIntWithDefault(
     value: string | undefined,

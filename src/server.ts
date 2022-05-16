@@ -23,8 +23,8 @@ export class ApiServer {
 
     app.use(express.json());
 
-    if (this.configuration.dev) {
-      // cors only used for development -- production serves from same server/port
+    if (this.configuration.enableCors) {
+      // cors should only be used for development -- production serves from same server/port
       app.use(cors());
     }
 

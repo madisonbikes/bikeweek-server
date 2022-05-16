@@ -4,6 +4,7 @@ import { Database } from "./database/database";
 import { SchedExporter } from "./sched/schedExporter";
 import { DiscountExporter } from "./discountExporter";
 import { setTimeout, clearTimeout } from "timers";
+import { Configuration } from "./config";
 
 @injectable()
 @singleton()
@@ -12,7 +13,8 @@ export class EventExporter {
     private database: Database,
     private schedExporter: SchedExporter,
     private discountExporter: DiscountExporter,
-    private eventModel: EventModel
+    private eventModel: EventModel,
+    private configuration: Configuration
   ) {}
 
   private cancelTimeout: NodeJS.Timeout | undefined;
@@ -31,6 +33,10 @@ export class EventExporter {
 
   // bridge gap to async safely
   private syncDoExport() {
+    if (!this.configuration.schedUri || !this.configuration.schedApiKey) {
+      console.log("Skipping sched sync without URI and/or API key");
+      return;
+    }
     Promise.resolve(this.doExport())
       .then(() => console.log("Successful sync to sched"))
       .catch((e) => console.log(e));
