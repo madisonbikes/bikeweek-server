@@ -89,7 +89,7 @@ export class SchedApi {
     const fullEndpoint = this.configuration.schedUri + endpoint;
     return superagent
       .post(fullEndpoint)
-      .set("User-Agent", "madisonbikeweek2021-importer/1.0.0")
+      .set("User-Agent", "madisonbikeweek-importer/1.0.0")
       .set("Content-Type", "application/x-www-form-urlencoded")
       .send(newRequestData);
   }
