@@ -8,8 +8,8 @@ import {
   SessionListResponse,
 } from "./types";
 import superagent from "superagent";
-import { error, ok, Result } from "../util/result";
-import { sleep } from "../util/await-sleep";
+import { error, ok, Result } from "../utils/result";
+import { sleep } from "../utils/await-sleep";
 import { injectable } from "tsyringe";
 import { Configuration } from "../config";
 

@@ -1,14 +1,14 @@
 import { injectable } from "tsyringe";
 import { setIntervalAsync } from "set-interval-async/dynamic";
-import { Configuration } from "./config";
-import { Importer } from "./gravityforms/importer";
-import { Processor } from "./gravityforms/processor";
+import { Configuration } from "../config";
+import { Importer } from "./importer";
+import { Processor } from "./processor";
 import { createHash } from "crypto";
-import { EventModel } from "./database/events";
-import { BikeWeekEvent } from "./database/types";
+import { EventModel } from "../database/events";
+import { BikeWeekEvent } from "../database/types";
 
 @injectable()
-export class EventPoller {
+export class RemoteEventPoller {
   constructor(
     private configuration: Configuration,
     private importer: Importer,

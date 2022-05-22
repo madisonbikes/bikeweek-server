@@ -9,7 +9,9 @@
     "pm2-start": "pm2 startOrRestart ecosystem.config.js",
     "pm2-stop": "pm2 stop ecosystem.config.js",
     "lint": "eslint '**/*.ts' '**/*.js'",
-    "check-package-updates": "npx npm-check-updates"
+    "check-package-updates": "npx npm-check-updates",
+    "test": "NODE_ENV=test npx jest",
+    "coverage": "NODE_ENV=test npx jest --coverage=true"
   },
   "repository": {
     "type": "git",
@@ -40,7 +42,7 @@
     "reflect-metadata": "^0.1.13",
     "set-interval-async": "^2.0.3",
     "superagent": "^7.1.3",
-    "ts-node": "^10.7.0",
+    "ts-node": "^10.8.0",
     "tsyringe": "^4.6.0",
     "typescript": "^4.6.4",
     "yargs": "^17.5.1"
@@ -58,13 +60,18 @@
     "@types/passport-local": "^1.0.34",
     "@types/set-interval-async": "^1.0.0",
     "@types/superagent": "^4.1.15",
+    "@types/supertest": "^2.0.12",
     "@types/yargs": "^17.0.10",
     "@typescript-eslint/eslint-plugin": "^5.25.0",
     "@typescript-eslint/parser": "^5.25.0",
-    "eslint": "^8.15.0",
+    "mongodb-memory-server": "^8.5.2",
+    "jest": "^28.1.0",
+    "eslint": "^8.16.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-no-autofix": "^1.2.3",
     "prettier": "2.6.2",
+    "supertest": "^6.2.3",
+    "ts-jest": "^28.0.2",
     "ts-node-dev": "^1.1.8"
   }
 }

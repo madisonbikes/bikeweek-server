@@ -1,14 +1,16 @@
 import { injectable, singleton } from "tsyringe";
-import { EventModel } from "./database/events";
-import { Database } from "./database/database";
-import { SchedExporter } from "./sched/schedExporter";
-import { DiscountExporter } from "./discountExporter";
+import { EventModel } from "../database/events";
+import { Database } from "../database/database";
+import { SchedExporter } from "./schedExporter";
+import { DiscountExporter } from "../discountExporter";
 import { setTimeout, clearTimeout } from "timers";
-import { Configuration } from "./config";
+import { Configuration } from "../config";
+
+/** handles sync to sched */
 
 @injectable()
 @singleton()
-export class EventExporter {
+export class EventSync {
   constructor(
     private database: Database,
     private schedExporter: SchedExporter,
@@ -18,6 +20,11 @@ export class EventExporter {
   ) {}
 
   private cancelTimeout: NodeJS.Timeout | undefined;
+
+  async start(): Promise<void> {
+    // launch initial trigger
+    this.trigger();
+  }
 
   trigger() {
     if (this.cancelTimeout) {
