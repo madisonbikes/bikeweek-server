@@ -66,6 +66,7 @@ export class SchedExporter {
           const timeBase = format(day, "yyyy-MM-dd");
           const sessionStart = `${timeBase} ${time.start}`;
           const sessionEnd = `${timeBase} ${time.end}`;
+          const sortedEventTypes = sortEventTypes(event.eventTypes);
           const base = {
             session_key: key,
             name:
@@ -174,3 +175,24 @@ export class SchedExporter {
     }
   }
 }
+
+export const sortEventTypes = (types: string[]): string[] => {
+  const retval = [...types];
+  retval.sort((a, b) => {
+    const a1 = eventTypeSortable(a);
+    const b1 = eventTypeSortable(b);
+    if (a1 === b1) return 0;
+    return a1 > b1 ? 1 : -1;
+  });
+  return retval;
+};
+
+const eventTypeSortable = (type: string) => {
+  if (type === "food") {
+    return "aaaaafood";
+  }
+  if (type === "ride") {
+    return "aaaaride";
+  }
+  return type;
+};
