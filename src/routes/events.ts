@@ -3,18 +3,15 @@ import express from "express";
 import { injectable } from "tsyringe";
 import { EventModel } from "../database/events";
 import { BikeWeekEvent } from "../database/types";
-import { EventExporter } from "../eventExporter";
+import { EventSync } from "../sched/sync";
 import { jwtMiddleware } from "../security/authentication";
 
 @injectable()
 export class EventRoutes {
   constructor(
     private eventModel: EventModel,
-    private eventExporter: EventExporter
-  ) {
-    // trigger an export at startup to catch anything we might have missed?
-    this.eventExporter.trigger();
-  }
+    private eventExporter: EventSync
+  ) {}
 
   readonly routes = express
     .Router()

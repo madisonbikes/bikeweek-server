@@ -6,6 +6,7 @@ import { ApiRoutes } from "./routes";
 import { Strategies } from "./security/authentication";
 import cors from "cors";
 import helmet from "helmet";
+import http, { Server } from "http";
 
 @injectable()
 export class ApiServer {
@@ -15,7 +16,9 @@ export class ApiServer {
     private strategies: Strategies
   ) {}
 
-  async start(): Promise<void> {
+  server: Server | undefined;
+
+  async create(): Promise<Server> {
     const app = express();
 
     // security
@@ -41,11 +44,20 @@ export class ApiServer {
     app.use(passport.initialize());
 
     app.use("/api/v1", this.apiRoutes.routes);
+    this.server = http.createServer(app);
+    return this.server;
+  }
 
-    app.listen(this.configuration.serverPort, () => {
+  async start(): Promise<void> {
+    await this.create();
+    this.server?.listen(this.configuration.serverPort, () => {
       console.log(
         `Server listening on http://localhost:${this.configuration.serverPort}`
       );
     });
+  }
+
+  async stop(): Promise<void> {
+    this.server?.close();
   }
 }

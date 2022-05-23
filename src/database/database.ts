@@ -15,7 +15,8 @@ export class Database {
   private _events!: Collection;
   private _status!: Collection;
 
-  private _database!: Db;
+  private client?: MongoClient;
+  private database?: Db;
 
   public get users() {
     return this._users;
@@ -34,8 +35,8 @@ export class Database {
   }
 
   public async getStatus(): Promise<Status> {
-    const status = (await this._database
-      .collection("status")
+    const status = (await this.database
+      ?.collection("status")
       .findOne()) as unknown as Status;
     if (!status) {
       return {};
@@ -52,29 +53,27 @@ export class Database {
   constructor(private configuration: Configuration) {}
 
   async start(): Promise<void> {
-    const client: MongoClient = new MongoClient(
-      this.configuration.mongoDbUri,
-      {}
-    );
-    await client.connect();
+    console.log(`Connecting to ${this.configuration.mongoDbUri}`);
+    this.client = new MongoClient(this.configuration.mongoDbUri, {});
+    await this.client.connect();
 
-    this._database = client.db("bikeweek");
+    this.database = this.client.db("bikeweek");
 
-    const collectionList = this._database.listCollections(
-      { name: "users" },
-      { nameOnly: true }
-    );
-    if (!(await collectionList.hasNext())) {
-      this._database.createCollection("users");
-      console.log("creating collection");
-    }
-    collectionList.close();
-
-    this._users = this._database.collection("users");
+    this._users = this.database.collection("users");
     this._users.createIndex({ username: 1 });
-    this._events = this._database.collection("events");
-    this._gfFormFields = this._database.collection("gfFormFields");
-    this._gfResponses = this._database.collection("gfResponses");
-    this._status = this._database.collection("status");
+
+    this._events = this.database.collection("events");
+    this._events.createIndex({ id: 1 });
+
+    this._gfFormFields = this.database.collection("gfFormFields");
+    this._gfResponses = this.database.collection("gfResponses");
+    this._status = this.database.collection("status");
+  }
+
+  async stop(): Promise<void> {
+    this.database = undefined;
+
+    await this.client?.close();
+    this.client = undefined;
   }
 }
