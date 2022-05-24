@@ -40,7 +40,7 @@ export const locations: EventLocation[] = [
   },
   {
     name: "The Velo UnderRound",
-    sched_address: "Capital City Trail, Fitchburg, WI 53711",
+    sched_address: "4789 Crescent Rd, Madison, WI 53711, USA",
     maps_query: "43.02384174161428, -89.46118663604771",
     maps_placeid: "ChIJtTh2R_GtB4gR3FXbJot9IvU",
   },
