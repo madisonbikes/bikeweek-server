@@ -15,7 +15,7 @@ export class EventRoutes {
 
   readonly routes = express
     .Router()
-    .get("/", jwtMiddleware, async (request, response) => {
+    .get("/", jwtMiddleware, async (_request, response) => {
       const events = await this.eventModel.events();
       response.send(events);
     })
@@ -29,6 +29,7 @@ export class EventRoutes {
           response.send(event);
         }
       } catch (err) {
+        console.log(err);
         response.status(400).send("invalid request");
       }
     })
@@ -49,6 +50,7 @@ export class EventRoutes {
           this.eventExporter.trigger();
         }
       } catch (err) {
+        console.log(err);
         response.status(400).send("invalid request");
       }
     })
@@ -65,6 +67,7 @@ export class EventRoutes {
           this.eventExporter.trigger();
         }
       } catch (err) {
+        console.log(err);
         response.status(400).send("invalid request");
       }
     });
