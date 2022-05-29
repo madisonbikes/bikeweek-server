@@ -1,11 +1,14 @@
 import {
   setupSuite,
+  testConfiguration,
   testContainer,
   testDatabase,
   testRequest,
   TestRequest,
 } from "../test";
 import { ApiServer } from "../server";
+import { JwtPayload, verify } from "jsonwebtoken";
+import { fromUnixTime } from "date-fns";
 
 describe("login route", () => {
   let apiServer: ApiServer;
@@ -16,6 +19,18 @@ describe("login route", () => {
   beforeAll(async () => {
     apiServer = testContainer().resolve(ApiServer);
     request = testRequest(await apiServer.create());
+
+    const config = testConfiguration();
+    config.jwt = {
+      // preserve defaults
+      ...config.jwt,
+
+      // override
+      secret: "secret",
+      audience: "audience",
+      issuer: "issuer",
+      expiresIn: "10m",
+    };
 
     // create a test user for login
     testDatabase().users.deleteMany({});
@@ -36,8 +51,18 @@ describe("login route", () => {
       .send({ username: "testuser", password: "password" })
       .expect(200)
       .expect((request) => {
-        // assume this is a JWT
-        expect(request.text.length).toBeGreaterThan(100);
+        // request returns a JWT
+        const verified = verify(request.text, "secret", {
+          audience: "audience",
+          issuer: "issuer",
+        }) as JwtPayload;
+
+        expect(verified.sub).toEqual("testuser");
+
+        // verify expire date is ~10min in future
+        const currentDate = Date.now() / 1000;
+        expect(verified.exp).toBeGreaterThan(currentDate + 9 * 60);
+        expect(verified.exp).toBeLessThan(currentDate + 10 * 60);
       });
   });
 

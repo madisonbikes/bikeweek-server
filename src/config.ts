@@ -3,6 +3,13 @@ import { injectable, singleton } from "tsyringe";
 
 const isDev = process.env.NODE_ENV === "development";
 
+export type JwtConfiguration = {
+  secret: string;
+  issuer: string;
+  audience: string;
+  expiresIn: string;
+};
+
 @injectable()
 @singleton()
 export class Configuration {
@@ -20,8 +27,7 @@ export class Configuration {
 
   public readonly serverPort = this.parseIntWithDefault(process.env.PORT, 3001);
 
-  public readonly jsonWebTokenSecret =
-    process.env.JSONWEBTOKEN_SECRET || "defaultsecretnotsecure";
+  public readonly jwt: JwtConfiguration;
 
   public readonly pollInterval = this.parseIntWithDefault(
     process.env.POLLINTERVAL,
@@ -43,6 +49,12 @@ export class Configuration {
     } else {
       this.schedApiKey = undefined;
     }
+    this.jwt = {
+      secret: process.env.JSONWEBTOKEN_SECRET || "defaultsecretnotsecure",
+      audience: "bikeweekadmin",
+      issuer: "bikeweekadmin",
+      expiresIn: "14d",
+    };
   }
 
   private parseIntWithDefault(

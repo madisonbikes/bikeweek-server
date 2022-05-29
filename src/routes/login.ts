@@ -1,10 +1,9 @@
 import express from "express";
 import { injectable } from "tsyringe";
-import { Configuration } from "../config";
-import jwt from "jsonwebtoken";
 import { AuthenticatedUser, localMiddleware } from "../security/authentication";
 import * as yup from "yup";
-import { validate } from "./validate";
+import { validateSchema } from "../security/validateSchema";
+import { JwtManager } from "../security/jwt";
 
 const schema = yup
   .object({
@@ -16,16 +15,16 @@ const schema = yup
 
 @injectable()
 export class LoginRoutes {
-  constructor(private configuration: Configuration) {}
+  constructor(private jwtManager: JwtManager) {}
   readonly routes = express
     .Router()
     .post(
       "/login",
-      validate(schema),
+      validateSchema(schema),
       localMiddleware,
       async (request, response) => {
         const user = request.user as AuthenticatedUser;
-        const token = jwt.sign(user, this.configuration.jsonWebTokenSecret);
+        const token = this.jwtManager.sign(user);
         response.send(token);
       }
     );

@@ -2,10 +2,11 @@ import { injectable } from "tsyringe";
 import { Database } from "./database";
 import bcrypt from "bcryptjs";
 
-export interface User {
+export type User = {
   username: string;
   password: string;
-}
+  admin?: boolean;
+};
 
 @injectable()
 export class UserModel {
@@ -17,6 +18,10 @@ export class UserModel {
     return (await this.database.users.findOne({
       username: username,
     })) as unknown as User | undefined;
+  };
+
+  users = async (): Promise<User[]> => {
+    return (await this.database.users.find({}).toArray()) as unknown as User[];
   };
 
   addUser = async (user: User): Promise<User | undefined> => {

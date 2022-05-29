@@ -8,7 +8,7 @@ type Middleware = (
 ) => Promise<void>;
 
 /** validate the request against the supplied yup schema, placing validated object into the request.validated property */
-export const validate = <T>(schema: Schema<T>): Middleware => {
+export const validateSchema = <T>(schema: Schema<T>): Middleware => {
   return async (request, response, next) => {
     try {
       const body = request.body;
