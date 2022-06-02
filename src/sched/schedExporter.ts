@@ -49,8 +49,8 @@ export class SchedExporter {
           return false;
         }
         if (
-          event.status != EventStatus.APPROVED &&
-          event.status != EventStatus.CANCELLED
+          event.status !== EventStatus.APPROVED &&
+          event.status !== EventStatus.CANCELLED
         ) {
           console.log(`Skipping ${event.name} (unapproved)`);
           return false;
