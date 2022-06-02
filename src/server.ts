@@ -5,7 +5,6 @@ import passport from "passport";
 import { ApiRoutes } from "./routes";
 import { Strategies } from "./security/authentication";
 import cors from "cors";
-import helmet from "helmet";
 import http, { Server } from "http";
 
 @injectable()
