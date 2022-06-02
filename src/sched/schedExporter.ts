@@ -48,7 +48,10 @@ export class SchedExporter {
           console.log(`Skipping ${event.name} (no days)`);
           return false;
         }
-        if (event.status != EventStatus.APPROVED) {
+        if (
+          event.status != EventStatus.APPROVED &&
+          event.status != EventStatus.CANCELLED
+        ) {
           console.log(`Skipping ${event.name} (unapproved)`);
           return false;
         }
