@@ -22,7 +22,7 @@ export class ApiServer {
     const app = express();
 
     // security
-    app.use(helmet());
+    app.use(helmet({ contentSecurityPolicy: false }));
 
     app.use(express.json());
 
