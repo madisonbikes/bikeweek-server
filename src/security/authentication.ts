@@ -25,7 +25,6 @@ export class Strategies {
   readonly jwt = new JwtStrategy(
     this.jwtManager.strategyOptions(),
     async (payload: JwtPayload, done) => {
-      console.log(`payload ${JSON.stringify(payload)}`);
       const lookupUser = await this.userModel.findUser(payload?.sub ?? "");
       if (lookupUser) {
         done(null, this.authenticatedUser(lookupUser));
