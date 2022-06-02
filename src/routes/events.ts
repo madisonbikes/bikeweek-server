@@ -5,6 +5,7 @@ import { EventModel } from "../database/events";
 import { BikeWeekEvent } from "../database/types";
 import { EventSync } from "../sched/sync";
 import { jwtMiddleware } from "../security/authentication";
+import { verifyAdmin } from "../security/validateAdmin";
 
 @injectable()
 export class EventRoutes {
@@ -15,11 +16,11 @@ export class EventRoutes {
 
   readonly routes = express
     .Router()
-    .get("/", jwtMiddleware, async (request, response) => {
+    .get("/", jwtMiddleware, verifyAdmin, async (_request, response) => {
       const events = await this.eventModel.events();
       response.send(events);
     })
-    .get("/:eventId", jwtMiddleware, async (request, response) => {
+    .get("/:eventId", jwtMiddleware, verifyAdmin, async (request, response) => {
       try {
         const id = parseInt(request.params.eventId);
         const event = await this.eventModel.findEvent(id);
@@ -29,10 +30,11 @@ export class EventRoutes {
           response.send(event);
         }
       } catch (err) {
+        console.log(err);
         response.status(400).send("invalid request");
       }
     })
-    .put("/:eventId", jwtMiddleware, async (request, response) => {
+    .put("/:eventId", jwtMiddleware, verifyAdmin, async (request, response) => {
       try {
         const eventData: Partial<BikeWeekEvent> = this.normalizeEvent(
           request.body
@@ -49,25 +51,32 @@ export class EventRoutes {
           this.eventExporter.trigger();
         }
       } catch (err) {
+        console.log(err);
         response.status(400).send("invalid request");
       }
     })
-    .delete("/:eventId", jwtMiddleware, async (request, response) => {
-      try {
-        const id = parseInt(request.params.eventId);
-        const event = await this.eventModel.deleteEvent(id);
-        if (!event) {
-          response.status(404).send("not found");
-        } else {
-          response.send("ok");
+    .delete(
+      "/:eventId",
+      jwtMiddleware,
+      verifyAdmin,
+      async (request, response) => {
+        try {
+          const id = parseInt(request.params.eventId);
+          const event = await this.eventModel.deleteEvent(id);
+          if (!event) {
+            response.status(404).send("not found");
+          } else {
+            response.send("ok");
 
-          // trigger an export on any modification
-          this.eventExporter.trigger();
+            // trigger an export on any modification
+            this.eventExporter.trigger();
+          }
+        } catch (err) {
+          console.log(err);
+          response.status(400).send("invalid request");
         }
-      } catch (err) {
-        response.status(400).send("invalid request");
       }
-    });
+    );
 
   normalizeEvent = (event: Partial<BikeWeekEvent>): Partial<BikeWeekEvent> => {
     if (event.createDate) {

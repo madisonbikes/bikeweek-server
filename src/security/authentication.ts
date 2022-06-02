@@ -1,13 +1,14 @@
 import { injectable } from "tsyringe";
-import { Configuration } from "../config";
-import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
+import { Strategy as JwtStrategy } from "passport-jwt";
 import { User, UserModel } from "../database/users";
 import { Strategy as LocalStrategy } from "passport-local";
 import passport from "passport";
+import { JwtManager, JwtPayload } from "./jwt";
 
-export interface AuthenticatedUser extends Express.User {
+export type AuthenticatedUser = Express.User & {
   username: string;
-}
+  admin: boolean;
+};
 
 export const localMiddleware = passport.authenticate("local", {
   session: false,
@@ -18,24 +19,14 @@ export const jwtMiddleware = passport.authenticate("jwt", { session: false });
 
 @injectable()
 export class Strategies {
-  constructor(
-    private configuration: Configuration,
-    private userModel: UserModel
-  ) {}
+  constructor(private userModel: UserModel, private jwtManager: JwtManager) {}
 
   /** passport strategy implementation for JWT bearer auth tokens */
   readonly jwt = new JwtStrategy(
-    {
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: this.configuration.jsonWebTokenSecret,
-    },
-    async (payload: User, done) => {
-      if (!payload.username) {
-        done("invalid jwt", false);
-        return;
-      }
-
-      const lookupUser = await this.userModel.findUser(payload.username);
+    this.jwtManager.strategyOptions(),
+    async (payload: JwtPayload, done) => {
+      console.log(`payload ${JSON.stringify(payload)}`);
+      const lookupUser = await this.userModel.findUser(payload?.sub ?? "");
       if (lookupUser) {
         done(null, this.authenticatedUser(lookupUser));
       } else {
@@ -66,6 +57,6 @@ export class Strategies {
 
   /** sanitizes user info for export to JWT and into request object */
   private authenticatedUser(user: User): AuthenticatedUser {
-    return { username: user.username };
+    return { username: user.username, admin: user.admin ?? false };
   }
 }

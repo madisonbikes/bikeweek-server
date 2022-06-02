@@ -1,28 +1,28 @@
 /** schema for sched responses */
 
-export interface BaseRequest {
+export type BaseRequest = {
   [key: string]: unknown;
-}
+};
 
-export interface SessionListRequest extends BaseRequest {
+export type SessionListRequest = BaseRequest & {
   since?: number;
   format?: string;
   status?: string;
   custom_data?: string;
-}
+};
 
-export interface SessionExportRequest extends BaseRequest {
+export type SessionExportRequest = BaseRequest & {
   since?: number;
   format?: string;
   status?: string;
   custom_data?: string;
-}
+};
 
-export interface DeleteSessionRequest extends BaseRequest {
+export type DeleteSessionRequest = BaseRequest & {
   session_key: string;
-}
+};
 
-export interface AddSessionRequest extends BaseRequest {
+export type AddSessionRequest = BaseRequest & {
   session_key: string;
   name: string;
   session_start: string;
@@ -38,22 +38,9 @@ export interface AddSessionRequest extends BaseRequest {
   rsvp_url?: string;
   ticket_message?: string;
   active?: string;
-}
+};
 
-export interface BaseResponse {
-  [key: string]: unknown;
-}
-
-export interface SessionListResponse extends BaseResponse {
-  event_key: string;
-}
-
-export interface SessionExportResponse extends BaseResponse {
-  event_key: string;
-  active: string;
-}
-
-export interface ModifySessionRequest extends BaseRequest {
+export type ModifySessionRequest = BaseRequest & {
   session_key: string;
   name?: string;
   // format: YYYY-MM-DD HH:MM
@@ -72,4 +59,17 @@ export interface ModifySessionRequest extends BaseRequest {
   rsvp_url?: string;
   ticket_message?: string;
   active?: string;
-}
+};
+
+export type BaseResponse = {
+  [key: string]: unknown;
+};
+
+export type SessionListResponse = BaseResponse & {
+  event_key: string;
+};
+
+export type SessionExportResponse = BaseResponse & {
+  event_key: string;
+  active: string;
+};

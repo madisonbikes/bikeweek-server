@@ -48,7 +48,10 @@ export class SchedExporter {
           console.log(`Skipping ${event.name} (no days)`);
           return false;
         }
-        if (event.status != EventStatus.APPROVED) {
+        if (
+          event.status !== EventStatus.APPROVED &&
+          event.status !== EventStatus.CANCELLED
+        ) {
           console.log(`Skipping ${event.name} (unapproved)`);
           return false;
         }
@@ -60,26 +63,26 @@ export class SchedExporter {
         for (const timeNdx in event.eventTimes) {
           const time = event.eventTimes[timeNdx];
           const dayOfYear = format(day, "DDD");
-          const key = `${event.id}.${dayOfYear}.${timeNdx}`;
+          const session_key = `${event.id}.${dayOfYear}.${timeNdx}`;
           const description = this.buildDescription(event);
 
           const timeBase = format(day, "yyyy-MM-dd");
-          const sessionStart = `${timeBase} ${time.start}`;
-          const sessionEnd = `${timeBase} ${time.end}`;
-          const sortedEventTypes = sortEventTypes(event.eventTypes);
+          const session_start = `${timeBase} ${time.start}`;
+          const session_end = `${timeBase} ${time.end}`;
+          const session_type = sortEventTypes(event.eventTypes)
+            .filter((value) => value != EventTypes.ENDOFWEEKPARTY)
+            .join(",");
           const base = {
-            session_key: key,
+            session_key,
             name:
               event.status !== EventStatus.CANCELLED
                 ? event.name
                 : `CANCELLED - ${event.name}`,
-            description: description,
+            description,
             // format: YYYY-MM-DD HH:MM
-            session_start: sessionStart,
-            session_end: sessionEnd,
-            session_type: event.eventTypes
-              .filter((value) => value != EventTypes.ENDOFWEEKPARTY)
-              .join(","),
+            session_start,
+            session_end,
+            session_type,
             venue: event.location?.sched_venue ?? event.location?.name ?? "",
             address: event.location?.sched_address ?? "",
             active: event.status === EventStatus.APPROVED ? "Y" : "N",
@@ -88,7 +91,7 @@ export class SchedExporter {
           };
           let result;
           let action;
-          if (relevantExistingKeys.indexOf(key) != -1) {
+          if (relevantExistingKeys.indexOf(session_key) != -1) {
             result = await this.sched.modifySession(base);
             action = "modified";
           } else {
@@ -96,13 +99,13 @@ export class SchedExporter {
             action = "added";
           }
           if (result.isError()) {
-            console.log(`${key} ${action} error: ${result.value}`);
+            console.log(`${session_key} ${action} error: ${result.value}`);
           } else {
             console.log(
-              `${key} ${action} ok(${result.value}) status: ${event.status}`
+              `${session_key} ${action} ok(${result.value}) status: ${event.status}`
             );
           }
-          handledKeys.add(key);
+          handledKeys.add(session_key);
         }
       }
     }
@@ -143,7 +146,7 @@ export class SchedExporter {
     description += modified;
 
     if (event.eventUrl?.trim() === "") {
-      description += `\n<br><a href="${event.eventUrl}">Learn more about this event here!</a>`;
+      description += `\n<br><a href="${event.eventUrl}" target="_blank">Learn more about this event here!</a>`;
     }
     return description;
   }
@@ -162,7 +165,7 @@ export class SchedExporter {
         }
         const url = value.url;
         if (url && url.length > 0) {
-          sponsorText += `<a href="${url}">${value.name}</a>`;
+          sponsorText += `<a href="${url}" target="_blank">${value.name}</a>`;
         } else {
           sponsorText += value.name;
         }

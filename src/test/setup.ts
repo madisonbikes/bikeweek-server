@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { Configuration } from "../config";
+import { Configuration, JwtConfiguration } from "../config";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import {
   container as rootContainer,
@@ -10,8 +10,8 @@ import {
 import { Database } from "../database/database";
 import assert from "assert";
 
-let mongoUri: string;
-let mongoServer: MongoMemoryServer | undefined;
+let testMongoUri: string;
+let testMongoServer: MongoMemoryServer | undefined;
 
 // the test container is initialized once for the suite
 let tc: DependencyContainer | undefined;
@@ -48,6 +48,11 @@ export function testContainer(): DependencyContainer {
   return tc;
 }
 
+/** return the custom test configuration object that exposes setters for testing */
+export function testConfiguration(): TestConfiguration {
+  return testContainer().resolve(Configuration) as TestConfiguration;
+}
+
 /** return the object managing the connection to the mongodb instance */
 export function testDatabase(): Database {
   return testContainer().resolve(Database);
@@ -59,8 +64,8 @@ async function initializeSuite(
   const withDatabase = options.withDatabase;
   if (withDatabase) {
     // start the mongo in-memory server on an ephemeral port
-    mongoServer = await MongoMemoryServer.create();
-    mongoUri = mongoServer.getUri();
+    testMongoServer = await MongoMemoryServer.create();
+    testMongoUri = testMongoServer.getUri();
   }
 
   // don't use value registrations because they will be cleared in the beforeEach() handler
@@ -91,19 +96,18 @@ async function initializeSuite(
 }
 
 async function cleanupSuite(): Promise<void> {
-  await mongoServer?.stop();
-  mongoServer = undefined;
+  await testMongoServer?.stop();
+  testMongoServer = undefined;
 }
 
 @injectable()
-class TestConfiguration extends Configuration {
-  public readonly mongoDbUri = `${process.env.MONGODB_URI}`;
+export class TestConfiguration extends Configuration {
+  declare mongoDbUri;
+  declare jwt: JwtConfiguration;
 
   constructor() {
     super();
-
-    // use static mongo URI set in suite initialization
-    this.mongoDbUri = mongoUri;
+    this.mongoDbUri = testMongoUri;
   }
 }
 
