@@ -21,8 +21,8 @@ export class ApiServer {
   async create(): Promise<Server> {
     const app = express();
 
-    // security
-    app.use(helmet({ contentSecurityPolicy: false }));
+    // FIXME disable right now because of issues
+    //app.use(helmet({ contentSecurityPolicy: false }));
 
     app.use(express.json());
 
