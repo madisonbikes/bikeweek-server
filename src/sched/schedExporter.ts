@@ -143,7 +143,7 @@ export class SchedExporter {
     description += modified;
 
     if (event.eventUrl?.trim() === "") {
-      description += `\n<br><a href="${event.eventUrl}">Learn more about this event here!</a>`;
+      description += `\n<br><a href="${event.eventUrl}" target="_blank">Learn more about this event here!</a>`;
     }
     return description;
   }
@@ -162,7 +162,7 @@ export class SchedExporter {
         }
         const url = value.url;
         if (url && url.length > 0) {
-          sponsorText += `<a href="${url}">${value.name}</a>`;
+          sponsorText += `<a href="${url}" target="_blank">${value.name}</a>`;
         } else {
           sponsorText += value.name;
         }
