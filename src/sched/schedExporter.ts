@@ -28,7 +28,7 @@ export class SchedExporter {
         return (
           updatedEvents.find((event) => {
             return key.startsWith(`${event.id}.`);
-          }) != undefined
+          }) !== undefined
         );
       });
 
@@ -44,7 +44,7 @@ export class SchedExporter {
           console.log(`Skipping ${event.name} (all day, no time)`);
           return false;
         }
-        if (event.eventDays.length == 0) {
+        if (event.eventDays.length === 0) {
           console.log(`Skipping ${event.name} (no days)`);
           return false;
         }
@@ -70,7 +70,7 @@ export class SchedExporter {
           const session_start = `${timeBase} ${time.start}`;
           const session_end = `${timeBase} ${time.end}`;
           const session_type = sortEventTypes(event.eventTypes)
-            .filter((value) => value != EventTypes.ENDOFWEEKPARTY)
+            .filter((value) => value !== EventTypes.ENDOFWEEKPARTY)
             .join(",");
           const base = {
             session_key,
@@ -91,7 +91,7 @@ export class SchedExporter {
           };
           let result;
           let action;
-          if (relevantExistingKeys.indexOf(session_key) != -1) {
+          if (relevantExistingKeys.indexOf(session_key) !== -1) {
             result = await this.sched.modifySession(base);
             action = "modified";
           } else {
@@ -157,7 +157,7 @@ export class SchedExporter {
       sponsorText += "Hosted by ";
       event.sponsors.forEach((value, index) => {
         if (index > 0) {
-          if (index == event.sponsors.length - 1) {
+          if (index === event.sponsors.length - 1) {
             sponsorText += " and ";
           } else {
             sponsorText += ", ";

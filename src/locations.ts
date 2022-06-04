@@ -5,14 +5,14 @@ export function buildMapsUrl(location: EventLocation): string {
   let params: { [name: string]: string | string[] } = {
     api: "1",
   };
-  if (location.maps_query && location.maps_query != "") {
+  if (location.maps_query && location.maps_query !== "") {
     params = { ...params, query: location.maps_query };
-  } else if (location.maps_description && location.maps_description != "") {
+  } else if (location.maps_description && location.maps_description !== "") {
     params = { ...params, query: location.maps_description };
   } else {
     params = { ...params, query: `${location.name} Madison, WI` };
   }
-  if (location.maps_placeid && location.maps_placeid != "") {
+  if (location.maps_placeid && location.maps_placeid !== "") {
     params = { ...params, query_place_id: location.maps_placeid };
   }
   return buildUrl("https://www.google.com/", {

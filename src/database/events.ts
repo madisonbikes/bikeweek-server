@@ -44,7 +44,7 @@ export class EventModel {
 
   deleteEvent = async (id: number): Promise<boolean> => {
     const result = await this.database.events.deleteOne({ id: `${id}` });
-    return result.deletedCount != 0;
+    return result.deletedCount !== 0;
   };
 
   updateEvent = async (
@@ -58,7 +58,7 @@ export class EventModel {
       },
       { $set: data }
     );
-    if (!result.acknowledged || result.matchedCount == 0) {
+    if (!result.acknowledged || result.matchedCount === 0) {
       return undefined;
     }
     return this.findEvent(id);

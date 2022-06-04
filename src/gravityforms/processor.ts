@@ -86,8 +86,8 @@ class EventHelper {
 
   getLocationInfo(entry: Entry): EventLocation | undefined {
     const firstChoice = this.lookupFieldValue(entry, "location_first");
-    let mapped = locations.find((value) => value.name == firstChoice);
-    if (!mapped && firstChoice != "N/A" && firstChoice != "None") {
+    let mapped = locations.find((value) => value.name === firstChoice);
+    if (!mapped && firstChoice !== "N/A" && firstChoice !== "None") {
       console.log(
         `ERROR: Missing location map for location name: ${firstChoice}`
       );
@@ -180,7 +180,7 @@ class EventHelper {
     if (!fieldId) return undefined;
 
     const inputs = this.fields
-      .find((value) => value.id == fieldId)
+      .find((value) => value.id === fieldId)
       ?.inputs?.map((input) => input.id);
     if (!inputs) return undefined;
 
@@ -222,6 +222,6 @@ class EventHelper {
   }
 
   lookupFieldId(adminLabel: string): number | undefined {
-    return this.fields.find((value) => value.adminLabel == adminLabel)?.id;
+    return this.fields.find((value) => value.adminLabel === adminLabel)?.id;
   }
 }

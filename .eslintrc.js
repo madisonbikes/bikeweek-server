@@ -15,4 +15,7 @@ module.exports = {
     ecmaVersion: 6,
   },
   plugins: ["@typescript-eslint", "promise"],
+  rules: {
+    eqeqeq: ["warn", "smart"],
+  },
 };

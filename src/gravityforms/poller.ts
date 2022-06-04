@@ -39,7 +39,7 @@ export class RemoteEventPoller {
       addCount = 0;
     for (const event of importedEvents) {
       const eventExists =
-        (await this.eventModel.findEvent(event.id)) != undefined;
+        (await this.eventModel.findEvent(event.id)) !== undefined;
       if (!eventExists) {
         addCount++;
         console.log(
@@ -66,7 +66,7 @@ export class RemoteEventPoller {
     }
     const calculatedHash = hash.digest("base64");
     const updated =
-      calculatedHash != this.lastHash || this.lastCount != events.length;
+      calculatedHash !== this.lastHash || this.lastCount !== events.length;
     this.lastCount = events.length;
     this.lastHash = calculatedHash;
     return updated;
