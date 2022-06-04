@@ -15,6 +15,7 @@ module.exports = {
     ecmaVersion: 6,
   },
   plugins: ["@typescript-eslint", "promise"],
+  reportUnusedDisableDirectives: true,
   rules: {
     eqeqeq: ["warn", "smart"],
   },
