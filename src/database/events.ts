@@ -3,17 +3,17 @@ import { EventTypes } from "../gravityforms/processor";
 import { Database } from "./database";
 import { BikeWeekEvent } from "./types";
 
-export function isDiscountEvent(event: BikeWeekEvent): boolean {
+export const isDiscountEvent = (event: BikeWeekEvent): boolean => {
   return event.eventTypes.includes(EventTypes.DISCOUNT);
-}
+};
 
-export function isEndOfWeekParty(event: BikeWeekEvent): boolean {
+export const isEndOfWeekParty = (event: BikeWeekEvent): boolean => {
   return event.eventTypes.includes(EventTypes.ENDOFWEEKPARTY);
-}
+};
 
-export function isAllDayEvent(event: BikeWeekEvent): boolean {
+export const isAllDayEvent = (event: BikeWeekEvent): boolean => {
   return event.eventTimes.length === 0;
-}
+};
 
 @injectable()
 export class EventModel {

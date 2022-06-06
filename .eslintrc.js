@@ -18,5 +18,6 @@ module.exports = {
   reportUnusedDisableDirectives: true,
   rules: {
     eqeqeq: ["warn", "smart"],
+    "func-style": ["warn"],
   },
 };

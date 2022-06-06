@@ -22,7 +22,7 @@ export type SuiteOptions = {
 };
 
 /** entry point that should be included first in each describe block */
-export function setupSuite(options: Partial<SuiteOptions> = {}): void {
+export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
   beforeAll(async () => {
     assert(tc === undefined);
     tc = await initializeSuite(options);
@@ -37,30 +37,30 @@ export function setupSuite(options: Partial<SuiteOptions> = {}): void {
     await cleanupSuite();
     tc = undefined;
   });
-}
+};
 
 /**
  * Callers that make modifications to the container should do so in a CHILD container because the container is not reset
  * between test
  */
-export function testContainer(): DependencyContainer {
+export const testContainer = (): DependencyContainer => {
   assert(tc);
   return tc;
-}
+};
 
 /** return the custom test configuration object that exposes setters for testing */
-export function testConfiguration(): TestConfiguration {
+export const testConfiguration = (): TestConfiguration => {
   return testContainer().resolve(Configuration) as TestConfiguration;
-}
+};
 
 /** return the object managing the connection to the mongodb instance */
-export function testDatabase(): Database {
+export const testDatabase = (): Database => {
   return testContainer().resolve(Database);
-}
+};
 
-async function initializeSuite(
+export const initializeSuite = async (
   options: Partial<SuiteOptions>
-): Promise<DependencyContainer> {
+): Promise<DependencyContainer> => {
   const withDatabase = options.withDatabase;
   if (withDatabase) {
     // start the mongo in-memory server on an ephemeral port
@@ -93,12 +93,12 @@ async function initializeSuite(
     });
   }
   return testContainer;
-}
+};
 
-async function cleanupSuite(): Promise<void> {
+export const cleanupSuite = async (): Promise<void> => {
   await testMongoServer?.stop();
   testMongoServer = undefined;
-}
+};
 
 @injectable()
 export class TestConfiguration extends Configuration {
@@ -111,10 +111,10 @@ export class TestConfiguration extends Configuration {
   }
 }
 
-async function clearDatabaseConnection() {
+export const clearDatabaseConnection = async () => {
   await testDatabase().stop();
-}
+};
 
-async function createDatabaseConnection() {
+export const createDatabaseConnection = async () => {
   await testDatabase().start();
-}
+};
