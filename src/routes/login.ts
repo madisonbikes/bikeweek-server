@@ -22,7 +22,7 @@ export class LoginRoutes {
       "/login",
       validateSchema(schema),
       localMiddleware,
-      async (request, response) => {
+      (request, response) => {
         const user = request.user as AuthenticatedUser;
         const token = this.jwtManager.sign(user);
         response.send(token);

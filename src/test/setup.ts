@@ -18,11 +18,11 @@ let tc: DependencyContainer | undefined;
 
 export type SuiteOptions = {
   // spin up a memory mongodb instance for testing purposes
-  withDatabase: boolean;
+  withDatabase?: boolean;
 };
 
 /** entry point that should be included first in each describe block */
-export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
+export const setupSuite = (options: SuiteOptions = {}): void => {
   beforeAll(async () => {
     assert(tc === undefined);
     tc = await initializeSuite(options);
@@ -58,10 +58,9 @@ export const testDatabase = (): Database => {
   return testContainer().resolve(Database);
 };
 
-export const initializeSuite = async (
-  options: Partial<SuiteOptions>
-): Promise<DependencyContainer> => {
-  const withDatabase = options.withDatabase;
+export const initializeSuite = async ({
+  withDatabase,
+}: SuiteOptions): Promise<DependencyContainer> => {
   if (withDatabase) {
     // start the mongo in-memory server on an ephemeral port
     testMongoServer = await MongoMemoryServer.create();

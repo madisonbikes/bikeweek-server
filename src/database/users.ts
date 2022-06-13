@@ -31,7 +31,7 @@ export class UserModel {
     return newUser;
   };
 
-  checkPassword = async (password: string, user: User): Promise<boolean> => {
+  checkPassword = (password: string, user: User): Promise<boolean> => {
     return bcrypt.compare(password, user.password);
   };
 }

@@ -8,7 +8,6 @@ import {
 } from "../test";
 import { ApiServer } from "../server";
 import { JwtPayload, verify } from "jsonwebtoken";
-import { fromUnixTime } from "date-fns";
 
 describe("login route", () => {
   let apiServer: ApiServer;
@@ -33,8 +32,9 @@ describe("login route", () => {
     };
 
     // create a test user for login
-    testDatabase().users.deleteMany({});
-    testDatabase().users.insertOne({
+    const db = testDatabase();
+    await db.users.deleteMany({});
+    await db.users.insertOne({
       username: "testuser",
       // this is a bcrypt of "password"
       password: "$2a$12$T6KY4dGCetX4j9ld.pz6aea8NCk3Ug4aCPfyH2Ng23LaGFB0vVmHW",
@@ -45,7 +45,7 @@ describe("login route", () => {
     await apiServer.stop();
   });
 
-  it("responds to login api with good credentials successfully", async () => {
+  it("responds to login api with good credentials successfully", () => {
     return request
       .post("/api/v1/login")
       .send({ username: "testuser", password: "password" })
@@ -66,7 +66,7 @@ describe("login route", () => {
       });
   });
 
-  it("responds to login api without credentials as bad request", async () => {
+  it("responds to login api without credentials as bad request", () => {
     return request
       .post("/api/v1/login")
       .expect(400)
@@ -74,7 +74,7 @@ describe("login route", () => {
       .expect(/password is a required field/);
   });
 
-  it("responds to login api with extra fields as bad request", async () => {
+  it("responds to login api with extra fields as bad request", () => {
     return request
       .post("/api/v1/login")
       .send({ username: "user1", password: "password", extraxyz: "extra" })
@@ -83,7 +83,7 @@ describe("login route", () => {
       .expect(/extraxyz/);
   });
 
-  it("responds to login api with credentials as success request but unauthorized", async () => {
+  it("responds to login api with credentials as success request but unauthorized", () => {
     return request
       .post("/api/v1/login")
       .send({ username: "bad", password: "bad" })
