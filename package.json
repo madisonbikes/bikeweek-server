@@ -1,6 +1,6 @@
 {
   "name": "bikeweek-backend",
-  "version": "v2022",
+  "version": "0.3.0",
   "description": "Imports events from CSV form data into Sched",
   "main": "src/index.ts",
   "scripts": {
@@ -12,7 +12,8 @@
     "check-package-updates": "npx npm-check-updates --reject '@types/node'",
     "test": "NODE_ENV=test npx jest",
     "test-watch": "NODE_ENV=test npx jest --watch",
-    "coverage": "NODE_ENV=test npx jest --coverage=true"
+    "coverage": "NODE_ENV=test npx jest --coverage=true",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -49,6 +50,8 @@
     "yup": "^1.0.0-beta.4"
   },
   "devDependencies": {
+    "@commitlint/cli": "^17.0.2",
+    "@commitlint/config-conventional": "^17.0.2",
     "@tsconfig/node16": "^1.0.3",
     "@types/bcryptjs": "^2.4.2",
     "@types/cookie-parser": "^1.4.3",
@@ -70,6 +73,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-no-autofix": "^1.2.3",
     "eslint-plugin-promise": "^6.0.0",
+    "husky": "^8.0.1",
     "jest": "^28.1.1",
     "mongodb-memory-server": "^8.6.0",
     "prettier": "2.6.2",
