@@ -41,7 +41,7 @@
     "passport-local": "^1.0.0",
     "pm2": "^5.2.0",
     "reflect-metadata": "^0.1.13",
-    "set-interval-async": "^2.0.3",
+    "set-interval-async": "^3.0.2",
     "superagent": "^8.0.0",
     "ts-node": "^10.9.1",
     "tsyringe": "^4.7.0",
