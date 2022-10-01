@@ -61,7 +61,7 @@
     "@types/node": "^16.11.56",
     "@types/jest": "^28.1.6",
     "@types/passport": "^1.0.10",
-    "@types/passport-jwt": "^3.0.6",
+    "@types/passport-jwt": "^3.0.7",
     "@types/passport-local": "^1.0.34",
     "@types/set-interval-async": "^1.0.0",
     "@types/superagent": "^4.1.15",
