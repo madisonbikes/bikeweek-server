@@ -60,7 +60,7 @@
     "@types/jsonwebtoken": "^8.5.9",
     "@types/node": "^16.11.62",
     "@types/jest": "^28.1.6",
-    "@types/passport": "^1.0.10",
+    "@types/passport": "^1.0.11",
     "@types/passport-jwt": "^3.0.7",
     "@types/passport-local": "^1.0.34",
     "@types/set-interval-async": "^1.0.0",
