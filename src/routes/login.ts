@@ -1,16 +1,15 @@
 import express from "express";
 import { injectable } from "tsyringe";
 import { AuthenticatedUser, localMiddleware } from "../security/authentication";
-import * as yup from "yup";
+import { z } from "zod";
 import { validateSchema } from "../security/validateSchema";
 import { JwtManager } from "../security/jwt";
 
-const schema = yup
+const schema = z
   .object({
-    username: yup.string().required(),
-    password: yup.string().required(),
+    username: z.string(),
+    password: z.string(),
   })
-  .noUnknown()
   .strict();
 
 @injectable()

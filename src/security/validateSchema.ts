@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { Schema, ValidationError } from "yup";
+import { z } from "zod";
 
 type Middleware = (
   request: Request,
@@ -8,19 +8,17 @@ type Middleware = (
 ) => Promise<void>;
 
 /** validate the request against the supplied yup schema, placing validated object into the request.validated property */
-export const validateSchema = <T>(schema: Schema<T>): Middleware => {
-  return async (request, response, next) => {
-    try {
-      const body = request.body;
-      request.validated = await schema.validate(body, { abortEarly: false });
+export const validateSchema = <T extends z.ZodTypeAny>(
+  schema: T
+): Middleware => {
+  return (request, response, next) => {
+    const body = request.body;
+    const parseResult = schema.safeParse(body);
+    if (parseResult.success) {
       next();
-    } catch (err) {
-      if (err instanceof ValidationError) {
-        response.status(400).send(err.errors);
-      } else {
-        console.log(err);
-        response.status(400).send(err);
-      }
+    } else {
+      response.status(400).send(parseResult.error.issues);
     }
+    return Promise.resolve();
   };
 };

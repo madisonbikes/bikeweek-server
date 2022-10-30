@@ -70,8 +70,20 @@ describe("login route", () => {
     return request
       .post("/api/v1/login")
       .expect(400)
-      .expect(/username is a required field/)
-      .expect(/password is a required field/);
+      .expect((res) => {
+        expect(res.body).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              code: "invalid_type",
+              path: ["username"],
+            }),
+            expect.objectContaining({
+              code: "invalid_type",
+              path: ["password"],
+            }),
+          ])
+        );
+      });
   });
 
   it("responds to login api with extra fields as bad request", () => {
@@ -79,7 +91,7 @@ describe("login route", () => {
       .post("/api/v1/login")
       .send({ username: "user1", password: "password", extraxyz: "extra" })
       .expect(400)
-      .expect(/unspecified keys/)
+      .expect(/unrecognized_keys/)
       .expect(/extraxyz/);
   });
 
