@@ -1,41 +1,50 @@
 /** schema for gravity forms responses */
 
-export type Entry = {
-  [key: string]: unknown;
-  id: number;
-  form_id: number;
-  post_id?: number;
-  date_created: string;
-  date_updated: string;
-  status: string;
-};
+import { z } from "zod";
 
-export type EntryResponse = {
-  total_count: number;
-  entries: Entry[];
-};
-export type Choice = {
-  text: string;
-  value: string;
-  isSelected: boolean;
-};
+export const EntrySchema = z
+  .object({
+    id: z.number(),
+    form_id: z.string(),
+    post_id: z.string().optional(),
+    date_created: z.string(),
+    date_updated: z.string(),
+    status: z.string(),
+  })
+  .passthrough();
+export type Entry = z.infer<typeof EntrySchema>;
 
-export type Input = {
-  id: string;
-  label: string;
-  name: string;
-};
+export const EntryResponseSchema = z.object({
+  total_count: z.number(),
+  entries: EntrySchema.array(),
+});
+export type EntryResponse = z.infer<typeof EntryResponseSchema>;
 
-export type Field = {
-  type: string;
-  id: number;
-  label: string;
-  adminLabel: string;
-  choices?: Choice[];
-  inputs?: Input[];
-};
+const ChoiceSchema = z.object({
+  text: z.string(),
+  value: z.string(),
+  isSelected: z.boolean(),
+});
 
-export type FormResponse = {
-  title: string;
-  fields: Field[];
-};
+const InputSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  name: z.string(),
+});
+
+export const FieldSchema = z.object({
+  type: z.string(),
+  id: z.number(),
+  label: z.string(),
+  adminLabel: z.string(),
+  choices: ChoiceSchema.array().optional(),
+  inputs: InputSchema.array().optional(),
+});
+export type Field = z.infer<typeof FieldSchema>;
+
+export const FormResponseSchema = z.object({
+  title: z.string(),
+  fields: FieldSchema.array(),
+});
+
+export type FormResponse = z.infer<typeof FormResponseSchema>;

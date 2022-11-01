@@ -1,4 +1,4 @@
-import { Entry, Field } from "./types";
+import { Field, Entry, EntrySchema, FieldSchema } from "./types";
 import { parse } from "date-fns";
 
 import { Configuration } from "../config";
@@ -6,11 +6,14 @@ import { locations } from "../locations";
 import { injectable } from "tsyringe";
 import { Database } from "../database/database";
 import {
+  BikeWeekEventSchema,
   BikeWeekEvent,
   EventLocation,
+  EventLocationSchema,
   EventSponsor,
-  EventStatus,
   EventTime,
+  EventStatusSchema,
+  EventTimeSchema,
 } from "../database/types";
 
 /** this list is NOT exhaustive, just used for conditional behaviors in the backend */
@@ -32,26 +35,26 @@ export class Processor {
   ) {}
 
   async extractEvents(): Promise<BikeWeekEvent[]> {
-    const fields: Field[] = (await this.database.gfFormFields
-      .find()
-      .toArray()) as unknown as Field[];
+    const fields = await FieldSchema.array().parseAsync(
+      this.database.gfFormFields.find().toArray()
+    );
 
-    const responses: Entry[] = (await this.database.gfResponses
-      .find()
-      .toArray()) as unknown as Entry[];
+    const responses = await EntrySchema.array().parseAsync(
+      this.database.gfResponses.find().toArray()
+    );
 
     const eventHelper = new EventHelper(fields, this.configuration);
 
     const retval = Array<BikeWeekEvent>();
     for (const entry of responses) {
       const sponsors = eventHelper.getSponsorInfo(entry);
-      const stringStatus = eventHelper.lookupFieldValue(entry, "status");
-      const status: EventStatus =
-        (stringStatus as EventStatus) ?? EventStatus.SUBMITTED;
+      const status = EventStatusSchema.optional()
+        .default(EventStatusSchema.Enum.submitted)
+        .parse(eventHelper.lookupFieldValue(entry, "status"));
       const createDate = parse(entry.date_created, GF_DATE_FORMAT, new Date());
       const modifyDate = parse(entry.date_updated, GF_DATE_FORMAT, new Date());
 
-      const newEntry: BikeWeekEvent = {
+      const newEntry = BikeWeekEventSchema.parse({
         id: entry.id.valueOf(),
         name: eventHelper.requireFieldValue(entry, "event_name"),
         eventUrl: eventHelper.lookupFieldValue(entry, "event_url"),
@@ -60,13 +63,15 @@ export class Processor {
         location: eventHelper.getLocationInfo(entry),
         eventTypes: eventHelper.getEventTypes(entry),
         eventDays: eventHelper.getEventDays(entry),
-        eventTimes: eventHelper.getEventTimes(entry),
+        eventTimes: EventTimeSchema.array().parse(
+          eventHelper.getEventTimes(entry)
+        ),
         eventGraphicUrl: eventHelper.lookupFieldValue(entry, "event_graphic"),
         modifyDate,
         createDate,
         status,
         comments: eventHelper.lookupFieldValue(entry, "comments"),
-      };
+      });
       // promote non-PAID and non-DISCOUNT items to FREE
       if (
         !newEntry.eventTypes.includes(EventTypes.PAID) &&
@@ -101,7 +106,7 @@ class EventHelper {
       entry,
       "location_other"
     );
-    return mapped;
+    return EventLocationSchema.parse(mapped);
   }
 
   getEventDays(entry: Entry): Date[] {
@@ -179,6 +184,9 @@ class EventHelper {
     const fieldId = this.lookupFieldId(adminLabel);
     if (!fieldId) return undefined;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const adaptedEntry: any = entry;
+
     const inputs = this.fields
       .find((value) => value.id === fieldId)
       ?.inputs?.map((input) => input.id);
@@ -186,7 +194,7 @@ class EventHelper {
 
     const retval: string[] = [];
     for (const i of inputs) {
-      const value = entry[i];
+      const value = adaptedEntry[i];
       if (typeof value === "string") {
         if (value && value.length > 0) {
           retval.push(value);
@@ -203,7 +211,11 @@ class EventHelper {
   lookupFieldValue(entry: Entry, adminLabel: string): string | undefined {
     const fieldId = this.lookupFieldId(adminLabel);
     if (!fieldId) return undefined;
-    const value = entry[`${fieldId}`];
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const adaptedEntry: any = entry;
+
+    const value = adaptedEntry[`${fieldId}`];
     if (typeof value !== "string") {
       console.log(
         `Unexpected non-string value in field ${adminLabel}: ${value}`

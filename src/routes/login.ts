@@ -5,7 +5,7 @@ import { z } from "zod";
 import { validateSchema } from "../security/validateSchema";
 import { JwtManager } from "../security/jwt";
 
-const schema = z
+const loginSchema = z
   .object({
     username: z.string(),
     password: z.string(),
@@ -19,7 +19,7 @@ export class LoginRoutes {
     .Router()
     .post(
       "/login",
-      validateSchema(schema),
+      validateSchema(loginSchema),
       localMiddleware,
       (request, response) => {
         const user = request.user as AuthenticatedUser;

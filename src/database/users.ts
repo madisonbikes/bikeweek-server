@@ -1,12 +1,15 @@
 import { injectable } from "tsyringe";
 import { Database } from "./database";
+import { z } from "zod";
 import bcrypt from "bcryptjs";
 
-export type User = {
-  username: string;
-  password: string;
-  admin?: boolean;
-};
+export const UserSchema = z.object({
+  username: z.string(),
+  password: z.string(),
+  admin: z.boolean().optional(),
+});
+
+export type User = z.infer<typeof UserSchema>;
 
 @injectable()
 export class UserModel {
@@ -15,16 +18,23 @@ export class UserModel {
   constructor(private database: Database) {}
 
   findUser = async (username: string): Promise<User | undefined> => {
-    return (await this.database.users.findOne({
+    const value = await this.database.users.findOne({
       username: username,
-    })) as unknown as User | undefined;
+    });
+    if (value == null) {
+      return undefined;
+    }
+
+    return UserSchema.parse(value);
   };
 
-  users = async (): Promise<User[]> => {
-    return (await this.database.users.find({}).toArray()) as unknown as User[];
+  users = (): Promise<User[]> => {
+    return UserSchema.array().parseAsync(
+      this.database.users.find({}).toArray()
+    );
   };
 
-  addUser = async (user: User): Promise<User | undefined> => {
+  addUser = async (user: User): Promise<User> => {
     const newUser: User = { ...user };
     newUser.password = await bcrypt.hash(user.password, this.BCRYPT_HASH_SIZE);
     await this.database.users.insertOne(newUser);

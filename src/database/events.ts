@@ -1,7 +1,7 @@
 import { injectable } from "tsyringe";
 import { EventTypes } from "../gravityforms/processor";
 import { Database } from "./database";
-import { BikeWeekEvent } from "./types";
+import { BikeWeekEventSchema, BikeWeekEvent } from "./types";
 
 export const isDiscountEvent = (event: BikeWeekEvent): boolean => {
   return event.eventTypes.includes(EventTypes.DISCOUNT);
@@ -28,18 +28,18 @@ export class EventModel {
     await this.database.events.insertMany(events);
   };
 
-  events = async (): Promise<BikeWeekEvent[]> => {
-    return (await this.database.events
-      .find({})
-      .toArray()) as unknown as BikeWeekEvent[];
+  events = (): Promise<BikeWeekEvent[]> => {
+    return BikeWeekEventSchema.array().parseAsync(
+      this.database.events.find({}).toArray()
+    );
   };
 
   findEvent = async (id: number): Promise<BikeWeekEvent | undefined> => {
-    const retval = (await this.database.events.findOne({
+    const retval = await this.database.events.findOne({
       id: `${id}`,
-    })) as unknown;
+    });
     if (!retval) return undefined;
-    return retval as BikeWeekEvent;
+    return BikeWeekEventSchema.parseAsync(retval);
   };
 
   deleteEvent = async (id: number): Promise<boolean> => {

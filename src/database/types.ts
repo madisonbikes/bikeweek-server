@@ -1,43 +1,50 @@
-export type EventTime = {
-  start: string;
-  end: string;
-};
+import { z } from "zod";
 
-export enum EventStatus {
-  SUBMITTED = "submitted",
-  APPROVED = "approved",
-  CANCELLED = "cancelled",
-  PENDING = "pending",
-}
+export const EventTimeSchema = z.object({
+  start: z.string(),
+  end: z.string(),
+});
+export type EventTime = z.infer<typeof EventTimeSchema>;
 
-export type EventSponsor = {
-  name: string;
-  url: string;
-};
+export const EventStatusSchema = z.enum([
+  "submitted",
+  "approved",
+  "cancelled",
+  "pending",
+]);
+export type EventStatus = z.infer<typeof EventStatusSchema>;
 
-export type EventLocation = {
-  name: string;
-  sched_venue?: string; // defaults to name
-  sched_address?: string; // required for specific address info
-  maps_query?: string;
-  maps_description?: string;
-  maps_placeid?: string;
-  detailed_location_description?: string;
-};
+export const EventSponsorSchema = z.object({
+  name: z.string(),
+  url: z.string().optional(),
+});
+export type EventSponsor = z.infer<typeof EventSponsorSchema>;
 
-export type BikeWeekEvent = {
-  id: number;
-  name: string;
-  eventUrl?: string;
-  description: string;
-  eventGraphicUrl?: string;
-  sponsors: EventSponsor[];
-  location?: EventLocation;
-  eventTypes: string[];
-  eventDays: Date[];
-  eventTimes: EventTime[];
-  status: EventStatus;
-  comments?: string;
-  modifyDate: Date;
-  createDate: Date;
-};
+export const EventLocationSchema = z.object({
+  name: z.string(),
+  sched_venue: z.string().optional(), // defaults to name if null
+  sched_address: z.string().optional(), // required for specific address info
+  maps_query: z.string().optional(),
+  maps_description: z.string().optional(),
+  maps_placeid: z.string().optional(),
+  detailed_location_description: z.string().optional(),
+});
+export type EventLocation = z.infer<typeof EventLocationSchema>;
+
+export const BikeWeekEventSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  eventUrl: z.string().optional(),
+  description: z.string(),
+  eventGraphicUrl: z.string().optional(),
+  sponsors: EventSponsorSchema.array(),
+  location: EventLocationSchema.optional(),
+  eventTypes: z.string().array(),
+  eventDays: z.date().array(),
+  eventTimes: EventTimeSchema.array(),
+  status: EventStatusSchema,
+  comments: z.string().optional(),
+  modifyDate: z.date(),
+  createDate: z.date(),
+});
+export type BikeWeekEvent = z.infer<typeof BikeWeekEventSchema>;

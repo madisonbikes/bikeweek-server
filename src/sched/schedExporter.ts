@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { isAllDayEvent, isEndOfWeekParty } from "../database/events";
 import { SchedApi } from "./api";
 import { buildMapsUrl } from "../locations";
-import { BikeWeekEvent, EventStatus } from "../database/types";
+import { BikeWeekEvent, EventStatusSchema } from "../database/types";
 import { EventTypes } from "../gravityforms/processor";
 
 @injectable()
@@ -49,8 +49,8 @@ export class SchedExporter {
           return false;
         }
         if (
-          event.status !== EventStatus.APPROVED &&
-          event.status !== EventStatus.CANCELLED
+          event.status !== EventStatusSchema.Enum.approved &&
+          event.status !== EventStatusSchema.Enum.cancelled
         ) {
           console.log(`Skipping ${event.name} (unapproved)`);
           return false;
@@ -75,7 +75,7 @@ export class SchedExporter {
           const base = {
             session_key,
             name:
-              event.status !== EventStatus.CANCELLED
+              event.status !== EventStatusSchema.enum.cancelled
                 ? event.name
                 : `CANCELLED - ${event.name}`,
             description,
@@ -85,7 +85,8 @@ export class SchedExporter {
             session_type,
             venue: event.location?.sched_venue ?? event.location?.name ?? "",
             address: event.location?.sched_address ?? "",
-            active: event.status === EventStatus.APPROVED ? "Y" : "N",
+            active:
+              event.status === EventStatusSchema.enum.approved ? "Y" : "N",
             rsvp_url: event.location ? buildMapsUrl(event.location) : "",
             media_url: event.eventGraphicUrl,
           };
