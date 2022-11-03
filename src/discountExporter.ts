@@ -1,7 +1,7 @@
 import { injectable } from "tsyringe";
 import { isAllDayEvent, isDiscountEvent } from "./database/events";
 import fs from "fs/promises";
-import { BikeWeekEvent } from "./database/types";
+import { BikeWeekEvent } from "./api/event";
 
 @injectable()
 export class DiscountExporter {

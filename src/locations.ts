@@ -1,5 +1,5 @@
 import buildUrl from "build-url";
-import { EventLocation } from "./database/types";
+import { EventLocation } from "./api/event";
 
 export const buildMapsUrl = (location: EventLocation): string => {
   let params: { [name: string]: string | string[] } = {

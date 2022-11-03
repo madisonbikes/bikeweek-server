@@ -1,7 +1,7 @@
 import { injectable } from "tsyringe";
 import { EventTypes } from "../gravityforms/processor";
 import { Database } from "./database";
-import { BikeWeekEventSchema, BikeWeekEvent } from "./types";
+import { BikeWeekEventSchema, BikeWeekEvent } from "../api/event";
 
 export const isDiscountEvent = (event: BikeWeekEvent): boolean => {
   return event.eventTypes.includes(EventTypes.DISCOUNT);

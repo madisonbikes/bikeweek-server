@@ -14,7 +14,7 @@ import {
   EventTime,
   EventStatusSchema,
   EventTimeSchema,
-} from "../database/types";
+} from "../api/event";
 
 /** this list is NOT exhaustive, just used for conditional behaviors in the backend */
 export enum EventTypes {

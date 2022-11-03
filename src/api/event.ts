@@ -1,3 +1,4 @@
+import { parseISO } from "date-fns";
 import { z } from "zod";
 
 export const EventTimeSchema = z.object({
@@ -31,6 +32,21 @@ export const EventLocationSchema = z.object({
 });
 export type EventLocation = z.infer<typeof EventLocationSchema>;
 
+export const EventDaysArraySchema = z
+  .string()
+  .regex(/^\d{4}-[01]\d-[0-3]\d$/)
+  .array();
+
+export const EventTimestampSchema = z.preprocess((val) => {
+  if (typeof val === "string") {
+    return parseISO(val);
+  } else if (val instanceof Date) {
+    return new Date(val);
+  } else {
+    return val;
+  }
+}, z.date());
+
 export const BikeWeekEventSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -40,11 +56,39 @@ export const BikeWeekEventSchema = z.object({
   sponsors: EventSponsorSchema.array(),
   location: EventLocationSchema.optional(),
   eventTypes: z.string().array(),
-  eventDays: z.date().array(),
+  eventDays: EventDaysArraySchema,
   eventTimes: EventTimeSchema.array(),
   status: EventStatusSchema,
   comments: z.string().optional(),
-  modifyDate: z.date(),
-  createDate: z.date(),
+  modifyDate: EventTimestampSchema,
+  createDate: EventTimestampSchema,
 });
 export type BikeWeekEvent = z.infer<typeof BikeWeekEventSchema>;
+
+const isStringArray = (value: unknown): value is string[] => {
+  if (value instanceof Array) {
+    for (const item of value) {
+      if (typeof item !== "string") {
+        return false;
+      }
+    }
+    return true;
+  }
+  return false;
+};
+
+const isDateArray = (value: unknown): value is Date[] => {
+  if (value instanceof Array) {
+    for (const item of value) {
+      if (!(item instanceof Date)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  return false;
+};
+
+const padToTwo = (n: number) => {
+  return n > 9 ? n : "0" + n;
+};

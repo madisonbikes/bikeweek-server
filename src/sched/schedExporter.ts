@@ -1,10 +1,10 @@
 import { injectable } from "tsyringe";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { isAllDayEvent, isEndOfWeekParty } from "../database/events";
 import { SchedApi } from "./api";
 import { buildMapsUrl } from "../locations";
-import { BikeWeekEvent, EventStatusSchema } from "../database/types";
 import { EventTypes } from "../gravityforms/processor";
+import { BikeWeekEvent, EventStatusSchema } from "../api/event";
 
 @injectable()
 export class SchedExporter {
@@ -59,14 +59,15 @@ export class SchedExporter {
       });
 
     for (const event of events) {
-      for (const day of event.eventDays) {
+      for (const isoDay of event.eventDays) {
+        const dayAsDate = parseISO(isoDay);
         for (const timeNdx in event.eventTimes) {
           const time = event.eventTimes[timeNdx];
-          const dayOfYear = format(day, "DDD");
+          const dayOfYear = format(dayAsDate, "DDD");
           const session_key = `${event.id}.${dayOfYear}.${timeNdx}`;
           const description = this.buildDescription(event);
 
-          const timeBase = format(day, "yyyy-MM-dd");
+          const timeBase = isoDay;
           const session_start = `${timeBase} ${time.start}`;
           const session_end = `${timeBase} ${time.end}`;
           const session_type = sortEventTypes(event.eventTypes)

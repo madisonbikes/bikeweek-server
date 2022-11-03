@@ -5,7 +5,7 @@ import { Importer } from "./importer";
 import { Processor } from "./processor";
 import { createHash } from "crypto";
 import { EventModel } from "../database/events";
-import { BikeWeekEvent } from "../database/types";
+import { BikeWeekEvent } from "../api/event";
 
 @injectable()
 export class RemoteEventPoller {
