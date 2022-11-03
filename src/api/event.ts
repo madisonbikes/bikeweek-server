@@ -64,31 +64,3 @@ export const BikeWeekEventSchema = z.object({
   createDate: EventTimestampSchema,
 });
 export type BikeWeekEvent = z.infer<typeof BikeWeekEventSchema>;
-
-const isStringArray = (value: unknown): value is string[] => {
-  if (value instanceof Array) {
-    for (const item of value) {
-      if (typeof item !== "string") {
-        return false;
-      }
-    }
-    return true;
-  }
-  return false;
-};
-
-const isDateArray = (value: unknown): value is Date[] => {
-  if (value instanceof Array) {
-    for (const item of value) {
-      if (!(item instanceof Date)) {
-        return false;
-      }
-    }
-    return true;
-  }
-  return false;
-};
-
-const padToTwo = (n: number) => {
-  return n > 9 ? n : "0" + n;
-};
