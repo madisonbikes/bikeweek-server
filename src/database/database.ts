@@ -1,11 +1,8 @@
 import { injectable, singleton } from "tsyringe";
 import { Configuration } from "../config";
 import { Collection, Db, MongoClient } from "mongodb";
-import { logger } from "../utils/logger";
-
-export type Status = {
-  lastSchedSync?: Date;
-};
+import { logger } from "../utils";
+import { DbStatus, dbStatusSchema } from "./types";
 
 @injectable()
 @singleton()
@@ -35,25 +32,20 @@ export class Database {
     return this._gfResponses;
   }
 
-  public async getStatus(): Promise<Status> {
-    const status = (await this.database
-      ?.collection("status")
-      .findOne()) as unknown as Status;
-    if (!status) {
-      return {};
-    } else {
-      return status;
-    }
+  public async getStatus(): Promise<DbStatus> {
+    return dbStatusSchema.parseAsync(
+      this.database?.collection("status").findOne()
+    );
   }
 
-  public async setStatus(status: Status) {
+  public async setStatus(status: DbStatus) {
     await this._status.deleteMany({});
     await this._status.insertOne(status);
   }
 
   constructor(private configuration: Configuration) {}
 
-  async start(): Promise<void> {
+  async start() {
     logger.info(`Connecting to ${this.configuration.mongoDbUri}`);
     this.client = new MongoClient(this.configuration.mongoDbUri, {});
     await this.client.connect();

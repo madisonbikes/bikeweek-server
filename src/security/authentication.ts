@@ -1,14 +1,23 @@
 import { injectable } from "tsyringe";
 import { Strategy as JwtStrategy } from "passport-jwt";
-import { User, UserModel } from "../database/users";
 import { Strategy as LocalStrategy } from "passport-local";
 import passport from "passport";
 import { JwtManager, JwtPayload } from "./jwt";
+
+import { UserModel } from "../database/users";
+import { DbUser } from "../database/types";
+import { NextFunction, Request, Response } from "express";
 
 export type AuthenticatedUser = Express.User & {
   username: string;
   admin: boolean;
 };
+
+export type ExpressMiddleware = (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => void;
 
 export const localMiddleware = passport.authenticate("local", {
   session: false,
@@ -55,7 +64,7 @@ export class Strategies {
   });
 
   /** sanitizes user info for export to JWT and into request object */
-  private authenticatedUser(user: User): AuthenticatedUser {
+  private authenticatedUser(user: DbUser): AuthenticatedUser {
     return { username: user.username, admin: user.admin ?? false };
   }
 }

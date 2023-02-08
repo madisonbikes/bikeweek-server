@@ -1,15 +1,12 @@
-import { NextFunction, Request, Response } from "express";
-import { AuthenticatedUser } from "./authentication";
+import { AuthenticatedUser, ExpressMiddleware } from "./authentication";
 
-export const verifyAdmin = (
-  request: Request,
-  response: Response,
-  next: NextFunction
-) => {
-  const user = request.user as AuthenticatedUser;
-  if (!user.admin) {
-    response.status(401).send("requires admin");
-    return;
-  }
-  next();
+export const validateAdmin = (): ExpressMiddleware => {
+  return (request, response, next) => {
+    const user = request.user as AuthenticatedUser;
+    if (!user?.admin) {
+      response.status(401).send("requires admin");
+      return;
+    }
+    next();
+  };
 };

@@ -2,20 +2,10 @@ import express from "express";
 import { injectable } from "tsyringe";
 import { UserModel } from "../database/users";
 import { jwtMiddleware } from "../security/authentication";
-import { z } from "zod";
-import { validateSchema } from "../security/validateSchema";
-import { verifyAdmin } from "../security/validateAdmin";
-
-const userSchema = z.object({
-  username: z.string(),
-  admin: z.boolean().default(false),
-});
-
-const userArraySchema = z.array(userSchema);
-
-const userWithPasswordSchema = userSchema.extend({
-  password: z.string(),
-});
+import { validateBodySchema } from "../security/validateSchema";
+import { validateAdmin } from "../security/validateAdmin";
+import { userSchema, userWithPasswordSchema } from "./contract";
+import { asyncWrapper } from "./async";
 
 @injectable()
 export class UserRoutes {
@@ -26,9 +16,9 @@ export class UserRoutes {
     .post(
       "/create",
       jwtMiddleware,
-      verifyAdmin,
-      validateSchema(userWithPasswordSchema),
-      async (request, response) => {
+      validateAdmin(),
+      validateBodySchema({ schema: userWithPasswordSchema }),
+      asyncWrapper(async (request, response) => {
         const newUser = userWithPasswordSchema.parse(request.validated);
 
         if (await this.userModel.findUser(newUser.username)) {
@@ -38,11 +28,15 @@ export class UserRoutes {
 
         const createdUser = await this.userModel.addUser(newUser);
         response.send(createdUser);
-      }
+      })
     )
-    .get("/", jwtMiddleware, async (request, response) => {
-      const users = await this.userModel.users();
-      const adaptedUsers = userArraySchema.parse(users);
-      response.send(adaptedUsers);
-    });
+    .get(
+      "/",
+      jwtMiddleware,
+      asyncWrapper(async (request, response) => {
+        const users = await this.userModel.users();
+        const adaptedUsers = userSchema.array().parse(users);
+        response.send(adaptedUsers);
+      })
+    );
 }

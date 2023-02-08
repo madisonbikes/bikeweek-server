@@ -1,15 +1,7 @@
 import { injectable } from "tsyringe";
 import { Database } from "./database";
-import { z } from "zod";
 import bcrypt from "bcryptjs";
-
-export const UserSchema = z.object({
-  username: z.string(),
-  password: z.string(),
-  admin: z.boolean().optional(),
-});
-
-export type User = z.infer<typeof UserSchema>;
+import { DbUser, dbUserSchema } from "./types";
 
 @injectable()
 export class UserModel {
@@ -17,7 +9,7 @@ export class UserModel {
 
   constructor(private database: Database) {}
 
-  findUser = async (username: string): Promise<User | undefined> => {
+  findUser = async (username: string): Promise<DbUser | undefined> => {
     const value = await this.database.users.findOne({
       username: username,
     });
@@ -25,23 +17,23 @@ export class UserModel {
       return undefined;
     }
 
-    return UserSchema.parse(value);
+    return dbUserSchema.parse(value);
   };
 
-  users = (): Promise<User[]> => {
-    return UserSchema.array().parseAsync(
-      this.database.users.find({}).toArray()
-    );
+  users = (): Promise<DbUser[]> => {
+    return dbUserSchema
+      .array()
+      .parseAsync(this.database.users.find({}).toArray());
   };
 
-  addUser = async (user: User): Promise<User> => {
-    const newUser: User = { ...user };
+  addUser = async (user: DbUser): Promise<DbUser> => {
+    const newUser: DbUser = { ...user };
     newUser.password = await bcrypt.hash(user.password, this.BCRYPT_HASH_SIZE);
     await this.database.users.insertOne(newUser);
     return newUser;
   };
 
-  checkPassword = (password: string, user: User): Promise<boolean> => {
+  checkPassword = (password: string, user: DbUser): Promise<boolean> => {
     return bcrypt.compare(password, user.password);
   };
 }

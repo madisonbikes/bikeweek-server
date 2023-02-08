@@ -1,16 +1,9 @@
 import express from "express";
 import { injectable } from "tsyringe";
 import { AuthenticatedUser, localMiddleware } from "../security/authentication";
-import { z } from "zod";
-import { validateSchema } from "../security/validateSchema";
+import { validateBodySchema } from "../security/validateSchema";
 import { JwtManager } from "../security/jwt";
-
-const loginSchema = z
-  .object({
-    username: z.string(),
-    password: z.string(),
-  })
-  .strict();
+import { loginRequestSchema, LoginResponse } from "./contract";
 
 @injectable()
 export class LoginRoutes {
@@ -19,12 +12,13 @@ export class LoginRoutes {
     .Router()
     .post(
       "/login",
-      validateSchema(loginSchema),
+      validateBodySchema({ schema: loginRequestSchema }),
       localMiddleware,
       (request, response) => {
         const user = request.user as AuthenticatedUser;
         const token = this.jwtManager.sign(user);
-        response.send(token);
+        const lr: LoginResponse = { jwtToken: token };
+        response.send(lr);
       }
     );
 }

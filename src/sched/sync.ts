@@ -5,7 +5,7 @@ import { SchedExporter } from "./schedExporter";
 import { DiscountExporter } from "../discountExporter";
 import { setTimeout, clearTimeout } from "timers";
 import { Configuration } from "../config";
-import { logger } from "../utils/logger";
+import { logger } from "../utils";
 
 /** handles sync to sched */
 

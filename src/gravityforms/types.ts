@@ -2,49 +2,49 @@
 
 import { z } from "zod";
 
-export const EntrySchema = z
+export const entrySchema = z
   .object({
-    id: z.number(),
+    id: z.coerce.number(),
     form_id: z.string(),
-    post_id: z.string().optional(),
+    post_id: z.string().nullish(),
     date_created: z.string(),
     date_updated: z.string(),
     status: z.string(),
   })
   .passthrough();
-export type Entry = z.infer<typeof EntrySchema>;
+export type Entry = z.infer<typeof entrySchema>;
 
-export const EntryResponseSchema = z.object({
+export const entryResponseSchema = z.object({
   total_count: z.number(),
-  entries: EntrySchema.array(),
+  entries: entrySchema.array(),
 });
-export type EntryResponse = z.infer<typeof EntryResponseSchema>;
+export type EntryResponse = z.infer<typeof entryResponseSchema>;
 
-const ChoiceSchema = z.object({
+const choiceSchema = z.object({
   text: z.string(),
   value: z.string(),
-  isSelected: z.boolean(),
+  isSelected: z.coerce.boolean(),
 });
 
-const InputSchema = z.object({
+const inputSchema = z.object({
   id: z.string(),
   label: z.string(),
   name: z.string(),
 });
 
-export const FieldSchema = z.object({
+export const fieldSchema = z.object({
   type: z.string(),
-  id: z.number(),
+  id: z.coerce.number(),
   label: z.string(),
   adminLabel: z.string(),
-  choices: ChoiceSchema.array().optional(),
-  inputs: InputSchema.array().optional(),
+  choices: z.union([choiceSchema.array(), z.string()]).nullish(),
+  inputs: z.union([inputSchema.array(), z.string()]).nullish(),
 });
-export type Field = z.infer<typeof FieldSchema>;
+export type Field = z.infer<typeof fieldSchema>;
 
 export const FormResponseSchema = z.object({
   title: z.string(),
-  fields: FieldSchema.array(),
+  fields: fieldSchema.array(),
 });
 
 export type FormResponse = z.infer<typeof FormResponseSchema>;

@@ -12,7 +12,7 @@ import { error, ok, Result } from "../utils/result";
 import { sleep } from "../utils/await-sleep";
 import { injectable } from "tsyringe";
 import { Configuration } from "../config";
-import { logger } from "../utils/logger";
+import { logger } from "../utils";
 
 @injectable()
 export class SchedApi {

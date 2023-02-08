@@ -5,8 +5,8 @@ import { Importer } from "./importer";
 import { Processor } from "./processor";
 import { createHash } from "crypto";
 import { EventModel } from "../database/events";
-import { BikeWeekEvent } from "../api/event";
-import { logger } from "../utils/logger";
+import { BikeWeekEvent } from "../routes/contract";
+import { logger } from "../utils";
 
 @injectable()
 export class RemoteEventPoller {
@@ -44,11 +44,9 @@ export class RemoteEventPoller {
       if (!eventExists) {
         addCount++;
         logger.debug(
-          {
-            event,
-          },
           `Importing new event ${event.id}: "${event.name}" from remote forms`
         );
+        logger.trace({ event });
         await this.eventModel.addEvent(event);
       } else {
         skipCount++;

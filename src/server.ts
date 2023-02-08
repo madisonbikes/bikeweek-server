@@ -6,7 +6,7 @@ import { ApiRoutes } from "./routes";
 import { Strategies } from "./security/authentication";
 import cors from "cors";
 import http, { Server } from "http";
-import { logger } from "./utils/logger";
+import { logger } from "./utils";
 
 @injectable()
 export class ApiServer {

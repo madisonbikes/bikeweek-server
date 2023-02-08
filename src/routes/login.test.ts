@@ -8,6 +8,7 @@ import {
 } from "../test";
 import { ApiServer } from "../server";
 import { JwtPayload, verify } from "jsonwebtoken";
+import { loginResponseSchema } from "./contract";
 
 describe("login route", () => {
   let apiServer: ApiServer;
@@ -51,8 +52,9 @@ describe("login route", () => {
       .send({ username: "testuser", password: "password" })
       .expect(200)
       .expect((request) => {
+        const response = loginResponseSchema.parse(request.body);
         // request returns a JWT
-        const verified = verify(request.text, "secret", {
+        const verified = verify(response.jwtToken, "secret", {
           audience: "audience",
           issuer: "issuer",
         }) as JwtPayload;

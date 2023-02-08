@@ -1,4 +1,4 @@
-import { Field, Entry, EntrySchema, FieldSchema } from "./types";
+import { Field, Entry, entrySchema, fieldSchema } from "./types";
 import { parse } from "date-fns";
 
 import { Configuration } from "../config";
@@ -6,16 +6,16 @@ import { locations } from "../locations";
 import { injectable } from "tsyringe";
 import { Database } from "../database/database";
 import {
-  BikeWeekEventSchema,
+  bikeWeekEventSchema,
   BikeWeekEvent,
   EventLocation,
-  EventLocationSchema,
+  eventLocationSchema,
   EventSponsor,
   EventTime,
-  EventStatusSchema,
-  EventTimeSchema,
-} from "../api/event";
-import { logger } from "../utils/logger";
+  eventStatusSchema,
+  eventTimeSchema,
+} from "../routes/contract";
+import { logger } from "../utils";
 
 /** this list is NOT exhaustive, just used for conditional behaviors in the backend */
 export enum EventTypes {
@@ -36,27 +36,28 @@ export class Processor {
   ) {}
 
   async extractEvents(): Promise<BikeWeekEvent[]> {
-    const fields = await FieldSchema.array().parseAsync(
-      this.database.gfFormFields.find().toArray()
-    );
+    const fields = fieldSchema
+      .array()
+      .parse(await this.database.gfFormFields.find().toArray());
 
-    const responses = await EntrySchema.array().parseAsync(
-      this.database.gfResponses.find().toArray()
-    );
+    const responses = entrySchema
+      .array()
+      .parse(await this.database.gfResponses.find().toArray());
 
     const eventHelper = new EventHelper(fields, this.configuration);
 
     const retval = Array<BikeWeekEvent>();
     for (const entry of responses) {
       const sponsors = eventHelper.getSponsorInfo(entry);
-      const status = EventStatusSchema.optional()
-        .default(EventStatusSchema.Enum.submitted)
+      const status = eventStatusSchema
+        .optional()
+        .default(eventStatusSchema.Enum.submitted)
         .parse(eventHelper.lookupFieldValue(entry, "status"));
       const createDate = parse(entry.date_created, GF_DATE_FORMAT, new Date());
       const modifyDate = parse(entry.date_updated, GF_DATE_FORMAT, new Date());
 
-      const newEntry = BikeWeekEventSchema.parse({
-        id: entry.id.valueOf(),
+      const newEntry = bikeWeekEventSchema.parse({
+        id: entry.id,
         name: eventHelper.requireFieldValue(entry, "event_name"),
         eventUrl: eventHelper.lookupFieldValue(entry, "event_url"),
         description: eventHelper.requireFieldValue(entry, "event_description"),
@@ -64,9 +65,9 @@ export class Processor {
         location: eventHelper.getLocationInfo(entry),
         eventTypes: eventHelper.getEventTypes(entry),
         eventDays: eventHelper.getEventDays(entry),
-        eventTimes: EventTimeSchema.array().parse(
-          eventHelper.getEventTimes(entry)
-        ),
+        eventTimes: eventTimeSchema
+          .array()
+          .parse(eventHelper.getEventTimes(entry)),
         eventGraphicUrl: eventHelper.lookupFieldValue(entry, "event_graphic"),
         modifyDate,
         createDate,
@@ -105,7 +106,7 @@ class EventHelper {
       entry,
       "location_other"
     );
-    return EventLocationSchema.parse(mapped);
+    return eventLocationSchema.parse(mapped);
   }
 
   getEventDays(entry: Entry): Date[] {
@@ -162,7 +163,7 @@ class EventHelper {
 
   requireFieldValue(entry: Entry, adminLabel: string): string {
     const fieldValue = this.lookupFieldValue(entry, adminLabel);
-    if (!fieldValue) {
+    if (fieldValue == null) {
       throw new Error(`No entry for admin label ${adminLabel}`);
     }
     return fieldValue;
@@ -170,7 +171,7 @@ class EventHelper {
 
   requireMultiFieldValue(entry: Entry, adminLabel: string): string[] {
     const fieldValue = this.lookupMultiFieldValue(entry, adminLabel);
-    if (!fieldValue) {
+    if (fieldValue == null) {
       throw new Error(`No entry for admin label ${adminLabel}`);
     }
     return fieldValue;
@@ -186,13 +187,20 @@ class EventHelper {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const adaptedEntry: any = entry;
 
-    const inputs = this.fields
-      .find((value) => value.id === fieldId)
-      ?.inputs?.map((input) => input.id);
-    if (!inputs) return undefined;
+    const rawInputs = this.fields.find((value) => value.id === fieldId)?.inputs;
+    if (rawInputs == null) {
+      return undefined;
+    }
+    if (typeof rawInputs === "string") {
+      if (rawInputs !== "") {
+        logger.warn("ignoring non-empty string input value");
+      }
+      return undefined;
+    }
+    const inputIds = rawInputs.map((input) => input.id);
 
     const retval: string[] = [];
-    for (const i of inputs) {
+    for (const i of inputIds) {
       const value = adaptedEntry[i];
       if (typeof value === "string") {
         if (value && value.length > 0) {
