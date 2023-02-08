@@ -1,10 +1,10 @@
 import { injectable } from "tsyringe";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { isAllDayEvent, isEndOfWeekParty } from "../database/events";
 import { SchedApi } from "./api";
 import { buildMapsUrl } from "../locations";
-import { BikeWeekEvent, EventStatus } from "../database/types";
 import { EventTypes } from "../gravityforms/processor";
+import { BikeWeekEvent, EventStatusSchema } from "../api/event";
 
 @injectable()
 export class SchedExporter {
@@ -28,7 +28,7 @@ export class SchedExporter {
         return (
           updatedEvents.find((event) => {
             return key.startsWith(`${event.id}.`);
-          }) != undefined
+          }) !== undefined
         );
       });
 
@@ -44,13 +44,13 @@ export class SchedExporter {
           console.log(`Skipping ${event.name} (all day, no time)`);
           return false;
         }
-        if (event.eventDays.length == 0) {
+        if (event.eventDays.length === 0) {
           console.log(`Skipping ${event.name} (no days)`);
           return false;
         }
         if (
-          event.status !== EventStatus.APPROVED &&
-          event.status !== EventStatus.CANCELLED
+          event.status !== EventStatusSchema.Enum.approved &&
+          event.status !== EventStatusSchema.Enum.cancelled
         ) {
           console.log(`Skipping ${event.name} (unapproved)`);
           return false;
@@ -59,23 +59,24 @@ export class SchedExporter {
       });
 
     for (const event of events) {
-      for (const day of event.eventDays) {
+      for (const isoDay of event.eventDays) {
+        const dayAsDate = parseISO(isoDay);
         for (const timeNdx in event.eventTimes) {
           const time = event.eventTimes[timeNdx];
-          const dayOfYear = format(day, "DDD");
+          const dayOfYear = format(dayAsDate, "DDD");
           const session_key = `${event.id}.${dayOfYear}.${timeNdx}`;
           const description = this.buildDescription(event);
 
-          const timeBase = format(day, "yyyy-MM-dd");
+          const timeBase = isoDay;
           const session_start = `${timeBase} ${time.start}`;
           const session_end = `${timeBase} ${time.end}`;
           const session_type = sortEventTypes(event.eventTypes)
-            .filter((value) => value != EventTypes.ENDOFWEEKPARTY)
+            .filter((value) => value !== EventTypes.ENDOFWEEKPARTY)
             .join(",");
           const base = {
             session_key,
             name:
-              event.status !== EventStatus.CANCELLED
+              event.status !== EventStatusSchema.enum.cancelled
                 ? event.name
                 : `CANCELLED - ${event.name}`,
             description,
@@ -85,13 +86,14 @@ export class SchedExporter {
             session_type,
             venue: event.location?.sched_venue ?? event.location?.name ?? "",
             address: event.location?.sched_address ?? "",
-            active: event.status === EventStatus.APPROVED ? "Y" : "N",
+            active:
+              event.status === EventStatusSchema.enum.approved ? "Y" : "N",
             rsvp_url: event.location ? buildMapsUrl(event.location) : "",
             media_url: event.eventGraphicUrl,
           };
           let result;
           let action;
-          if (relevantExistingKeys.indexOf(session_key) != -1) {
+          if (relevantExistingKeys.indexOf(session_key) !== -1) {
             result = await this.sched.modifySession(base);
             action = "modified";
           } else {
@@ -157,7 +159,7 @@ export class SchedExporter {
       sponsorText += "Hosted by ";
       event.sponsors.forEach((value, index) => {
         if (index > 0) {
-          if (index == event.sponsors.length - 1) {
+          if (index === event.sponsors.length - 1) {
             sponsorText += " and ";
           } else {
             sponsorText += ", ";

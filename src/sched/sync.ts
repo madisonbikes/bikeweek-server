@@ -21,9 +21,10 @@ export class EventSync {
 
   private cancelTimeout: NodeJS.Timeout | undefined;
 
-  async start(): Promise<void> {
+  start(): Promise<void> {
     // launch initial trigger
     this.trigger();
+    return Promise.resolve();
   }
 
   trigger() {

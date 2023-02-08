@@ -1,16 +1,15 @@
 import express from "express";
 import { injectable } from "tsyringe";
 import { AuthenticatedUser, localMiddleware } from "../security/authentication";
-import * as yup from "yup";
+import { z } from "zod";
 import { validateSchema } from "../security/validateSchema";
 import { JwtManager } from "../security/jwt";
 
-const schema = yup
+const loginSchema = z
   .object({
-    username: yup.string().required(),
-    password: yup.string().required(),
+    username: z.string(),
+    password: z.string(),
   })
-  .noUnknown()
   .strict();
 
 @injectable()
@@ -20,9 +19,9 @@ export class LoginRoutes {
     .Router()
     .post(
       "/login",
-      validateSchema(schema),
+      validateSchema(loginSchema),
       localMiddleware,
-      async (request, response) => {
+      (request, response) => {
         const user = request.user as AuthenticatedUser;
         const token = this.jwtManager.sign(user);
         response.send(token);

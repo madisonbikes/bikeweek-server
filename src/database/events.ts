@@ -1,19 +1,19 @@
 import { injectable } from "tsyringe";
 import { EventTypes } from "../gravityforms/processor";
 import { Database } from "./database";
-import { BikeWeekEvent } from "./types";
+import { BikeWeekEventSchema, BikeWeekEvent } from "../api/event";
 
-export function isDiscountEvent(event: BikeWeekEvent): boolean {
+export const isDiscountEvent = (event: BikeWeekEvent): boolean => {
   return event.eventTypes.includes(EventTypes.DISCOUNT);
-}
+};
 
-export function isEndOfWeekParty(event: BikeWeekEvent): boolean {
+export const isEndOfWeekParty = (event: BikeWeekEvent): boolean => {
   return event.eventTypes.includes(EventTypes.ENDOFWEEKPARTY);
-}
+};
 
-export function isAllDayEvent(event: BikeWeekEvent): boolean {
+export const isAllDayEvent = (event: BikeWeekEvent): boolean => {
   return event.eventTimes.length === 0;
-}
+};
 
 @injectable()
 export class EventModel {
@@ -28,23 +28,23 @@ export class EventModel {
     await this.database.events.insertMany(events);
   };
 
-  events = async (): Promise<BikeWeekEvent[]> => {
-    return (await this.database.events
-      .find({})
-      .toArray()) as unknown as BikeWeekEvent[];
+  events = (): Promise<BikeWeekEvent[]> => {
+    return BikeWeekEventSchema.array().parseAsync(
+      this.database.events.find({}).toArray()
+    );
   };
 
   findEvent = async (id: number): Promise<BikeWeekEvent | undefined> => {
-    const retval = (await this.database.events.findOne({
+    const retval = await this.database.events.findOne({
       id: `${id}`,
-    })) as unknown;
+    });
     if (!retval) return undefined;
-    return retval as BikeWeekEvent;
+    return BikeWeekEventSchema.parseAsync(retval);
   };
 
   deleteEvent = async (id: number): Promise<boolean> => {
     const result = await this.database.events.deleteOne({ id: `${id}` });
-    return result.deletedCount != 0;
+    return result.deletedCount !== 0;
   };
 
   updateEvent = async (
@@ -58,7 +58,7 @@ export class EventModel {
       },
       { $set: data }
     );
-    if (!result.acknowledged || result.matchedCount == 0) {
+    if (!result.acknowledged || result.matchedCount === 0) {
       return undefined;
     }
     return this.findEvent(id);

@@ -2,19 +2,19 @@ import express from "express";
 import { injectable } from "tsyringe";
 import { UserModel } from "../database/users";
 import { jwtMiddleware } from "../security/authentication";
-import * as yup from "yup";
+import { z } from "zod";
 import { validateSchema } from "../security/validateSchema";
 import { verifyAdmin } from "../security/validateAdmin";
 
-const userSchema = yup.object({
-  username: yup.string().required(),
-  admin: yup.boolean().default(false),
+const userSchema = z.object({
+  username: z.string(),
+  admin: z.boolean().default(false),
 });
 
-const userArraySchema = yup.array(userSchema);
+const userArraySchema = z.array(userSchema);
 
-const userWithPasswordSchema = userSchema.shape({
-  password: yup.string().required(),
+const userWithPasswordSchema = userSchema.extend({
+  password: z.string(),
 });
 
 @injectable()
@@ -29,7 +29,7 @@ export class UserRoutes {
       verifyAdmin,
       validateSchema(userWithPasswordSchema),
       async (request, response) => {
-        const newUser = userWithPasswordSchema.cast(request.validated);
+        const newUser = userWithPasswordSchema.parse(request.validated);
 
         if (await this.userModel.findUser(newUser.username)) {
           response.status(409).send("user already exists");
@@ -42,9 +42,7 @@ export class UserRoutes {
     )
     .get("/", jwtMiddleware, async (request, response) => {
       const users = await this.userModel.users();
-      const adaptedUsers = await userArraySchema.validate(users, {
-        stripUnknown: true,
-      });
+      const adaptedUsers = userArraySchema.parse(users);
       response.send(adaptedUsers);
     });
 }

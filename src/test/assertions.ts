@@ -1,6 +1,9 @@
 /** custom assertions that do a nicer job of type narrowing */
 
-import { Ok, Result, Error } from "../utils";
+import { Error, Ok, Result } from "../utils";
+
+// note that using our preferred func-style actually changes behavior here for some reason and causes test failures (ts(2775))
+/* eslint-disable func-style */
 
 export function assertOk<T1, T2>(
   result: Result<T1, T2>

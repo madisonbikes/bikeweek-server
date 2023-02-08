@@ -106,7 +106,7 @@ export class SchedApi {
       return;
     }
     this.callCount++;
-    if (this.callCount % 15 == 0) {
+    if (this.callCount % 15 === 0) {
       console.log("throttling api call, waiting 30 seconds");
       await sleep(30000);
     }

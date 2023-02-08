@@ -1,8 +1,7 @@
-import { parseISO } from "date-fns";
 import express from "express";
 import { injectable } from "tsyringe";
+import { BikeWeekEvent, EventTimestampSchema } from "../api/event";
 import { EventModel } from "../database/events";
-import { BikeWeekEvent } from "../database/types";
 import { EventSync } from "../sched/sync";
 import { jwtMiddleware } from "../security/authentication";
 import { verifyAdmin } from "../security/validateAdmin";
@@ -80,11 +79,11 @@ export class EventRoutes {
 
   normalizeEvent = (event: Partial<BikeWeekEvent>): Partial<BikeWeekEvent> => {
     if (event.createDate) {
-      event.createDate = parseISO(event.createDate as unknown as string);
+      event.createDate = EventTimestampSchema.parse(event.createDate);
     }
 
     if (event.modifyDate) {
-      event.modifyDate = parseISO(event.modifyDate as unknown as string);
+      event.modifyDate = EventTimestampSchema.parse(event.modifyDate);
     }
 
     if (event.location) {
@@ -111,12 +110,6 @@ export class EventRoutes {
 
     if (event.eventGraphicUrl?.trim() === "") {
       event.eventGraphicUrl = undefined;
-    }
-
-    // days come as array of strings, we want array of dates
-    if (event.eventDays) {
-      const days = event.eventDays as unknown as string[];
-      event.eventDays = days.map((v) => parseISO(v));
     }
     return event;
   };

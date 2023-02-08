@@ -1,6 +1,11 @@
 import superagent from "superagent";
 
-import { EntryResponse, FormResponse } from "./types";
+import {
+  EntryResponseSchema,
+  EntryResponse,
+  FormResponse,
+  FormResponseSchema,
+} from "./types";
 
 import { injectable } from "tsyringe";
 import { Configuration } from "../config";
@@ -34,7 +39,7 @@ export class Importer {
         this.config.gravityFormsConsumerApiKey,
         this.config.gravityFormsConsumerSecret
       );
-    return body;
+    return EntryResponseSchema.parse(body);
   }
 
   private async loadForms(): Promise<FormResponse> {
@@ -44,6 +49,6 @@ export class Importer {
         this.config.gravityFormsConsumerApiKey,
         this.config.gravityFormsConsumerSecret
       );
-    return body;
+    return FormResponseSchema.parse(body);
   }
 }

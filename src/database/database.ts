@@ -57,13 +57,13 @@ export class Database {
     this.client = new MongoClient(this.configuration.mongoDbUri, {});
     await this.client.connect();
 
-    this.database = this.client.db("bikeweek");
+    this.database = this.client.db();
 
     this._users = this.database.collection("users");
-    this._users.createIndex({ username: 1 });
+    await this._users.createIndex({ username: 1 });
 
     this._events = this.database.collection("events");
-    this._events.createIndex({ id: 1 });
+    await this._events.createIndex({ id: 1 });
 
     this._gfFormFields = this.database.collection("gfFormFields");
     this._gfResponses = this.database.collection("gfResponses");

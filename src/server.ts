@@ -17,7 +17,7 @@ export class ApiServer {
 
   server: Server | undefined;
 
-  async create(): Promise<Server> {
+  create(): Promise<Server> {
     const app = express();
 
     // FIXME disable right now because of issues
@@ -44,7 +44,7 @@ export class ApiServer {
 
     app.use("/api/v1", this.apiRoutes.routes);
     this.server = http.createServer(app);
-    return this.server;
+    return Promise.resolve(this.server);
   }
 
   async start(): Promise<void> {
@@ -56,7 +56,8 @@ export class ApiServer {
     });
   }
 
-  async stop(): Promise<void> {
+  stop(): Promise<void> {
     this.server?.close();
+    return Promise.resolve();
   }
 }

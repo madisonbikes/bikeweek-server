@@ -1,4 +1,4 @@
-# bikeweek-backend
+# Madison Bikes Bike Week Backend
 
 ## Information
 
@@ -36,3 +36,7 @@ Several environment variables must be set, or even better a `.env` file should b
 - `JSONWEBTOKEN_SECRET` - Set this to a long string of random digits or words unique to the server. Used to secure JWT tokens.
 - `PORT` - change the port on which the server runs. Default is 3001.
 - `STATIC_ROOT_DIR` - set to the location of the bikeweek-server build directory. Used in production to serve both APIs and React client from same host/port.
+
+## Code
+
+This repository enforces [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) as of July 2022.
