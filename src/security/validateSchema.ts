@@ -7,7 +7,7 @@ type Middleware = (
   next: NextFunction
 ) => Promise<void>;
 
-/** validate the request against the supplied yup schema, placing validated object into the request.validated property */
+/** validate the request against the supplied zod schema, placing validated object into the request.validated property */
 export const validateSchema = <T extends z.ZodTypeAny>(
   schema: T
 ): Middleware => {
