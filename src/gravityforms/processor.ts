@@ -15,6 +15,7 @@ import {
   EventStatusSchema,
   EventTimeSchema,
 } from "../api/event";
+import { logger } from "../utils/logger";
 
 /** this list is NOT exhaustive, just used for conditional behaviors in the backend */
 export enum EventTypes {
@@ -93,9 +94,7 @@ class EventHelper {
     const firstChoice = this.lookupFieldValue(entry, "location_first");
     let mapped = locations.find((value) => value.name === firstChoice);
     if (!mapped && firstChoice !== "N/A" && firstChoice !== "None") {
-      console.log(
-        `ERROR: Missing location map for location name: ${firstChoice}`
-      );
+      logger.error(`Missing location map for location name: ${firstChoice}`);
     }
     if (mapped) {
       mapped = { ...mapped };
@@ -131,7 +130,7 @@ class EventHelper {
     const eventEnd = this.lookupFieldValue(entry, "event_end");
     if (!eventEnd || !eventStart) {
       if (eventEnd || eventStart) {
-        console.log(
+        logger.warn(
           "Event has a mismatched start/end time. Event will be assumed to all-day."
         );
       }
@@ -200,7 +199,10 @@ class EventHelper {
           retval.push(value);
         }
       } else {
-        console.log(
+        logger.warn(
+          {
+            entry,
+          },
           `Unexpected non-string value in field ${adminLabel}: ${value}`
         );
       }
@@ -217,7 +219,8 @@ class EventHelper {
 
     const value = adaptedEntry[`${fieldId}`];
     if (typeof value !== "string") {
-      console.log(
+      logger.warn(
+        { entry },
         `Unexpected non-string value in field ${adminLabel}: ${value}`
       );
       return undefined;

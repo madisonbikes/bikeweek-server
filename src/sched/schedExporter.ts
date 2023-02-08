@@ -5,6 +5,7 @@ import { SchedApi } from "./api";
 import { buildMapsUrl } from "../locations";
 import { EventTypes } from "../gravityforms/processor";
 import { BikeWeekEvent, EventStatusSchema } from "../api/event";
+import { logger } from "../utils/logger";
 
 @injectable()
 export class SchedExporter {
@@ -37,22 +38,22 @@ export class SchedExporter {
       .sort((a, b) => a.name.localeCompare(b.name))
       .filter((event) => {
         if (isEndOfWeekParty(event)) {
-          console.log(`Skipping ${event.name} (end of week party tabling)`);
+          logger.debug(`Skipping ${event.name} (end of week party tabling)`);
           return false;
         }
         if (isAllDayEvent(event)) {
-          console.log(`Skipping ${event.name} (all day, no time)`);
+          logger.debug(`Skipping ${event.name} (all day, no time)`);
           return false;
         }
         if (event.eventDays.length === 0) {
-          console.log(`Skipping ${event.name} (no days)`);
+          logger.debug(`Skipping ${event.name} (no days)`);
           return false;
         }
         if (
           event.status !== EventStatusSchema.Enum.approved &&
           event.status !== EventStatusSchema.Enum.cancelled
         ) {
-          console.log(`Skipping ${event.name} (unapproved)`);
+          logger.debug(`Skipping ${event.name} (unapproved)`);
           return false;
         }
         return true;
@@ -101,9 +102,9 @@ export class SchedExporter {
             action = "added";
           }
           if (result.isError()) {
-            console.log(`${session_key} ${action} error: ${result.value}`);
+            logger.error(`${session_key} ${action} error: ${result.value}`);
           } else {
-            console.log(
+            logger.debug(
               `${session_key} ${action} ok(${result.value}) status: ${event.status}`
             );
           }
@@ -125,7 +126,7 @@ export class SchedExporter {
         session_key: key.toString(),
       });
       if (result.isError()) {
-        console.log(`delete $key error: ${result.value}`);
+        logger.error(`delete $key error: ${result.value}`);
       }
     }
   }

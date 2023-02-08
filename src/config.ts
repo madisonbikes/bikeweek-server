@@ -1,5 +1,7 @@
-import dotenv from "dotenv";
 import { injectable, singleton } from "tsyringe";
+import { initEnv } from "./utils/env";
+
+initEnv();
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -70,10 +72,4 @@ export class Configuration {
     }
     return retval;
   }
-}
-
-// this has to run first outside of constructor
-const result = dotenv.config();
-if (result.error && isDev) {
-  console.log(result.error);
 }

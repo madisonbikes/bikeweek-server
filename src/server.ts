@@ -6,6 +6,7 @@ import { ApiRoutes } from "./routes";
 import { Strategies } from "./security/authentication";
 import cors from "cors";
 import http, { Server } from "http";
+import { logger } from "./utils/logger";
 
 @injectable()
 export class ApiServer {
@@ -50,7 +51,7 @@ export class ApiServer {
   async start(): Promise<void> {
     await this.create();
     this.server?.listen(this.configuration.serverPort, () => {
-      console.log(
+      logger.info(
         `Server listening on http://localhost:${this.configuration.serverPort}`
       );
     });

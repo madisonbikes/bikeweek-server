@@ -6,6 +6,7 @@ import { Processor } from "./processor";
 import { createHash } from "crypto";
 import { EventModel } from "../database/events";
 import { BikeWeekEvent } from "../api/event";
+import { logger } from "../utils/logger";
 
 @injectable()
 export class RemoteEventPoller {
@@ -20,7 +21,7 @@ export class RemoteEventPoller {
     await this.importer.import();
 
     // defaults to every hour
-    console.log(
+    logger.info(
       `Scheduling poll of form data for every ${
         this.configuration.pollInterval / 1000
       } seconds`
@@ -31,7 +32,7 @@ export class RemoteEventPoller {
 
   /** perform the import if form data has been updated or if it's the first execution */
   private async doImport(): Promise<void> {
-    console.log("running remote forms import");
+    logger.debug("running remote forms import");
     await this.importer.import();
 
     const importedEvents = await this.processor.extractEvents();
@@ -42,7 +43,10 @@ export class RemoteEventPoller {
         (await this.eventModel.findEvent(event.id)) !== undefined;
       if (!eventExists) {
         addCount++;
-        console.log(
+        logger.debug(
+          {
+            event,
+          },
           `Importing new event ${event.id}: "${event.name}" from remote forms`
         );
         await this.eventModel.addEvent(event);
@@ -50,7 +54,7 @@ export class RemoteEventPoller {
         skipCount++;
       }
     }
-    console.log(
+    logger.info(
       `Finished remote forms import, skipped ${skipCount} added ${addCount}`
     );
   }

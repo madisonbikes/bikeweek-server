@@ -12,6 +12,7 @@ import { error, ok, Result } from "../utils/result";
 import { sleep } from "../utils/await-sleep";
 import { injectable } from "tsyringe";
 import { Configuration } from "../config";
+import { logger } from "../utils/logger";
 
 @injectable()
 export class SchedApi {
@@ -107,7 +108,7 @@ export class SchedApi {
     }
     this.callCount++;
     if (this.callCount % 15 === 0) {
-      console.log("throttling api call, waiting 30 seconds");
+      logger.debug("throttling api call, waiting 30 seconds");
       await sleep(30000);
     }
   }

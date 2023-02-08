@@ -1,6 +1,7 @@
 import { injectable, singleton } from "tsyringe";
 import { Configuration } from "../config";
 import { Collection, Db, MongoClient } from "mongodb";
+import { logger } from "../utils/logger";
 
 export type Status = {
   lastSchedSync?: Date;
@@ -53,7 +54,7 @@ export class Database {
   constructor(private configuration: Configuration) {}
 
   async start(): Promise<void> {
-    console.log(`Connecting to ${this.configuration.mongoDbUri}`);
+    logger.info(`Connecting to ${this.configuration.mongoDbUri}`);
     this.client = new MongoClient(this.configuration.mongoDbUri, {});
     await this.client.connect();
 

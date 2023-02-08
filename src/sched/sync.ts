@@ -5,6 +5,7 @@ import { SchedExporter } from "./schedExporter";
 import { DiscountExporter } from "../discountExporter";
 import { setTimeout, clearTimeout } from "timers";
 import { Configuration } from "../config";
+import { logger } from "../utils/logger";
 
 /** handles sync to sched */
 
@@ -42,12 +43,12 @@ export class EventSync {
   // bridge gap to async safely
   private syncDoExport() {
     if (!this.configuration.schedUri || !this.configuration.schedApiKey) {
-      console.log("Skipping sched sync without URI and/or API key");
+      logger.warn("Skipping sched sync without URI and/or API key");
       return;
     }
     Promise.resolve(this.doExport())
-      .then(() => console.log("Successful sync to sched"))
-      .catch((e) => console.log(e));
+      .then(() => logger.info("Successful sync to sched"))
+      .catch((e) => logger.error(e));
   }
 
   private async doExport(): Promise<void> {

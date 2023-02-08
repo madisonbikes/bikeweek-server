@@ -5,6 +5,7 @@ import { EventModel } from "../database/events";
 import { EventSync } from "../sched/sync";
 import { jwtMiddleware } from "../security/authentication";
 import { verifyAdmin } from "../security/validateAdmin";
+import { logger } from "../utils/logger";
 
 @injectable()
 export class EventRoutes {
@@ -29,7 +30,7 @@ export class EventRoutes {
           response.send(event);
         }
       } catch (err) {
-        console.log(err);
+        logger.error(err);
         response.status(400).send("invalid request");
       }
     })
@@ -50,7 +51,7 @@ export class EventRoutes {
           this.eventExporter.trigger();
         }
       } catch (err) {
-        console.log(err);
+        logger.error(err);
         response.status(400).send("invalid request");
       }
     })
@@ -71,7 +72,7 @@ export class EventRoutes {
             this.eventExporter.trigger();
           }
         } catch (err) {
-          console.log(err);
+          logger.error(err);
           response.status(400).send("invalid request");
         }
       }
