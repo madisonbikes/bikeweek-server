@@ -1,6 +1,6 @@
 import { injectable } from "tsyringe";
 import { Configuration } from "./config";
-import express from "express";
+import express, { Request, Response } from "express";
 import passport from "passport";
 import { ApiRoutes } from "./routes";
 import { Strategies } from "./security/authentication";
@@ -44,6 +44,16 @@ export class ApiServer {
     app.use(passport.initialize());
 
     app.use("/api/v1", this.apiRoutes.routes);
+
+    app.use((err: Error, _req: Request, res: Response) => {
+      logger.error(err, "Unhandled server error");
+      res.sendStatus(500);
+    });
+
+    app.on("error", (err) => {
+      logger.error(err);
+    });
+
     this.server = http.createServer(app);
     return Promise.resolve(this.server);
   }
