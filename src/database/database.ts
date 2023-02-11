@@ -32,9 +32,9 @@ export class Database {
     return this._gfResponses;
   }
 
-  public async getStatus(): Promise<DbStatus> {
-    return dbStatusSchema.parseAsync(
-      this.database?.collection("status").findOne()
+  public async getStatus() {
+    return dbStatusSchema.parse(
+      await this.database?.collection("status").findOne()
     );
   }
 

@@ -51,6 +51,7 @@ export const bikeWeekEventSchema = z.object({
 });
 export type BikeWeekEvent = z.infer<typeof bikeWeekEventSchema>;
 
+/** mutable removes several fields */
 export const mutableBikeWeekEventSchema = bikeWeekEventSchema.omit({
   modifyDate: true,
   createDate: true,

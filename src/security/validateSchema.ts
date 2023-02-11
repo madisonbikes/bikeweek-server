@@ -11,7 +11,7 @@ export const validateBodySchema = <T extends z.ZodTypeAny>({
   schema,
 }: ValidateOptions<T>): ExpressMiddleware => {
   return (request, response, next) => {
-    logger.trace("validating body schema");
+    logger.trace(request.body, "validating body schema");
     const parseResult = schema.safeParse(request.body);
     if (parseResult.success) {
       request.validated = parseResult.data;

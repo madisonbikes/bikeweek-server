@@ -4,15 +4,15 @@ import { BikeWeekEvent, MutableBikeWeekEvent } from "../routes/contract";
 import { Database } from "./database";
 import { DbBikeWeekEvent, dbBikeWeekEventSchema } from "./types";
 
-export const isDiscountEvent = (event: DbBikeWeekEvent): boolean => {
+export const isDiscountEvent = (event: DbBikeWeekEvent) => {
   return event.eventTypes.includes(EventTypes.DISCOUNT);
 };
 
-export const isEndOfWeekParty = (event: DbBikeWeekEvent): boolean => {
+export const isEndOfWeekParty = (event: DbBikeWeekEvent) => {
   return event.eventTypes.includes(EventTypes.ENDOFWEEKPARTY);
 };
 
-export const isAllDayEvent = (event: DbBikeWeekEvent): boolean => {
+export const isAllDayEvent = (event: DbBikeWeekEvent) => {
   return event.eventTimes.length === 0;
 };
 
@@ -24,18 +24,18 @@ export class EventModel {
     await this.database.events.insertOne(event);
   };
 
-  setAllEvents = async (events: DbBikeWeekEvent[]): Promise<void> => {
+  setAllEvents = async (events: DbBikeWeekEvent[]) => {
     await this.database.events.deleteMany({});
     await this.database.events.insertMany(events);
   };
 
-  events = (): Promise<DbBikeWeekEvent[]> => {
+  events = async () => {
     return dbBikeWeekEventSchema
       .array()
-      .parseAsync(this.database.events.find({}).toArray());
+      .parse(await this.database.events.find({}).toArray());
   };
 
-  findEvent = async (id: number): Promise<DbBikeWeekEvent | undefined> => {
+  findEvent = async (id: number) => {
     const retval = await this.database.events.findOne({
       id,
     });
@@ -43,15 +43,12 @@ export class EventModel {
     return dbBikeWeekEventSchema.parse(retval);
   };
 
-  deleteEvent = async (id: number): Promise<boolean> => {
+  deleteEvent = async (id: number) => {
     const result = await this.database.events.deleteOne({ id });
     return result.deletedCount !== 0;
   };
 
-  updateEvent = async (
-    id: number,
-    data: Partial<MutableBikeWeekEvent>
-  ): Promise<DbBikeWeekEvent | undefined> => {
+  updateEvent = async (id: number, data: Partial<MutableBikeWeekEvent>) => {
     const modData: Partial<BikeWeekEvent> = { modifyDate: new Date(), ...data };
     const result = await this.database.events.updateOne(
       {
