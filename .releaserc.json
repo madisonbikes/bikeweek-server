@@ -2,7 +2,7 @@
   "branches": [
     "main"
   ],
-  "repositoryUrl": "https://github.com/madisonbikes/cyclistsofmsn-backend.git",
+  "repositoryUrl": "https://github.com/madisonbikes/bikeweek-backend.git",
   "plugins": [
     "@semantic-release/commit-analyzer",
     [
@@ -24,7 +24,7 @@
         "assets": [
           "CHANGELOG.md"
         ],
-        "message": "chore(release): cyclistsofmsn-backend ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+        "message": "chore(release): bikeweek-backend ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
     ],
     "semantic-release-export-data"
