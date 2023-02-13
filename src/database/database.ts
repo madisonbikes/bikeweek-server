@@ -33,9 +33,8 @@ export class Database {
   }
 
   public async getStatus() {
-    return dbStatusSchema.parse(
-      await this.database?.collection("status").findOne()
-    );
+    const status = (await this.database?.collection("status").findOne()) ?? {};
+    return dbStatusSchema.parse(status);
   }
 
   public async setStatus(status: DbStatus) {
