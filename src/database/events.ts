@@ -39,7 +39,7 @@ export class EventModel {
     const retval = await this.database.events.findOne({
       id,
     });
-    if (retval == null) return undefined;
+    if (!retval) return undefined;
     return dbBikeWeekEventSchema.parse(retval);
   };
 

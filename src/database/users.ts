@@ -13,7 +13,7 @@ export class UserModel {
     const value = await this.database.users.findOne({
       username: username,
     });
-    if (value == null) {
+    if (!value) {
       return undefined;
     }
 
