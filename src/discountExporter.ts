@@ -12,12 +12,12 @@ export class DiscountExporter {
 
     let buffer = "";
     for (const event of events) {
-      const location = event.location;
+      const { location } = event;
 
       const link = createLink(event.name, event.eventUrl);
 
       buffer += `<h2>${link}</h2>\n`;
-      if (location?.maps_description) {
+      if (location?.maps_description !== undefined) {
         // do something
       }
     }

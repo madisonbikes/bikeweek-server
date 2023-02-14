@@ -15,17 +15,19 @@ export type JwtConfiguration = {
 @injectable()
 @singleton()
 export class Configuration {
-  public readonly gravityFormsUri = `${process.env.GF_URI}/wp-json/gf/v2`;
-  public readonly gravityFormsId = `${process.env.GF_FORM_ID}`;
-  public readonly gravityFormsConsumerApiKey = `${process.env.GF_CONSUMER_API_KEY}`;
-  public readonly gravityFormsConsumerSecret = `${process.env.GF_CONSUMER_SECRET}`;
+  public readonly gravityFormsUri;
+  public readonly gravityFormsId = process.env.GF_FORM_ID ?? "";
+  public readonly gravityFormsConsumerApiKey =
+    process.env.GF_CONSUMER_API_KEY ?? "";
+  public readonly gravityFormsConsumerSecret =
+    process.env.GF_CONSUMER_SECRET ?? "";
 
-  public readonly schedUri: string | undefined;
-  public readonly schedApiKey: string | undefined;
+  public readonly schedUri;
+  public readonly schedApiKey = process.env.SCHED_API_KEY ?? "";
 
-  public readonly reactStaticRootDir = process.env.STATIC_ROOT_DIR;
+  public readonly reactStaticRootDir = process.env.STATIC_ROOT_DIR ?? "";
 
-  public readonly mongoDbUri = `${process.env.MONGODB_URI}`;
+  public readonly mongoDbUri = process.env.MONGODB_URI ?? "";
 
   public readonly serverPort = this.parseIntWithDefault(process.env.PORT, 3001);
 
@@ -36,23 +38,24 @@ export class Configuration {
     10 * 60 * 1000
   );
 
-  public readonly enableCors = process.env.ENABLE_CORS === "true";
+  public readonly enableCors = Boolean(process.env.ENABLE_CORS);
 
   public readonly dev = isDev;
 
   constructor() {
-    if (process.env.SCHED_URI) {
+    if (process.env.GF_URI !== undefined && process.env.GF_URI !== "") {
+      this.gravityFormsUri = `${process.env.GF_URI}/wp-json/gf/v2`;
+    } else {
+      this.gravityFormsUri = "";
+    }
+
+    if (process.env.SCHED_URI !== undefined && process.env.SCHED_URI !== "") {
       this.schedUri = `${process.env.SCHED_URI}/api/`;
     } else {
-      this.schedUri = undefined;
-    }
-    if (process.env.SCHED_API_KEY) {
-      this.schedApiKey = `${process.env.SCHED_API_KEY}`;
-    } else {
-      this.schedApiKey = undefined;
+      this.schedUri = "";
     }
     this.jwt = {
-      secret: process.env.JSONWEBTOKEN_SECRET || "defaultsecretnotsecure",
+      secret: process.env.JSONWEBTOKEN_SECRET ?? "defaultsecretnotsecure",
       audience: "bikeweekadmin",
       issuer: "bikeweekadmin",
       expiresIn: "14d",
@@ -64,7 +67,7 @@ export class Configuration {
     defaultValue: number
   ): number {
     let retval = defaultValue;
-    if (value) {
+    if (value !== undefined) {
       retval = Number(value);
       if (isNaN(retval)) {
         retval = defaultValue;

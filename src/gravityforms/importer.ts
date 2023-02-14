@@ -13,6 +13,11 @@ export class Importer {
   constructor(private config: Configuration, private database: Database) {}
 
   async import(): Promise<void> {
+    if (!this.isEnabled()) {
+      logger.info("Gravity forms URI not provided, no form data importing");
+      return;
+    }
+
     const [formFields, responses] = await Promise.all([
       this.loadForms(),
       this.loadEntries(),
@@ -22,6 +27,10 @@ export class Importer {
 
     await this.database.gfResponses.deleteMany({});
     await this.database.gfResponses.insertMany(responses.entries);
+  }
+
+  isEnabled() {
+    return this.config.gravityFormsUri;
   }
 
   // FIXME support pagination for > 100 entries

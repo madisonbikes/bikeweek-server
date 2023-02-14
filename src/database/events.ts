@@ -20,7 +20,7 @@ export const isAllDayEvent = (event: DbBikeWeekEvent) => {
 export class EventModel {
   constructor(private database: Database) {}
 
-  addEvent = async (event: DbBikeWeekEvent): Promise<void> => {
+  addEvent = async (event: DbBikeWeekEvent) => {
     await this.database.events.insertOne(event);
   };
 

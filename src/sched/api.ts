@@ -21,8 +21,11 @@ export class SchedApi {
   async addSession(
     session: AddSessionRequest
   ): Promise<Result<unknown, string>> {
-    const response = await this.postRequest("session/add", session);
-    if (response.error) {
+    const { response, isError } = await this.postRequest(
+      "session/add",
+      session
+    );
+    if (isError) {
       return error(response.text);
     } else {
       return ok(response.text);
@@ -32,8 +35,11 @@ export class SchedApi {
   async modifySession(
     session: ModifySessionRequest
   ): Promise<Result<unknown, string>> {
-    const response = await this.postRequest("session/mod", session);
-    if (response.error) {
+    const { response, isError } = await this.postRequest(
+      "session/mod",
+      session
+    );
+    if (isError) {
       return error(response.text);
     } else {
       return ok(response.text);
@@ -44,8 +50,11 @@ export class SchedApi {
     query?: SessionListRequest
   ): Promise<Result<SessionListResponse[], string>> {
     const newQuery = { format: "json", ...query };
-    const response = await this.postRequest("session/list", newQuery);
-    if (response.error) {
+    const { response, isError } = await this.postRequest(
+      "session/list",
+      newQuery
+    );
+    if (isError) {
       return error(response.text);
     } else {
       const body = response.body;
@@ -57,8 +66,11 @@ export class SchedApi {
     query?: SessionExportRequest
   ): Promise<Result<SessionExportResponse[], string>> {
     const newQuery = { format: "json", ...query };
-    const response = await this.postRequest("session/export", newQuery);
-    if (response.error) {
+    const { response, isError } = await this.postRequest(
+      "session/export",
+      newQuery
+    );
+    if (isError) {
       return error(response.text);
     } else {
       const body = response.body;
@@ -69,8 +81,11 @@ export class SchedApi {
   async deleteSession(
     session: DeleteSessionRequest
   ): Promise<Result<unknown, string>> {
-    const response = await this.postRequest("session/del", session);
-    if (response.error) {
+    const { response, isError } = await this.postRequest(
+      "session/del",
+      session
+    );
+    if (isError) {
       return error(response.text);
     } else {
       return ok(response.text);
@@ -88,11 +103,18 @@ export class SchedApi {
       api_key: this.configuration.schedApiKey,
     };
     const fullEndpoint = this.configuration.schedUri + endpoint;
-    return superagent
+    const response = await superagent
       .post(fullEndpoint)
       .set("User-Agent", "madisonbikeweek-importer/1.0.0")
       .set("Content-Type", "application/x-www-form-urlencoded")
       .send(newRequestData);
+
+    // error can be false or an error code, we'll separate those values
+    if (response.error === false) {
+      return { response, isError: false, code: undefined };
+    } else {
+      return { response, isError: true, code: response.error };
+    }
   }
 
   private callCount = 0;

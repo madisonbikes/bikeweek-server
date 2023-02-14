@@ -4,7 +4,11 @@ import { UserModel } from "../database/users";
 import { jwtMiddleware } from "../security/authentication";
 import { validateBodySchema } from "../security/validateSchema";
 import { validateAdmin } from "../security/validateAdmin";
-import { userSchema, userWithPasswordSchema } from "./contract";
+import {
+  userSchema,
+  UserWithPassword,
+  userWithPasswordSchema,
+} from "./contract";
 import { asyncWrapper } from "./async";
 
 @injectable()
@@ -19,9 +23,9 @@ export class UserRoutes {
       validateAdmin(),
       validateBodySchema({ schema: userWithPasswordSchema }),
       asyncWrapper(async (request, response) => {
-        const newUser = userWithPasswordSchema.parse(request.validated);
+        const newUser = request.validated as UserWithPassword;
 
-        if (await this.userModel.findUser(newUser.username)) {
+        if ((await this.userModel.findUser(newUser.username)) !== undefined) {
           response.status(409).send("user already exists");
           return;
         }
@@ -33,7 +37,7 @@ export class UserRoutes {
     .get(
       "/",
       jwtMiddleware,
-      asyncWrapper(async (request, response) => {
+      asyncWrapper(async (_request, response) => {
         const users = await this.userModel.users();
         const adaptedUsers = userSchema.array().parse(users);
         response.send(adaptedUsers);

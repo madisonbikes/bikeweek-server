@@ -59,7 +59,7 @@ export class EventSync {
 
     // get list of events that need to be synced
     const filteredEvents = allEvents.filter((event) => {
-      if (!status.lastSchedSync) return true;
+      if (status.lastSchedSync === undefined) return true;
       return (
         event.createDate > status.lastSchedSync ||
         event.modifyDate > status.lastSchedSync

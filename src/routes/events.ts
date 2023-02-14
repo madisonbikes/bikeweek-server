@@ -52,21 +52,16 @@ export class EventRoutes {
       validateAdmin(),
       validateBodySchema({ schema: mutableBikeWeekEventSchema }),
       asyncWrapper(async (request, response) => {
-        try {
-          const eventData = request.validated as MutableBikeWeekEvent;
-          const id = parseInt(request.params.eventId);
-          const event = await this.eventModel.updateEvent(id, eventData);
-          if (!event) {
-            response.status(404).send("not found");
-          } else {
-            response.send(event);
+        const eventData = request.validated as MutableBikeWeekEvent;
+        const id = parseInt(request.params.eventId);
+        const event = await this.eventModel.updateEvent(id, eventData);
+        if (!event) {
+          response.status(404).send("not found");
+        } else {
+          response.send(event);
 
-            // trigger an export on any modification
-            this.eventExporter.trigger();
-          }
-        } catch (err) {
-          logger.error(err);
-          response.status(400).send("invalid request");
+          // trigger an export on any modification
+          this.eventExporter.trigger();
         }
       })
     )
@@ -75,20 +70,15 @@ export class EventRoutes {
       jwtMiddleware,
       validateAdmin(),
       asyncWrapper(async (request, response) => {
-        try {
-          const id = parseInt(request.params.eventId);
-          const event = await this.eventModel.deleteEvent(id);
-          if (!event) {
-            response.status(404).send("not found");
-          } else {
-            response.send("ok");
+        const id = parseInt(request.params.eventId);
+        const event = await this.eventModel.deleteEvent(id);
+        if (!event) {
+          response.status(404).send("not found");
+        } else {
+          response.send("ok");
 
-            // trigger an export on any modification
-            this.eventExporter.trigger();
-          }
-        } catch (err) {
-          logger.error(err);
-          response.status(400).send("invalid request");
+          // trigger an export on any modification
+          this.eventExporter.trigger();
         }
       })
     );

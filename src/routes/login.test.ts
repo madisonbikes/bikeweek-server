@@ -1,49 +1,19 @@
-import {
-  setupSuite,
-  testConfiguration,
-  testContainer,
-  testDatabase,
-  testRequest,
-  TestRequest,
-} from "../test";
-import { ApiServer } from "../server";
+import { setupSuite, testRequest, TestRequest, createTestUser } from "../test";
 import { JwtPayload, verify } from "jsonwebtoken";
 import { loginResponseSchema } from "./contract";
 
 describe("login route", () => {
-  let apiServer: ApiServer;
   let request: TestRequest;
 
-  setupSuite({ withDatabase: true });
+  setupSuite({ withDatabase: true, withApiServer: true });
 
   beforeAll(async () => {
-    apiServer = testContainer().resolve(ApiServer);
-    request = testRequest(await apiServer.create());
-
-    const config = testConfiguration();
-    config.jwt = {
-      // preserve defaults
-      ...config.jwt,
-
-      // override
-      secret: "secret",
-      audience: "audience",
-      issuer: "issuer",
-      expiresIn: "10m",
-    };
-
     // create a test user for login
-    const db = testDatabase();
-    await db.users.deleteMany({});
-    await db.users.insertOne({
-      username: "testuser",
-      // this is a bcrypt of "password"
-      password: "$2a$12$T6KY4dGCetX4j9ld.pz6aea8NCk3Ug4aCPfyH2Ng23LaGFB0vVmHW",
-    });
+    await createTestUser();
   });
 
-  afterAll(async () => {
-    await apiServer.stop();
+  beforeEach(() => {
+    request = testRequest();
   });
 
   it("responds to login api with good credentials successfully", () => {

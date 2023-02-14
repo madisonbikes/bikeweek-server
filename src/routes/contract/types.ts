@@ -81,3 +81,4 @@ export const userSchema = z.object({
 export const userWithPasswordSchema = userSchema.extend({
   password: z.string(),
 });
+export type UserWithPassword = z.infer<typeof userWithPasswordSchema>;

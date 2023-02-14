@@ -154,7 +154,7 @@ export class SchedExporter {
     return description;
   }
 
-  buildSponsor(event: BikeWeekEvent): string | undefined {
+  buildSponsor(event: BikeWeekEvent): string {
     let sponsorText = "";
     if (event.sponsors.length > 0) {
       sponsorText += "Hosted by ";
@@ -167,18 +167,14 @@ export class SchedExporter {
           }
         }
         const url = value.url;
-        if (url && url.length > 0) {
+        if (url !== undefined && url.length > 0) {
           sponsorText += `<a href="${url}" target="_blank">${value.name}</a>`;
         } else {
           sponsorText += value.name;
         }
       });
     }
-    if (sponsorText.length > 0) {
-      return sponsorText;
-    } else {
-      return undefined;
-    }
+    return sponsorText;
   }
 }
 

@@ -127,8 +127,8 @@ class EventHelper {
   }
 
   getEventTimes(entry: Entry): EventTime[] {
-    const eventStart = this.lookupFieldValue(entry, "event_start");
-    const eventEnd = this.lookupFieldValue(entry, "event_end");
+    const eventStart = this.lookupFieldValue(entry, "event_start") ?? "";
+    const eventEnd = this.lookupFieldValue(entry, "event_end") ?? "";
     if (!eventEnd || !eventStart) {
       if (eventEnd || eventStart) {
         logger.warn(
@@ -182,7 +182,7 @@ class EventHelper {
     adminLabel: string
   ): string[] | undefined {
     const fieldId = this.lookupFieldId(adminLabel);
-    if (!fieldId) return undefined;
+    if (fieldId === undefined) return undefined;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const adaptedEntry: any = entry;
@@ -220,7 +220,7 @@ class EventHelper {
 
   lookupFieldValue(entry: Entry, adminLabel: string): string | undefined {
     const fieldId = this.lookupFieldId(adminLabel);
-    if (!fieldId) return undefined;
+    if (fieldId === undefined) return undefined;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const adaptedEntry: any = entry;
@@ -238,7 +238,7 @@ class EventHelper {
 
   requireFieldId(adminLabel: string): number {
     const fieldId = this.lookupFieldId(adminLabel);
-    if (!fieldId) {
+    if (fieldId === undefined) {
       throw new Error(`No field for admin label ${adminLabel}`);
     }
     return fieldId;
