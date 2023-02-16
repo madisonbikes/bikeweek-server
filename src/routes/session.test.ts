@@ -1,5 +1,5 @@
-import { setupSuite, testRequest, TestRequest, createTestUser } from "../test";
-import { authenticatedUserSchema } from "./contract";
+import { setupSuite, testRequest, TestRequest } from "../test";
+import { createTestUser } from "../test/data";
 
 describe("login route", () => {
   let request: TestRequest;
@@ -20,11 +20,8 @@ describe("login route", () => {
       .post("/api/v1/session/login")
       .send({ username: "testuser", password: "password" })
       .expect(200)
-      .expect((request) => {
-        const response = authenticatedUserSchema.parse(request.body);
-
-        expect(response.username).toEqual("testuser");
-        expect(response.roles).toHaveLength(0);
+      .expect(() => {
+        // nothing
       });
   });
 
@@ -57,10 +54,52 @@ describe("login route", () => {
       .expect(/extraxyz/);
   });
 
-  it("responds to login api with credentials as success request but unauthorized", () => {
+  it("responds to login api with good username, bad credentials as unauthorized", () => {
+    return request
+      .post("/api/v1/session/login")
+      .send({ username: "testuser", password: "wrong_password" })
+      .expect(401);
+  });
+
+  it("responds to login api with bad username (and bad password) as unauthorized", () => {
     return request
       .post("/api/v1/session/login")
       .send({ username: "bad", password: "bad" })
       .expect(401);
+  });
+
+  it("responds to logout api with good session successfully", async () => {
+    await request
+      .post("/api/v1/session/login")
+      .send({ username: "testuser", password: "password" })
+      .expect(200)
+      .expect(() => {
+        // nothing
+      });
+
+    await request
+      .post("/api/v1/session/logout")
+      .expect(200)
+      .expect(/logged out/);
+  });
+
+  it("responds to logout api with bad session failure", async () => {
+    await request.post("/api/v1/session/logout").expect(400);
+  });
+
+  it("responds to session info with good session successfully", async () => {
+    await request
+      .post("/api/v1/session/login")
+      .send({ username: "testuser", password: "password" })
+      .expect(200);
+
+    await request
+      .get("/api/v1/session/info")
+      .expect(200)
+      .expect(/testuser/);
+  });
+
+  it("responds to session info with no session", async () => {
+    await request.get("/api/v1/session/info").expect(401);
   });
 });

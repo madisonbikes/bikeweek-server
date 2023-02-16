@@ -1,12 +1,6 @@
-import { AuthenticatedUser, ExpressMiddleware } from "./authentication";
+import { Roles } from "./authentication";
+import { validateRole } from "./validateRole";
 
-export const validateAdmin = (): ExpressMiddleware => {
-  return (request, response, next) => {
-    const user = request.user as AuthenticatedUser;
-    if (!user?.admin) {
-      response.status(401).send("requires admin");
-      return;
-    }
-    next();
-  };
+export const validateAdmin = () => {
+  return validateRole({ role: Roles.ADMIN });
 };

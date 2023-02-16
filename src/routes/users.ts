@@ -1,7 +1,6 @@
 import express from "express";
 import { injectable } from "tsyringe";
 import { UserModel } from "../database/users";
-import { jwtMiddleware } from "../security/authentication";
 import { validateBodySchema } from "../security/validateSchema";
 import { validateAdmin } from "../security/validateAdmin";
 import {
@@ -10,6 +9,7 @@ import {
   userWithPasswordSchema,
 } from "./contract";
 import { asyncWrapper } from "./async";
+import { validateAuthenticated, generateHashedPassword } from "../security";
 
 @injectable()
 export class UserRoutes {
@@ -19,7 +19,6 @@ export class UserRoutes {
     .Router()
     .post(
       "/create",
-      jwtMiddleware,
       validateAdmin(),
       validateBodySchema({ schema: userWithPasswordSchema }),
       asyncWrapper(async (request, response) => {
@@ -30,13 +29,17 @@ export class UserRoutes {
           return;
         }
 
-        const createdUser = await this.userModel.addUser(newUser);
+        const hashed_password = await generateHashedPassword(newUser.password);
+        const createdUser = await this.userModel.addUser({
+          ...newUser,
+          hashed_password,
+        });
         response.send(createdUser);
       })
     )
     .get(
       "/",
-      jwtMiddleware,
+      validateAuthenticated(),
       asyncWrapper(async (_request, response) => {
         const users = await this.userModel.users();
         const adaptedUsers = userSchema.array().parse(users);

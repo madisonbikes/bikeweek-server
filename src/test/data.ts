@@ -6,14 +6,14 @@ const PASSWORD_WITH_LOW_WORK_FACTOR =
 export const createTestUser = async () => {
   await testDatabase().users.insertOne({
     username: "testuser",
-    password: PASSWORD_WITH_LOW_WORK_FACTOR,
+    hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
   });
 };
 
 export const createTestAdminUser = async () => {
   await testDatabase().users.insertOne({
     username: "testadmin",
-    password: PASSWORD_WITH_LOW_WORK_FACTOR,
-    admin: true,
+    hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
+    roles: ["admin"],
   });
 };

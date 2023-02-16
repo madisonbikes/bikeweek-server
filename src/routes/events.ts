@@ -3,7 +3,6 @@ import { injectable } from "tsyringe";
 import { MutableBikeWeekEvent, mutableBikeWeekEventSchema } from "./contract";
 import { EventModel } from "../database/events";
 import { EventSync } from "../sched/sync";
-import { jwtMiddleware } from "../security/authentication";
 import { validateAdmin } from "../security/validateAdmin";
 import { logger } from "../utils";
 import { validateBodySchema } from "../security/validateSchema";
@@ -20,7 +19,6 @@ export class EventRoutes {
     .Router()
     .get(
       "/",
-      jwtMiddleware,
       validateAdmin(),
       asyncWrapper(async (_request, response) => {
         const events = await this.eventModel.events();
@@ -29,7 +27,6 @@ export class EventRoutes {
     )
     .get(
       "/:eventId",
-      jwtMiddleware,
       validateAdmin(),
       asyncWrapper(async (request, response) => {
         try {
@@ -48,7 +45,6 @@ export class EventRoutes {
     )
     .put(
       "/:eventId",
-      jwtMiddleware,
       validateAdmin(),
       validateBodySchema({ schema: mutableBikeWeekEventSchema }),
       asyncWrapper(async (request, response) => {
@@ -67,7 +63,6 @@ export class EventRoutes {
     )
     .delete(
       "/:eventId",
-      jwtMiddleware,
       validateAdmin(),
       asyncWrapper(async (request, response) => {
         const id = parseInt(request.params.eventId);

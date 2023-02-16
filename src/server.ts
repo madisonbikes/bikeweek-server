@@ -1,19 +1,23 @@
 import { injectable } from "tsyringe";
 import { Configuration } from "./config";
 import express, { Request, Response } from "express";
+import session from "express-session";
+
 import passport from "passport";
 import { ApiRoutes } from "./routes";
 import { Strategies } from "./security/authentication";
 import cors from "cors";
 import http, { Server } from "http";
 import { logger } from "./utils";
+import { RedisConnection } from "./redis";
 
 @injectable()
 export class ApiServer {
   constructor(
     private configuration: Configuration,
     private apiRoutes: ApiRoutes,
-    private strategies: Strategies
+    private strategies: Strategies,
+    private redis: RedisConnection
   ) {}
 
   server: Server | undefined;
@@ -37,11 +41,29 @@ export class ApiServer {
 
     // used for login method
     passport.use(this.strategies.local);
+    passport.serializeUser<string>((user, done) => {
+      logger.trace(user, "serialize user");
+      const data = JSON.stringify(user);
+      done(null, data);
+    });
 
-    // used for securing most api endpoints
-    passport.use(this.strategies.jwt);
+    passport.deserializeUser<string>((data, done) => {
+      const user = JSON.parse(data);
+      logger.trace(user, "deserialize user");
+      done(null, user);
+    });
 
+    const sessionOptions: session.SessionOptions = {
+      secret: this.configuration.sessionStoreSecret,
+      resave: false,
+      saveUninitialized: false,
+    };
+    if (this.redis.isEnabled()) {
+      sessionOptions.store = this.redis.createStore();
+    }
+    app.use(session(sessionOptions));
     app.use(passport.initialize());
+    app.use(passport.session());
 
     app.use("/api/v1", this.apiRoutes.routes);
 

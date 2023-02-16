@@ -1,17 +1,31 @@
+import "reflect-metadata";
 import { injectable } from "tsyringe";
-import { Strategy as JwtStrategy } from "passport-jwt";
-import { Strategy as LocalStrategy } from "passport-local";
 import passport from "passport";
-import { JwtManager, JwtPayload } from "./jwt";
-
-import { UserModel } from "../database/users";
+import { Strategy as LocalStrategy } from "passport-local";
+import { logger } from "../utils";
+import { AuthenticatedUser, authenticatedUserSchema } from "../routes/contract";
+import { Request, Response, NextFunction } from "express";
+import bcrypt from "bcryptjs";
 import { DbUser } from "../database/types";
-import { NextFunction, Request, Response } from "express";
+import { UserModel } from "../database/users";
 
-export type AuthenticatedUser = Express.User & {
-  username: string;
-  admin: boolean;
+export type AuthenticatedExpressUser = Express.User & AuthenticatedUser;
+
+export enum Roles {
+  ADMIN = "admin",
+  EDITOR = "editor",
+}
+
+/** check this level every few years, eventually bump to higher hash size to improve security */
+const BCRYPT_HASH_SIZE = 10;
+
+export const userHasRole = (user: AuthenticatedUser, role: string) => {
+  return user.roles.find((r) => r === role) !== undefined;
 };
+
+export const localMiddleware = passport.authenticate("local", {
+  session: true,
+});
 
 export type ExpressMiddleware = (
   request: Request,
@@ -19,52 +33,50 @@ export type ExpressMiddleware = (
   next: NextFunction
 ) => void;
 
-export const localMiddleware = passport.authenticate("local", {
-  session: false,
-});
-
-/** passport jwt middleware */
-export const jwtMiddleware = passport.authenticate("jwt", { session: false });
-
 @injectable()
 export class Strategies {
-  constructor(private userModel: UserModel, private jwtManager: JwtManager) {}
+  constructor(private users: UserModel) {}
 
-  /** passport strategy implementation for JWT bearer auth tokens */
-  readonly jwt = new JwtStrategy(
-    this.jwtManager.strategyOptions(),
-    async (payload: JwtPayload, done) => {
-      const lookupUser = await this.userModel.findUser(payload?.sub ?? "");
-      if (lookupUser) {
-        done(null, this.authenticatedUser(lookupUser));
-      } else {
-        // user deleted?
-        done(null, false);
-      }
-    }
-  );
-
-  /** passport strategy implmentation for username/pw against mongodb */
+  /** passport strategy implementation for username/pw against mongodb */
   readonly local = new LocalStrategy(async (username, password, done) => {
+    logger.trace({ username }, "local passport auth");
     let success = false;
     if (!username) {
       done("null username", false);
       return;
     }
-
-    const user = await this.userModel.findUser(username);
-    if (user) {
-      success = await this.userModel.checkPassword(password, user);
-    }
-    if (!success || !user) {
-      done(null, false);
-    } else {
-      done(null, this.authenticatedUser(user));
+    try {
+      const user = await this.users.findUser(username);
+      if (user) {
+        success = await checkPassword(password, user);
+      } else {
+        // even with missing user, waste cpu cycles "checking" password to hide this API consumers
+        await generateHashedPassword("no_password");
+      }
+      if (!success || user === undefined) {
+        done(null, false);
+      } else {
+        done(null, this.authenticatedUser(user));
+      }
+    } catch (err) {
+      done(err, false);
     }
   });
 
-  /** sanitizes user info for export to JWT and into request object */
+  simulateCheckPassword(hashedPassword: string, checkPassword: string) {
+    return bcrypt.compare(checkPassword, hashedPassword);
+  }
+
+  /** sanitizes user info for export to passport and into request object */
   private authenticatedUser(user: DbUser): AuthenticatedUser {
-    return { username: user.username, admin: user.admin ?? false };
+    return authenticatedUserSchema.parse(user);
   }
 }
+
+export const generateHashedPassword = (password: string) => {
+  return bcrypt.hash(password, BCRYPT_HASH_SIZE);
+};
+
+export const checkPassword = (password: string, user: DbUser) => {
+  return bcrypt.compare(password, user.hashed_password);
+};

@@ -9,8 +9,8 @@ export type DbBikeWeekEvent = z.infer<typeof dbBikeWeekEventSchema>;
 
 export const dbUserSchema = z.object({
   username: z.string(),
-  password: z.string(),
-  admin: z.boolean().optional(),
+  hashed_password: z.string(),
+  roles: z.string().array().optional().default([]),
 });
 
 export type DbUser = z.infer<typeof dbUserSchema>;

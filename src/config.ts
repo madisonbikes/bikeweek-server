@@ -5,13 +5,6 @@ initEnv();
 
 const isDev = process.env.NODE_ENV === "development";
 
-export type JwtConfiguration = {
-  secret: string;
-  issuer: string;
-  audience: string;
-  expiresIn: string;
-};
-
 @injectable()
 @singleton()
 export class Configuration {
@@ -31,12 +24,15 @@ export class Configuration {
 
   public readonly serverPort = this.parseIntWithDefault(process.env.PORT, 3001);
 
-  public readonly jwt: JwtConfiguration;
-
   public readonly pollInterval = this.parseIntWithDefault(
     process.env.POLLINTERVAL,
     10 * 60 * 1000
   );
+
+  public readonly redisUri = process.env.REDIS_URI ?? "";
+
+  public readonly sessionStoreSecret =
+    process.env.SESSION_STORE_SECRET ?? "notverysecret";
 
   public readonly enableCors = Boolean(process.env.ENABLE_CORS);
 
@@ -54,12 +50,6 @@ export class Configuration {
     } else {
       this.schedUri = "";
     }
-    this.jwt = {
-      secret: process.env.JSONWEBTOKEN_SECRET ?? "defaultsecretnotsecure",
-      audience: "bikeweekadmin",
-      issuer: "bikeweekadmin",
-      expiresIn: "14d",
-    };
   }
 
   private parseIntWithDefault(

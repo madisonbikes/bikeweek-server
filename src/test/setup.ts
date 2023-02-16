@@ -119,20 +119,15 @@ export const cleanupSuite = async (): Promise<void> => {
 @injectable()
 export class TestConfiguration extends Configuration {
   public override mongoDbUri;
-  public override jwt;
   public override gravityFormsUri;
   public override schedUri;
+  public override redisUri;
 
   constructor() {
     super();
     this.mongoDbUri = testMongoUri;
     this.gravityFormsUri = "";
     this.schedUri = "";
-    this.jwt = {
-      secret: "secret",
-      audience: "audience",
-      issuer: "issuer",
-      expiresIn: "10m",
-    };
+    this.redisUri = "";
   }
 }
