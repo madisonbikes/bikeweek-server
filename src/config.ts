@@ -22,9 +22,9 @@ export class Configuration {
 
   public readonly mongoDbUri = process.env.MONGODB_URI ?? "";
 
-  public readonly serverPort = this.parseIntWithDefault(process.env.PORT, 3001);
+  public readonly serverPort = parseIntWithDefault(process.env.PORT, 3001);
 
-  public readonly pollInterval = this.parseIntWithDefault(
+  public readonly pollInterval = parseIntWithDefault(
     process.env.POLLINTERVAL,
     10 * 60 * 1000
   );
@@ -34,7 +34,15 @@ export class Configuration {
   public readonly sessionStoreSecret =
     process.env.SESSION_STORE_SECRET ?? "notverysecret";
 
-  public readonly enableCors = Boolean(process.env.ENABLE_CORS);
+  public readonly secureCookie = parseBooleanWithDefault(
+    process.env.SECURE_COOKIE,
+    !isDev
+  );
+
+  public readonly enableCors = parseBooleanWithDefault(
+    process.env.ENABLE_CORS,
+    false
+  );
 
   public readonly dev = isDev;
 
@@ -51,18 +59,29 @@ export class Configuration {
       this.schedUri = "";
     }
   }
-
-  private parseIntWithDefault(
-    value: string | undefined,
-    defaultValue: number
-  ): number {
-    let retval = defaultValue;
-    if (value !== undefined) {
-      retval = Number(value);
-      if (isNaN(retval)) {
-        retval = defaultValue;
-      }
-    }
-    return retval;
-  }
 }
+
+const parseIntWithDefault = (
+  value: string | undefined,
+  defaultValue: number
+): number => {
+  let retval = defaultValue;
+  if (value !== undefined) {
+    retval = Number(value);
+    if (isNaN(retval)) {
+      retval = defaultValue;
+    }
+  }
+  return retval;
+};
+
+const parseBooleanWithDefault = (
+  value: string | undefined,
+  defaultValue: boolean
+): boolean => {
+  let retval = defaultValue;
+  if (value !== undefined) {
+    retval = value.toLowerCase() === "true";
+  }
+  return retval;
+};

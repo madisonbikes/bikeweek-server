@@ -2,10 +2,10 @@ import "reflect-metadata";
 import { injectable } from "tsyringe";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
+import bcrypt from "bcryptjs";
+import { Request, Response, NextFunction } from "express";
 import { logger } from "../utils";
 import { AuthenticatedUser, authenticatedUserSchema } from "../routes/contract";
-import { Request, Response, NextFunction } from "express";
-import bcrypt from "bcryptjs";
 import { DbUser } from "../database/types";
 import { UserModel } from "../database/users";
 
@@ -34,7 +34,7 @@ export type ExpressMiddleware = (
 ) => void;
 
 @injectable()
-export class Strategies {
+export class AuthenticationStrategies {
   constructor(private users: UserModel) {}
 
   /** passport strategy implementation for username/pw against mongodb */
@@ -62,10 +62,6 @@ export class Strategies {
       done(err, false);
     }
   });
-
-  simulateCheckPassword(hashedPassword: string, checkPassword: string) {
-    return bcrypt.compare(checkPassword, hashedPassword);
-  }
 
   /** sanitizes user info for export to passport and into request object */
   private authenticatedUser(user: DbUser): AuthenticatedUser {

@@ -1,23 +1,22 @@
-import { injectable } from "tsyringe";
-import { Configuration } from "./config";
-import express, { Request, Response } from "express";
-import session from "express-session";
-
-import passport from "passport";
-import { ApiRoutes } from "./routes";
-import { Strategies } from "./security/authentication";
-import cors from "cors";
 import http, { Server } from "http";
+import { injectable } from "tsyringe";
+import express, { Request, Response } from "express";
+import cors from "cors";
+import passport from "passport";
+
+import { Configuration } from "./config";
 import { logger } from "./utils";
-import { RedisConnection } from "./redis";
+import { ApiRoutes } from "./routes";
+import { AuthenticationStrategies } from "./security";
+import { SessionMiddlewareConfigurator } from "./session";
 
 @injectable()
 export class ApiServer {
   constructor(
     private configuration: Configuration,
     private apiRoutes: ApiRoutes,
-    private strategies: Strategies,
-    private redis: RedisConnection
+    private authenticationStrategies: AuthenticationStrategies,
+    private sessionMiddlewareConfigurator: SessionMiddlewareConfigurator
   ) {}
 
   server: Server | undefined;
@@ -40,28 +39,28 @@ export class ApiServer {
     }
 
     // used for login method
-    passport.use(this.strategies.local);
+    passport.use(this.authenticationStrategies.local);
     passport.serializeUser<string>((user, done) => {
-      logger.trace(user, "serialize user");
-      const data = JSON.stringify(user);
-      done(null, data);
+      try {
+        logger.trace(user, "serialize user");
+        const data = JSON.stringify(user);
+        done(null, data);
+      } catch (err) {
+        done(err, undefined);
+      }
     });
 
     passport.deserializeUser<string>((data, done) => {
-      const user = JSON.parse(data);
-      logger.trace(user, "deserialize user");
-      done(null, user);
+      try {
+        const user = JSON.parse(data);
+        logger.trace(user, "deserialize user");
+        done(null, user);
+      } catch (err) {
+        done(err, undefined);
+      }
     });
 
-    const sessionOptions: session.SessionOptions = {
-      secret: this.configuration.sessionStoreSecret,
-      resave: false,
-      saveUninitialized: false,
-    };
-    if (this.redis.isEnabled()) {
-      sessionOptions.store = this.redis.createStore();
-    }
-    app.use(session(sessionOptions));
+    app.use(this.sessionMiddlewareConfigurator.build());
     app.use(passport.initialize());
     app.use(passport.session());
 
