@@ -122,6 +122,7 @@ export class TestConfiguration extends Configuration {
   public override gravityFormsUri;
   public override schedUri;
   public override redisUri;
+  public override secureCookie;
 
   constructor() {
     super();
@@ -129,5 +130,6 @@ export class TestConfiguration extends Configuration {
     this.gravityFormsUri = "";
     this.schedUri = "";
     this.redisUri = "";
+    this.secureCookie = false;
   }
 }
