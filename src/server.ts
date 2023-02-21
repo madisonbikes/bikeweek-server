@@ -1,6 +1,6 @@
 import http, { Server } from "http";
 import { injectable } from "tsyringe";
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import passport from "passport";
 
@@ -40,6 +40,9 @@ export class ApiServer {
 
     // used for login method
     passport.use(this.authenticationStrategies.local);
+    if (this.authenticationStrategies.google.isEnabled()) {
+      passport.use(this.authenticationStrategies.google);
+    }
     passport.serializeUser<string>((user, done) => {
       try {
         logger.trace(user, "serialize user");
@@ -66,7 +69,8 @@ export class ApiServer {
 
     app.use("/api/v1", this.apiRoutes.routes);
 
-    app.use((err: Error, _req: Request, res: Response) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
       logger.error(err, "Unhandled server error");
       res.sendStatus(500);
     });

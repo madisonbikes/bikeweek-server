@@ -1,17 +1,23 @@
 import express from "express";
-import passport from "passport";
 import { injectable } from "tsyringe";
-import { validateBodySchema, validateAuthenticated } from "../security";
+import {
+  validateBodySchema,
+  validateAuthenticated,
+  localMiddleware,
+} from "../security";
 import { loginBodySchema, AuthenticatedUser } from "./contract";
+import { FederatedSecurityRoutes } from "./federated";
 
 @injectable()
 export class SessionRoutes {
+  constructor(private federatedRoutes: FederatedSecurityRoutes) {}
   readonly routes = express
     .Router()
+    .use(this.federatedRoutes.routes)
     .post(
       "/login",
       validateBodySchema({ schema: loginBodySchema }),
-      passport.authenticate("local", { session: true, failWithError: false }),
+      localMiddleware,
       (request, response) => {
         const user = request.user as AuthenticatedUser;
         response.send(user);

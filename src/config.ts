@@ -44,6 +44,8 @@ export class Configuration {
     false
   );
 
+  public readonly googleAuthClientId = process.env.GOOGLE_AUTH_CLIENT_ID ?? "";
+
   constructor() {
     if (process.env.GF_URI !== undefined && process.env.GF_URI !== "") {
       this.gravityFormsUri = `${process.env.GF_URI}/wp-json/gf/v2`;

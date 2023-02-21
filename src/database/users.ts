@@ -1,6 +1,6 @@
 import { injectable } from "tsyringe";
 import { Database } from "./database";
-import { DbUser, dbUserSchema } from "./types";
+import { DbFederatedProvider, DbUser, dbUserSchema } from "./types";
 
 @injectable()
 export class UserModel {
@@ -15,6 +15,19 @@ export class UserModel {
     }
 
     return dbUserSchema.parse(value);
+  };
+
+  findFederatedUser = async (provider: DbFederatedProvider, id: string) => {
+    const value = await this.database.users
+      .find({
+        federated: { provider, id },
+      })
+      .toArray();
+    if (value.length !== 1) {
+      return undefined;
+    }
+
+    return dbUserSchema.parse(value[0]);
   };
 
   users = async () => {

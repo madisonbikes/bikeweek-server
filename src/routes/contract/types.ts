@@ -83,3 +83,8 @@ export const authenticatedUserSchema = z.object({
   roles: z.string().array().default([]),
 });
 export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;
+
+export const federatedGoogleAuthBodySchema = z.object({ token: z.string() });
+export type FederatedGoogleAuthBody = z.infer<
+  typeof federatedGoogleAuthBodySchema
+>;
