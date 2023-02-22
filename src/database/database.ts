@@ -1,7 +1,7 @@
 import { injectable, singleton } from "tsyringe";
 import { Configuration } from "../config";
 import { Collection, Db, MongoClient } from "mongodb";
-import { logger } from "../utils";
+import { logger, maskUriPassword } from "../utils";
 import { DbStatus, dbStatusSchema } from "./types";
 
 @injectable()
@@ -45,7 +45,9 @@ export class Database {
   constructor(private configuration: Configuration) {}
 
   async start() {
-    logger.info(`Connecting to ${this.configuration.mongoDbUri}`);
+    logger.info(
+      `Connecting to ${maskUriPassword(this.configuration.mongoDbUri)}`
+    );
     this.client = new MongoClient(this.configuration.mongoDbUri, {});
     await this.client.connect();
 

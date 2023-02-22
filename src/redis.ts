@@ -2,7 +2,7 @@ import { injectable, singleton } from "tsyringe";
 import { Configuration } from "./config";
 import connectRedis from "connect-redis";
 import { createClient, RedisClientType } from "redis";
-import { logger } from "./utils";
+import { logger, maskUriPassword } from "./utils";
 import session from "express-session";
 
 @injectable()
@@ -25,7 +25,9 @@ export class RedisConnection {
 
   async start() {
     if (this.client !== undefined) {
-      logger.info(`Connecting to redis on ${this.config.redisUri}`);
+      logger.info(
+        `Connecting to redis on ${maskUriPassword(this.config.redisUri)}`
+      );
       await this.client.connect();
     }
   }
