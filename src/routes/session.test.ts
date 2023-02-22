@@ -2,15 +2,14 @@ import { setupSuite, testRequest, TestRequest } from "../test";
 import { createTestUser } from "../test/data";
 
 describe("login route", () => {
-  let request: TestRequest;
+  setupSuite({ withDatabase: true, withApiServer: true, clearUsers: true });
 
-  setupSuite({ withDatabase: true, withApiServer: true });
-
-  beforeAll(async () => {
+  beforeEach(async () => {
     // create a test user for login
     await createTestUser();
   });
 
+  let request: TestRequest;
   beforeEach(() => {
     request = testRequest();
   });

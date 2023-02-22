@@ -4,8 +4,9 @@ import {
   validateBodySchema,
   validateAuthenticated,
   localMiddleware,
+  finalizeAuthenticationMiddleware,
 } from "../security";
-import { loginBodySchema, AuthenticatedUser } from "./contract";
+import { loginBodySchema } from "./contract";
 import { FederatedSecurityRoutes } from "./federated";
 
 @injectable()
@@ -18,10 +19,7 @@ export class SessionRoutes {
       "/login",
       validateBodySchema({ schema: loginBodySchema }),
       localMiddleware,
-      (request, response) => {
-        const user = request.user as AuthenticatedUser;
-        response.send(user);
-      }
+      finalizeAuthenticationMiddleware
     )
     .post("/logout", (request, response, next) => {
       if (request.user == null) {

@@ -2,16 +2,14 @@ import { setupSuite, testRequest, TestRequest, createTestUser } from "../test";
 import { authenticatedUserSchema } from "./contract";
 
 describe("login route", () => {
+  setupSuite({ withDatabase: true, withApiServer: true, clearUsers: true });
+
   let request: TestRequest;
 
-  setupSuite({ withDatabase: true, withApiServer: true });
-
-  beforeAll(async () => {
+  beforeEach(async () => {
     // create a test user for login
     await createTestUser();
-  });
 
-  beforeEach(() => {
     request = testRequest();
   });
 

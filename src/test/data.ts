@@ -7,6 +7,15 @@ export const createTestUser = async () => {
   await testDatabase().users.insertOne({
     username: "testuser",
     hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
+    federated: [{ provider: "google", id: "blarg@blarg.com" }],
+  });
+};
+
+export const createDuplicatedFederatedId = async () => {
+  await testDatabase().users.insertOne({
+    username: "testuser2",
+    hashed_password: PASSWORD_WITH_LOW_WORK_FACTOR,
+    federated: [{ provider: "google", id: "blarg@blarg.com" }],
   });
 };
 

@@ -9,6 +9,12 @@ import { GoogleStrategy } from "./google";
 
 export type AuthenticatedExpressUser = Express.User & AuthenticatedUser;
 
+export type ExpressMiddleware = (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => void;
+
 export enum Roles {
   ADMIN = "admin",
   EDITOR = "editor",
@@ -18,21 +24,29 @@ export const userHasRole = (user: AuthenticatedUser, role: string) => {
   return user.roles.find((r) => r === role) !== undefined;
 };
 
-export const localMiddleware = passport.authenticate("local", {
-  session: true,
-  failWithError: false,
-});
+export const localMiddleware: ExpressMiddleware = passport.authenticate(
+  "local",
+  {
+    session: true,
+    failWithError: false,
+  }
+);
 
-export const googleMiddleware = passport.authenticate("google", {
-  session: true,
-  failWithError: false,
-});
+export const googleMiddleware: ExpressMiddleware = passport.authenticate(
+  "google",
+  {
+    session: true,
+    failWithError: false,
+  }
+);
 
-export type ExpressMiddleware = (
-  request: Request,
-  response: Response,
-  next: NextFunction
-) => void;
+export const finalizeAuthenticationMiddleware: ExpressMiddleware = (
+  request,
+  response
+) => {
+  const user = request.user as AuthenticatedUser;
+  response.send(user);
+};
 
 @injectable()
 export class AuthenticationStrategies {

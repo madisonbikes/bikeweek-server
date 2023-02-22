@@ -6,6 +6,7 @@ import {
   DependencyContainer,
   injectable,
   Lifecycle,
+  singleton,
 } from "tsyringe";
 import { Database } from "../database/database";
 import assert from "assert";
@@ -26,22 +27,35 @@ export type SuiteOptions = {
 
   // run api server
   withApiServer: boolean;
+
+  // clear users after each test
+  clearUsers: boolean;
+
+  // supply an alternate configuration
+  withModifiedConfiguration: (config: TestConfiguration) => void;
+
+  // modify test container (add mocks) before server created
+  withTestContainerInit: (container: DependencyContainer) => void;
 };
 
 /** entry point that should be included first in each describe block */
 export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
   const withDatabase = options.withDatabase ?? false;
   const withApiServer = options.withApiServer ?? false;
+  const withTestContainerInit = options.withTestContainerInit;
   beforeAll(async () => {
     assert(tc === undefined);
     tc = await initializeSuite();
+    if (withTestContainerInit) {
+      withTestContainerInit(tc);
+    }
     if (withDatabase) {
       // start the mongo in-memory server on an ephemeral port
       testMongoServer = await MongoMemoryServer.create();
       testMongoUri = testMongoServer.getUri();
 
       // provide a Database object scoped to the container rather, overriding singleton normally
-      tc.register<Database>(
+      tc.register(
         Database,
         { useClass: Database },
         { lifecycle: Lifecycle.ContainerScoped }
@@ -50,17 +64,29 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
       await testDatabase().start();
     } else {
       // if database not enabled, trigger an error if we try to inject a database object
-      tc.register<Database>(Database, {
+      tc.register(Database, {
         useFactory: () => {
           throw new Error("No database allowed for this test suite");
         },
       });
     }
 
+    if (options.withModifiedConfiguration) {
+      options.withModifiedConfiguration(tc.resolve(Configuration));
+    }
+
     if (withApiServer) {
       apiServer = tc.resolve(ApiServer);
       runningApiServer = await apiServer.create();
     }
+  });
+
+  afterEach(async () => {
+    const queries: Array<Promise<unknown>> = [];
+    if (options.clearUsers ?? false) {
+      queries.push(testDatabase().users.deleteMany({}));
+    }
+    await Promise.all(queries);
   });
 
   afterAll(async () => {
@@ -102,9 +128,8 @@ export const testDatabase = (): Database => {
 export const initializeSuite = (): Promise<DependencyContainer> => {
   // don't use value registrations because they will be cleared in the beforeEach() handler
   const testContainer = rootContainer.createChildContainer();
-
   // provide a custom TestConfiguration adapted for the testing environment
-  testContainer.register<Configuration>(
+  testContainer.register(
     Configuration,
     { useClass: TestConfiguration },
     { lifecycle: Lifecycle.ContainerScoped }
@@ -117,12 +142,14 @@ export const cleanupSuite = async (): Promise<void> => {
 };
 
 @injectable()
+@singleton()
 export class TestConfiguration extends Configuration {
   public override mongoDbUri;
   public override gravityFormsUri;
   public override schedUri;
   public override redisUri;
   public override secureCookie;
+  public override googleAuthClientId;
 
   constructor() {
     super();
@@ -131,5 +158,6 @@ export class TestConfiguration extends Configuration {
     this.schedUri = "";
     this.redisUri = "";
     this.secureCookie = false;
+    this.googleAuthClientId = "";
   }
 }

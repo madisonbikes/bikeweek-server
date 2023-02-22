@@ -8,27 +8,41 @@ import { UserModel } from "../database/users";
 import { buildAuthenticatedUser } from "./authentication";
 import { logger } from "../utils";
 
+/** separate out this logic to make it easy to mock using tsyringe */
+@injectable()
+export class GoogleVerifier {
+  constructor(private config: Configuration) {}
+
+  async verifyToken(token: string) {
+    const client = new OAuth2Client({
+      clientId: this.config.googleAuthClientId,
+    });
+    const verified = await client.verifyIdToken({ idToken: token });
+    return verified.getPayload()?.email;
+  }
+}
+
 const STRATEGY_NAME = "google";
 
 @injectable()
 export class GoogleStrategy extends Strategy {
-  constructor(private config: Configuration, private users: UserModel) {
+  constructor(
+    private config: Configuration,
+    private users: UserModel,
+    private verifier: GoogleVerifier
+  ) {
     super();
     this.name = STRATEGY_NAME;
   }
 
   isEnabled() {
-    return this.config.googleAuthClientId;
+    return Boolean(this.config.googleAuthClientId);
   }
 
   override async authenticate(req: Request) {
-    const client = new OAuth2Client({
-      clientId: this.config.googleAuthClientId,
-    });
     try {
       const auth = req.validated as FederatedGoogleAuthBody;
-      const verified = await client.verifyIdToken({ idToken: auth.token });
-      const email = verified.getPayload()?.email;
+      const email = await this.verifier.verifyToken(auth.token);
 
       let ok = false;
       if (email !== undefined) {

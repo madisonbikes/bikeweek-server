@@ -1,6 +1,7 @@
 import { injectable } from "tsyringe";
 import { Database } from "./database";
 import { DbFederatedProvider, DbUser, dbUserSchema } from "./types";
+import { logger } from "../utils";
 
 @injectable()
 export class UserModel {
@@ -23,7 +24,12 @@ export class UserModel {
         federated: { provider, id },
       })
       .toArray();
-    if (value.length !== 1) {
+    if (value.length === 0) {
+      logger.debug({ provider, id }, "no federated user found");
+      return undefined;
+    }
+    if (value.length > 1) {
+      logger.warn({ provider, id }, "multiple federated users found");
       return undefined;
     }
 
