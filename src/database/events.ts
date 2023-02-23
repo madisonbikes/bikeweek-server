@@ -1,6 +1,6 @@
 import { injectable } from "tsyringe";
 import { EventTypes } from "../gravityforms/processor";
-import { BikeWeekEvent, MutableBikeWeekEvent } from "../routes/contract";
+import { BikeWeekEvent, MutateBikeWeekEvent } from "../routes/contract";
 import { Database } from "./database";
 import { DbBikeWeekEvent, dbBikeWeekEventSchema } from "./types";
 
@@ -48,7 +48,7 @@ export class EventModel {
     return result.deletedCount !== 0;
   };
 
-  updateEvent = async (id: number, data: Partial<MutableBikeWeekEvent>) => {
+  updateEvent = async (id: number, data: Partial<MutateBikeWeekEvent>) => {
     const modData: Partial<BikeWeekEvent> = { modifyDate: new Date(), ...data };
     const result = await this.database.events.updateOne(
       {

@@ -21,7 +21,7 @@ export enum Roles {
 }
 
 export const userHasRole = (user: AuthenticatedUser, role: string) => {
-  return user.roles.find((r) => r === role) !== undefined;
+  return user.roles?.find((r) => r === role) !== undefined;
 };
 
 export const localMiddleware: ExpressMiddleware = passport.authenticate(
@@ -60,5 +60,7 @@ export class AuthenticationStrategies {
 
 /** sanitizes user info for export to passport and into request object */
 export const buildAuthenticatedUser = (user: DbUser) => {
-  return authenticatedUserSchema.parse(user);
+  // map ObjectId to string for _id to id
+  const mappedUser = { id: user._id.toString(), ...user };
+  return authenticatedUserSchema.parse(mappedUser);
 };

@@ -1,5 +1,9 @@
+import { ObjectId } from "mongodb";
 import { z } from "zod";
-import { bikeWeekEventSchema } from "../routes/contract";
+import {
+  bikeWeekEventSchema,
+  federatedIdentitySchema,
+} from "../routes/contract";
 
 export const dbStatusSchema = z.object({ lastSchedSync: z.date().optional() });
 export type DbStatus = z.infer<typeof dbStatusSchema>;
@@ -7,18 +11,12 @@ export type DbStatus = z.infer<typeof dbStatusSchema>;
 export const dbBikeWeekEventSchema = bikeWeekEventSchema.extend({});
 export type DbBikeWeekEvent = z.infer<typeof dbBikeWeekEventSchema>;
 
-export const dbFederatedProviderSchema = z.enum(["google"]);
-export type DbFederatedProvider = z.infer<typeof dbFederatedProviderSchema>;
-
-export const dbFederatedIdentitySchema = z.object({
-  provider: dbFederatedProviderSchema,
-  id: z.string(),
-});
 export const dbUserSchema = z.object({
+  _id: z.instanceof(ObjectId),
   username: z.string(),
   hashed_password: z.string(),
   roles: z.string().array().optional().default([]),
-  federated: dbFederatedIdentitySchema.array().optional(),
+  federated: federatedIdentitySchema.array().optional(),
 });
 
 export type DbUser = z.infer<typeof dbUserSchema>;

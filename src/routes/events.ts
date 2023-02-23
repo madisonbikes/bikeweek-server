@@ -1,6 +1,6 @@
 import express from "express";
 import { injectable } from "tsyringe";
-import { MutableBikeWeekEvent, mutableBikeWeekEventSchema } from "./contract";
+import { MutateBikeWeekEvent, mutateBikeWeekEventSchema } from "./contract";
 import { EventModel } from "../database/events";
 import { EventSync } from "../sched/sync";
 import { validateAdmin } from "../security/validateAdmin";
@@ -46,9 +46,9 @@ export class EventRoutes {
     .put(
       "/:eventId",
       validateAdmin(),
-      validateBodySchema({ schema: mutableBikeWeekEventSchema }),
+      validateBodySchema({ schema: mutateBikeWeekEventSchema }),
       asyncWrapper(async (request, response) => {
-        const eventData = request.validated as MutableBikeWeekEvent;
+        const eventData = request.validated as MutateBikeWeekEvent;
         const id = parseInt(request.params.eventId);
         const event = await this.eventModel.updateEvent(id, eventData);
         if (!event) {

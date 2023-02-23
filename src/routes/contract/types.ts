@@ -51,13 +51,16 @@ export const bikeWeekEventSchema = z.object({
 });
 export type BikeWeekEvent = z.infer<typeof bikeWeekEventSchema>;
 
-/** mutable removes several fields */
-export const mutableBikeWeekEventSchema = bikeWeekEventSchema.omit({
-  modifyDate: true,
-  createDate: true,
-  id: true,
-});
-export type MutableBikeWeekEvent = z.infer<typeof mutableBikeWeekEventSchema>;
+/** mutate removes several fields */
+export const mutateBikeWeekEventSchema = bikeWeekEventSchema
+  .omit({
+    modifyDate: true,
+    createDate: true,
+    id: true,
+  })
+  .partial()
+  .strict();
+export type MutateBikeWeekEvent = z.infer<typeof mutateBikeWeekEventSchema>;
 
 export const loginBodySchema = z
   .object({
@@ -68,23 +71,52 @@ export const loginBodySchema = z
 
 export type LoginBody = z.infer<typeof loginBodySchema>;
 
+export const federatedProviderSchema = z.enum(["google"]);
+export type FederatedProvider = z.infer<typeof federatedProviderSchema>;
+
+export const federatedIdentitySchema = z.object({
+  provider: federatedProviderSchema,
+
+  /** normally an email */
+  federatedId: z.string(),
+});
+export type FederatedIdentity = z.infer<typeof federatedIdentitySchema>;
+
 export const userSchema = z.object({
+  id: z.string(),
   username: z.string(),
   roles: z.string().array().default([]),
+  federated: federatedIdentitySchema.array().optional(),
 });
+export type User = z.infer<typeof userSchema>;
+
+export const mutateUserSchema = z
+  .object({
+    change_password: z.object({ old: z.string(), new: z.string() }),
+    add_federated: z.object({
+      provider: federatedProviderSchema,
+      validateToken: z.string(),
+    }),
+    remove_federated: federatedProviderSchema,
+  })
+  .strict()
+  .partial();
+export type MutateUser = z.infer<typeof mutateUserSchema>;
 
 export const userWithPasswordSchema = userSchema.extend({
   password: z.string(),
 });
 export type UserWithPassword = z.infer<typeof userWithPasswordSchema>;
 
-export const authenticatedUserSchema = z.object({
-  username: z.string(),
-  roles: z.string().array().default([]),
-});
-export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;
-
 export const federatedGoogleAuthBodySchema = z.object({ token: z.string() });
 export type FederatedGoogleAuthBody = z.infer<
   typeof federatedGoogleAuthBodySchema
 >;
+
+export const authenticatedUserSchema = z.object({
+  id: z.string(),
+  username: z.string(),
+  roles: z.string().array().optional(),
+  federated: federatedIdentitySchema.array().optional(),
+});
+export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;

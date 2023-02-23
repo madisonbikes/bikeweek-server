@@ -3,7 +3,7 @@ import { Roles, userHasRole } from "./authentication";
 
 describe("authentication", () => {
   it("plain user lacks role", () => {
-    const user: AuthenticatedUser = { username: "plain", roles: [] };
+    const user: AuthenticatedUser = { id: "id", username: "plain" };
     expect(userHasRole(user, Roles.ADMIN)).toBeFalsy();
     expect(userHasRole(user, Roles.EDITOR)).toBeFalsy();
     expect(userHasRole(user, "")).toBeFalsy();
@@ -11,6 +11,7 @@ describe("authentication", () => {
 
   it("admin user has role", () => {
     const user: AuthenticatedUser = {
+      id: "id",
       username: "admin",
       roles: ["admin"],
     };

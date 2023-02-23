@@ -23,7 +23,7 @@ export class LocalStrategyProvider {
       return;
     }
     try {
-      const user = await this.users.findUser(username);
+      const user = await this.users.findUserByUsername(username);
       if (user) {
         success = await checkPassword(password, user);
       } else {
