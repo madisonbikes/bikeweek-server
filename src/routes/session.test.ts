@@ -1,3 +1,4 @@
+import { StatusCodes } from "http-status-codes";
 import { setupSuite, testRequest, TestRequest } from "../test";
 import { createTestUser } from "../test/data";
 
@@ -18,7 +19,7 @@ describe("login route", () => {
     return request
       .post("/api/v1/session/login")
       .send({ username: "testuser", password: "password" })
-      .expect(200)
+      .expect(StatusCodes.OK)
       .expect(() => {
         // nothing
       });
@@ -27,7 +28,7 @@ describe("login route", () => {
   it("responds to login api without credentials as bad request", () => {
     return request
       .post("/api/v1/session/login")
-      .expect(400)
+      .expect(StatusCodes.BAD_REQUEST)
       .expect((res) => {
         expect(res.body).toEqual(
           expect.arrayContaining([
@@ -48,7 +49,7 @@ describe("login route", () => {
     return request
       .post("/api/v1/session/login")
       .send({ username: "user1", password: "password", extraxyz: "extra" })
-      .expect(400)
+      .expect(StatusCodes.BAD_REQUEST)
       .expect(/unrecognized_keys/)
       .expect(/extraxyz/);
   });
@@ -57,48 +58,50 @@ describe("login route", () => {
     return request
       .post("/api/v1/session/login")
       .send({ username: "testuser", password: "wrong_password" })
-      .expect(401);
+      .expect(StatusCodes.UNAUTHORIZED);
   });
 
   it("responds to login api with bad username (and bad password) as unauthorized", () => {
     return request
       .post("/api/v1/session/login")
       .send({ username: "bad", password: "bad" })
-      .expect(401);
+      .expect(StatusCodes.UNAUTHORIZED);
   });
 
   it("responds to logout api with good session successfully", async () => {
     await request
       .post("/api/v1/session/login")
       .send({ username: "testuser", password: "password" })
-      .expect(200)
+      .expect(StatusCodes.OK)
       .expect(() => {
         // nothing
       });
 
     await request
       .post("/api/v1/session/logout")
-      .expect(200)
+      .expect(StatusCodes.OK)
       .expect(/logged out/);
   });
 
   it("responds to logout api with bad session failure", async () => {
-    await request.post("/api/v1/session/logout").expect(400);
+    await request
+      .post("/api/v1/session/logout")
+      .expect(StatusCodes.UNAUTHORIZED);
   });
 
   it("responds to session info with good session successfully", async () => {
     await request
       .post("/api/v1/session/login")
       .send({ username: "testuser", password: "password" })
-      .expect(200);
+      .expect(StatusCodes.OK);
 
     await request
       .get("/api/v1/session/info")
-      .expect(200)
+      .expect(StatusCodes.OK)
       .expect(/testuser/);
   });
 
   it("responds to session info with no session", async () => {
-    await request.get("/api/v1/session/info").expect(401);
+    await request.get("/api/v1/session/info").expect(StatusCodes.UNAUTHORIZED);
   });
 });

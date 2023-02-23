@@ -1,4 +1,5 @@
 import express from "express";
+import { StatusCodes } from "http-status-codes";
 import { injectable } from "tsyringe";
 import {
   validateBodySchema,
@@ -23,7 +24,7 @@ export class SessionRoutes {
     )
     .post("/logout", (request, response, next) => {
       if (request.user == null) {
-        response.status(400).send("not logged in");
+        response.status(StatusCodes.UNAUTHORIZED).send("not logged in");
       } else {
         request.logout((err) => {
           if (err !== undefined) {

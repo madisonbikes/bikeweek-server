@@ -1,3 +1,4 @@
+import { StatusCodes } from "http-status-codes";
 import { z } from "zod";
 import { logger } from "../utils";
 import { ExpressMiddleware } from "./authentication";
@@ -19,7 +20,7 @@ export const validateBodySchema = <T extends z.ZodTypeAny>({
     } else {
       request.validated = undefined;
       logger.debug(parseResult.error.issues, "invalid body");
-      response.status(400).send(parseResult.error.issues);
+      response.status(StatusCodes.BAD_REQUEST).send(parseResult.error.issues);
     }
   };
 };
@@ -37,7 +38,7 @@ export const validateQuerySchema = <T extends z.ZodTypeAny>({
     } else {
       logger.debug(parseResult.error.issues, "invalid query");
       request.validated = undefined;
-      response.status(400).send(parseResult.error.issues);
+      response.status(StatusCodes.BAD_REQUEST).send(parseResult.error.issues);
     }
   };
 };

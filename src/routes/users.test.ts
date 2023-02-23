@@ -1,3 +1,4 @@
+import { StatusCodes } from "http-status-codes";
 import { loginTestUser, setupSuite, testRequest, TestRequest } from "../test";
 import { createTestUser } from "../test/data";
 import { userSchema } from "./contract";
@@ -19,13 +20,15 @@ describe("users routes", () => {
   });
 
   it("responds to unauthenticated self info retrieval with 401", async () => {
-    await request.get("/api/v1/users/self").expect(401);
+    await request.get("/api/v1/users/self").expect(StatusCodes.UNAUTHORIZED);
   });
 
   it("responds to authenticated self info retrieval", async () => {
     await loginTestUser(request);
 
-    const userResponse = await request.get("/api/v1/users/self").expect(200);
+    const userResponse = await request
+      .get("/api/v1/users/self")
+      .expect(StatusCodes.OK);
     const parsed = userSchema.strict().parse(userResponse.body);
     expect(parsed).toMatchObject({
       username: "testuser",
@@ -40,7 +43,7 @@ describe("users routes", () => {
     const userResponse = await request
       .put("/api/v1/users/self")
       .send({ change_password: { old: "password", new: "new_password" } })
-      .expect(200);
+      .expect(StatusCodes.OK);
     const parsed = userSchema.strict().parse(userResponse.body);
     expect(parsed).toMatchObject({
       username: "testuser",
@@ -57,19 +60,25 @@ describe("users routes", () => {
     await request
       .put("/api/v1/users/self")
       .send({ change_password: { old: "wrong_password", new: "new_password" } })
-      .expect(401)
+      .expect(StatusCodes.FORBIDDEN)
       .expect(/old password/);
   });
 
   it("responds to authenticated self change with bad change data (strict test)", async () => {
     await loginTestUser(request);
 
-    await request.put("/api/v1/users/self").send({ data: "bad" }).expect(400);
+    await request
+      .put("/api/v1/users/self")
+      .send({ data: "bad" })
+      .expect(StatusCodes.BAD_REQUEST);
   });
 
   it("responds to authenticated self change with empty change data (strict test)", async () => {
     await loginTestUser(request);
 
-    await request.put("/api/v1/users/self").send({}).expect(400);
+    await request
+      .put("/api/v1/users/self")
+      .send({})
+      .expect(StatusCodes.NOT_ACCEPTABLE);
   });
 });

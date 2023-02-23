@@ -18,6 +18,7 @@ import {
 import { ObjectId } from "mongodb";
 import { DbUser } from "../database/types";
 import { logger } from "../utils";
+import { StatusCodes } from "http-status-codes";
 
 @injectable()
 export class UserRoutes {
@@ -34,7 +35,7 @@ export class UserRoutes {
         const newUser = request.validated as UserWithPassword;
 
         if (await this.userModel.findUserByUsername(newUser.username)) {
-          response.status(409).send("user already exists");
+          response.status(StatusCodes.CONFLICT).send("user already exists");
           return;
         }
 
@@ -71,7 +72,7 @@ export class UserRoutes {
         );
         if (!dbUser) {
           // something's wrong if can't find id because it's an authenticated session
-          response.status(500);
+          response.status(StatusCodes.INTERNAL_SERVER_ERROR);
           return;
         }
 
@@ -95,14 +96,16 @@ export class UserRoutes {
         if (!foundUser) {
           // something's wrong if can't find id because it's an authenticated session
           logger.warn({ dbId }, "unexpected missing user");
-          response.sendStatus(500);
+          response.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
           return;
         }
 
         const updateUser: Partial<DbUser> = {};
         if (modify.change_password) {
           if (!(await checkPassword(modify.change_password.old, foundUser))) {
-            response.status(401).send("old password doesn't match");
+            response
+              .status(StatusCodes.FORBIDDEN)
+              .send("old password doesn't match");
             return;
           }
           updateUser.hashed_password = await generateHashedPassword(
@@ -111,19 +114,19 @@ export class UserRoutes {
         }
         if (modify.add_federated || modify.remove_federated) {
           // not implemented
-          response.sendStatus(500);
+          response.sendStatus(StatusCodes.NOT_IMPLEMENTED);
           return;
         }
 
         if (Object.keys(updateUser).length === 0) {
-          response.status(400).send("nothing to do");
+          response.status(StatusCodes.NOT_ACCEPTABLE).send("nothing to do");
           return;
         }
 
         const newUser = await this.userModel.modifyUser(dbId, updateUser);
         if (!newUser) {
           logger.warn({ dbId }, "unexpected missing user for modify");
-          response.sendStatus(500);
+          response.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
           return;
         }
         const returnMap = mapDbUserToExternalUser(newUser);

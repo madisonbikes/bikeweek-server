@@ -2,6 +2,7 @@ import { setupSuite, testRequest, TestRequest } from "../test";
 import { createDuplicatedFederatedId, createTestUser } from "../test/data";
 import { injectable, Lifecycle } from "tsyringe";
 import { GoogleVerifier } from "../security/google";
+import { StatusCodes } from "http-status-codes";
 
 describe("federated routes", () => {
   describe("google enabled", () => {
@@ -42,14 +43,14 @@ describe("federated routes", () => {
       await request
         .post("/api/v1/session/federated/google/login")
         .send({ token: "blarg" })
-        .expect(401);
+        .expect(StatusCodes.UNAUTHORIZED);
     });
 
     it("responds to federated/google auth with 400 if supply invalid body", async () => {
       await request
         .post("/api/v1/session/federated/google/login")
         .send({ invalid_token: "blarg" })
-        .expect(400)
+        .expect(StatusCodes.BAD_REQUEST)
         .expect(/invalid_type/)
         .expect(/token/);
     });
@@ -59,7 +60,7 @@ describe("federated routes", () => {
       await request
         .post("/api/v1/session/federated/google/login")
         .send({ token: "blarg" })
-        .expect(200);
+        .expect(StatusCodes.OK);
     });
 
     it("responds to federated/google auth without proper match id", async () => {
@@ -67,7 +68,7 @@ describe("federated routes", () => {
       await request
         .post("/api/v1/session/federated/google/login")
         .send({ token: "blarg" })
-        .expect(401);
+        .expect(StatusCodes.UNAUTHORIZED);
     });
 
     it("responds to federated/google auth with duplicate matching federated ids", async () => {
@@ -76,7 +77,7 @@ describe("federated routes", () => {
       await request
         .post("/api/v1/session/federated/google/login")
         .send({ token: "blarg" })
-        .expect(401);
+        .expect(StatusCodes.UNAUTHORIZED);
     });
   });
 
@@ -98,7 +99,7 @@ describe("federated routes", () => {
       await request
         .post("/api/v1/session/federated/google/login")
         .send({ token: "blarg" })
-        .expect(404);
+        .expect(StatusCodes.NOT_FOUND);
     });
   });
 });

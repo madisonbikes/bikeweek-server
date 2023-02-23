@@ -1,3 +1,4 @@
+import { StatusCodes } from "http-status-codes";
 import { setupSuite, testRequest, TestRequest, createTestUser } from "../test";
 import { authenticatedUserSchema } from "./contract";
 
@@ -17,7 +18,7 @@ describe("login route", () => {
     return request
       .post("/api/v1/session/login")
       .send({ username: "testuser", password: "password" })
-      .expect(200)
+      .expect(StatusCodes.OK)
       .expect((request) => {
         const response = authenticatedUserSchema.parse(request.body);
 
@@ -29,7 +30,7 @@ describe("login route", () => {
   it("responds to login api without credentials as bad request", () => {
     return request
       .post("/api/v1/session/login")
-      .expect(400)
+      .expect(StatusCodes.BAD_REQUEST)
       .expect((res) => {
         expect(res.body).toEqual(
           expect.arrayContaining([
@@ -50,7 +51,7 @@ describe("login route", () => {
     return request
       .post("/api/v1/session/login")
       .send({ username: "user1", password: "password", extraxyz: "extra" })
-      .expect(400)
+      .expect(StatusCodes.BAD_REQUEST)
       .expect(/unrecognized_keys/)
       .expect(/extraxyz/);
   });
@@ -59,6 +60,6 @@ describe("login route", () => {
     return request
       .post("/api/v1/session/login")
       .send({ username: "bad", password: "bad" })
-      .expect(401);
+      .expect(StatusCodes.UNAUTHORIZED);
   });
 });

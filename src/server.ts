@@ -9,6 +9,7 @@ import { logger } from "./utils";
 import { ApiRoutes } from "./routes";
 import { AuthenticationStrategies } from "./security";
 import { SessionMiddlewareConfigurator } from "./session";
+import { StatusCodes } from "http-status-codes";
 
 @injectable()
 export class ApiServer {
@@ -72,7 +73,7 @@ export class ApiServer {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
       logger.error(err, "Unhandled server error");
-      res.sendStatus(500);
+      res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
     });
 
     app.on("error", (err) => {

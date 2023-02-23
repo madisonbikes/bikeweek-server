@@ -1,3 +1,4 @@
+import { StatusCodes } from "http-status-codes";
 import { AuthenticatedUser } from "../routes/contract";
 import { logger } from "../utils";
 import { ExpressMiddleware, Roles, userHasRole } from "./authentication";
@@ -11,7 +12,7 @@ export const validateRole = ({ role }: ValidateOptions): ExpressMiddleware => {
     logger.trace(request.user, `validating role "${role}"`);
     const user = request.user as AuthenticatedUser;
     if (user === undefined || !userHasRole(user, role)) {
-      response.status(401).send(`requires role "${role}"`);
+      response.status(StatusCodes.FORBIDDEN).send(`requires role "${role}"`);
     } else {
       next();
     }
