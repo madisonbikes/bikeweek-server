@@ -1,8 +1,9 @@
-import { setupSuite, testRequest, TestRequest } from "../test";
+import { loginTestUser, setupSuite, testRequest, TestRequest } from "../test";
 import { createDuplicatedFederatedId, createTestUser } from "../test/data";
 import { injectable, Lifecycle } from "tsyringe";
 import { GoogleFederatedVerifier } from "../security/google";
 import { StatusCodes } from "http-status-codes";
+import { userSchema } from "./contract";
 
 describe("federated routes", () => {
   describe("google enabled", () => {
@@ -88,6 +89,39 @@ describe("federated routes", () => {
         .post("/api/v1/session/federated/login")
         .send({ provider: "google", token: "blarg" })
         .expect(StatusCodes.UNAUTHORIZED);
+    });
+
+    it("responds to authenticated self remove federated identity", async () => {
+      await loginTestUser(request);
+
+      const userResponse = await request
+        .delete("/api/v1/users/self/federated/google")
+        .expect(StatusCodes.OK);
+
+      const parsed = userSchema.strict().parse(userResponse.body);
+      expect(parsed).toMatchObject({
+        username: "testuser",
+        federated: [],
+      });
+      expect(parsed.id).toBeDefined();
+    });
+
+    it("responds to authenticated self add federated identity", async () => {
+      await loginTestUser(request);
+
+      mockVerifierReturnEmail = "nomatch@blarg.com";
+
+      const userResponse = await request
+        .put("/api/v1/users/self/federated")
+        .send({ provider: "google", validateToken: "any_token" })
+        .expect(StatusCodes.OK);
+
+      const parsed = userSchema.strict().parse(userResponse.body);
+      expect(parsed).toMatchObject({
+        username: "testuser",
+        federated: [{ provider: "google", federatedId: "nomatch@blarg.com" }],
+      });
+      expect(parsed.id).toBeDefined();
     });
   });
 

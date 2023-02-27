@@ -2,9 +2,12 @@ import express from "express";
 import { injectable } from "tsyringe";
 import { UserModel } from "../database/users";
 import {
+  AddFederatedIdentity,
+  addFederatedIdentitySchema,
   AuthenticatedUser,
   ChangeUserPassword,
   changeUserPasswordSchema,
+  federatedProviderSchema,
   User,
   userSchema,
 } from "./contract";
@@ -19,10 +22,14 @@ import { ObjectId } from "mongodb";
 import { DbUser } from "../database/types";
 import { logger } from "../utils";
 import { StatusCodes } from "http-status-codes";
+import { GoogleFederatedVerifier } from "../security/google";
 
 @injectable()
 export class UserRoutes {
-  constructor(private userModel: UserModel) {}
+  constructor(
+    private userModel: UserModel,
+    private googleFederatedVerifier: GoogleFederatedVerifier
+  ) {}
 
   readonly routes = express
     .Router()
@@ -119,6 +126,55 @@ export class UserRoutes {
         const returnMap = mapDbUserToExternalUser(newUser);
         const adaptedUser = userSchema.parse(returnMap);
         response.send(adaptedUser);
+      })
+    )
+    .put(
+      "/self/federated",
+      validateAuthenticated(),
+      validateBodySchema({ schema: addFederatedIdentitySchema }),
+      asyncWrapper(async (request, response) => {
+        const authUser = request.user as AuthenticatedUser;
+        const dbId = new ObjectId(authUser.id);
+        const data = request.body as AddFederatedIdentity;
+        const federatedId =
+          await this.googleFederatedVerifier.verifyFederatedToken(
+            data.validateToken
+          );
+        if (federatedId === undefined) {
+          response.sendStatus(StatusCodes.FORBIDDEN);
+          return;
+        }
+        const result = await this.userModel.connectFederatedProvider(dbId, {
+          provider: data.provider,
+          federatedId,
+        });
+        if (!result) {
+          response.sendStatus(StatusCodes.NOT_FOUND);
+        } else {
+          const returnMap = mapDbUserToExternalUser(result);
+          const adaptedUser = userSchema.parse(returnMap);
+          response.send(adaptedUser);
+        }
+      })
+    )
+    .delete(
+      "/self/federated/:provider",
+      validateAuthenticated(),
+      asyncWrapper(async (request, response) => {
+        const authUser = request.user as AuthenticatedUser;
+        const dbId = new ObjectId(authUser.id);
+        const provider = federatedProviderSchema.parse(request.params.provider);
+        const result = await this.userModel.disconnectFederatedProvider(
+          dbId,
+          provider
+        );
+        if (!result) {
+          response.sendStatus(StatusCodes.NOT_FOUND);
+        } else {
+          const returnMap = mapDbUserToExternalUser(result);
+          const adaptedUser = userSchema.parse(returnMap);
+          response.send(adaptedUser);
+        }
       })
     );
 }

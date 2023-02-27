@@ -2,7 +2,7 @@ import { injectable } from "tsyringe";
 import { Database } from "./database";
 import { DbUser, dbUserSchema } from "./types";
 import { logger } from "../utils";
-import { FederatedProvider } from "../routes/contract";
+import { FederatedIdentity, FederatedProvider } from "../routes/contract";
 import { ObjectId } from "mongodb";
 
 @injectable()
@@ -57,6 +57,33 @@ export class UserModel {
 
   modifyUser = async (_id: ObjectId, user: Partial<Omit<DbUser, "_id">>) => {
     const value = await this.database.users.updateOne({ _id }, { $set: user });
+    if (value.modifiedCount !== 1) {
+      return Promise.resolve(undefined);
+    }
+    return this.findUserById(_id);
+  };
+
+  disconnectFederatedProvider = async (
+    _id: ObjectId,
+    provider: FederatedProvider
+  ) => {
+    const value = await this.database.users.updateOne(
+      { _id },
+      { $pull: { federated: { provider: { $eq: provider } } } }
+    );
+    if (value.modifiedCount !== 1) {
+      return Promise.resolve(undefined);
+    }
+    return this.findUserById(_id);
+  };
+
+  connectFederatedProvider = async (_id: ObjectId, data: FederatedIdentity) => {
+    await this.disconnectFederatedProvider(_id, data.provider);
+    const value = await this.database.users.updateOne(
+      { _id },
+      { $push: { federated: data } }
+    );
+
     if (value.modifiedCount !== 1) {
       return Promise.resolve(undefined);
     }
