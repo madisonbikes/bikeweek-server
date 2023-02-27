@@ -3,8 +3,8 @@ import { injectable } from "tsyringe";
 import { UserModel } from "../database/users";
 import {
   AuthenticatedUser,
-  mutateUserSchema,
-  MutateUser,
+  ChangeUserPassword,
+  changeUserPasswordSchema,
   User,
   userSchema,
 } from "./contract";
@@ -84,12 +84,12 @@ export class UserRoutes {
 
     /** update current user info */
     .put(
-      "/self",
+      "/self/password",
       validateAuthenticated(),
-      validateBodySchema({ schema: mutateUserSchema }),
+      validateBodySchema({ schema: changeUserPasswordSchema }),
       asyncWrapper(async (request, response) => {
         const authUser = request.user as AuthenticatedUser;
-        const modify = request.validated as MutateUser;
+        const modify = request.validated as ChangeUserPassword;
         const dbId = new ObjectId(authUser.id);
 
         const foundUser = await this.userModel.findUserById(dbId);
@@ -100,30 +100,17 @@ export class UserRoutes {
           return;
         }
 
-        const updateUser: Partial<DbUser> = {};
-        if (modify.change_password) {
-          if (!(await checkPassword(modify.change_password.old, foundUser))) {
-            response
-              .status(StatusCodes.FORBIDDEN)
-              .send("old password doesn't match");
-            return;
-          }
-          updateUser.hashed_password = await generateHashedPassword(
-            modify.change_password.new
-          );
-        }
-        if (modify.add_federated || modify.remove_federated) {
-          // not implemented
-          response.sendStatus(StatusCodes.NOT_IMPLEMENTED);
+        if (!(await checkPassword(modify.old, foundUser))) {
+          response
+            .status(StatusCodes.FORBIDDEN)
+            .send("old password doesn't match");
           return;
         }
+        const hashed_password = await generateHashedPassword(modify.new);
 
-        if (Object.keys(updateUser).length === 0) {
-          response.status(StatusCodes.NOT_ACCEPTABLE).send("nothing to do");
-          return;
-        }
-
-        const newUser = await this.userModel.modifyUser(dbId, updateUser);
+        const newUser = await this.userModel.modifyUser(dbId, {
+          hashed_password,
+        });
         if (!newUser) {
           logger.warn({ dbId }, "unexpected missing user for modify");
           response.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);

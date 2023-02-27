@@ -4,8 +4,11 @@ import passport from "passport";
 import { Request, Response, NextFunction } from "express";
 import { AuthenticatedUser, authenticatedUserSchema } from "../routes/contract";
 import { DbUser } from "../database/types";
-import { LocalStrategyProvider } from "./local";
-import { GoogleStrategy } from "./google";
+import { STRATEGY_NAME as LOCAL_STRATEGY_NAME, LocalStrategy } from "./local";
+import {
+  FederatedStrategy,
+  STRATEGY_NAME as FEDERATED_STRATEGY_NAME,
+} from "./federated";
 
 export type AuthenticatedExpressUser = Express.User & AuthenticatedUser;
 
@@ -25,15 +28,15 @@ export const userHasRole = (user: AuthenticatedUser, role: string) => {
 };
 
 export const localMiddleware: ExpressMiddleware = passport.authenticate(
-  "local",
+  LOCAL_STRATEGY_NAME,
   {
     session: true,
     failWithError: false,
   }
 );
 
-export const googleMiddleware: ExpressMiddleware = passport.authenticate(
-  "google",
+export const federatedMiddleware: ExpressMiddleware = passport.authenticate(
+  FEDERATED_STRATEGY_NAME,
   {
     session: true,
     failWithError: false,
@@ -51,11 +54,20 @@ export const finalizeAuthenticationMiddleware: ExpressMiddleware = (
 @injectable()
 export class AuthenticationStrategies {
   constructor(
-    private localProvider: LocalStrategyProvider,
-    readonly google: GoogleStrategy
+    private localStrategy: LocalStrategy,
+    private federatedStrategy: FederatedStrategy
   ) {}
 
-  readonly local = this.localProvider.strategy;
+  private readonly local = this.localStrategy;
+  private readonly federated = this.federatedStrategy;
+
+  registerPassportStrategies = () => {
+    // used for login method
+    passport.use(this.local);
+    if (this.federated.enabled) {
+      passport.use(this.federated);
+    }
+  };
 }
 
 /** sanitizes user info for export to passport and into request object */

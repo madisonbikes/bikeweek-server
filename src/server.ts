@@ -39,11 +39,7 @@ export class ApiServer {
       app.use("/", express.static(this.configuration.reactStaticRootDir));
     }
 
-    // used for login method
-    passport.use(this.authenticationStrategies.local);
-    if (this.authenticationStrategies.google.isEnabled()) {
-      passport.use(this.authenticationStrategies.google);
-    }
+    this.authenticationStrategies.registerPassportStrategies();
     passport.serializeUser<string>((user, done) => {
       try {
         logger.trace(user, "serialize user");

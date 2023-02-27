@@ -2,7 +2,7 @@ import { injectable } from "tsyringe";
 import { Database } from "./database";
 import { DbUser, dbUserSchema } from "./types";
 import { logger } from "../utils";
-import { FederatedProvider, MutateUser } from "../routes/contract";
+import { FederatedProvider } from "../routes/contract";
 import { ObjectId } from "mongodb";
 
 @injectable()

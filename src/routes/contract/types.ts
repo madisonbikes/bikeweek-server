@@ -74,6 +74,11 @@ export type LoginBody = z.infer<typeof loginBodySchema>;
 export const federatedProviderSchema = z.enum(["google"]);
 export type FederatedProvider = z.infer<typeof federatedProviderSchema>;
 
+export const federatedLoginBodySchema = z.discriminatedUnion("provider", [
+  z.object({ provider: z.literal("google"), token: z.string() }),
+]);
+export type FederatedLoginBody = z.infer<typeof federatedLoginBodySchema>;
+
 export const federatedIdentitySchema = z.object({
   provider: federatedProviderSchema,
 
@@ -90,28 +95,31 @@ export const userSchema = z.object({
 });
 export type User = z.infer<typeof userSchema>;
 
-export const mutateUserSchema = z
+export const changeUserPasswordSchema = z
   .object({
-    change_password: z.object({ old: z.string(), new: z.string() }),
-    add_federated: z.object({
-      provider: federatedProviderSchema,
-      validateToken: z.string(),
-    }),
-    remove_federated: federatedProviderSchema,
+    old: z.string(),
+    new: z.string(),
   })
-  .strict()
-  .partial();
-export type MutateUser = z.infer<typeof mutateUserSchema>;
+  .strict();
+export type ChangeUserPassword = z.infer<typeof changeUserPasswordSchema>;
+
+export const addFederatedIdentitySchema = z
+  .object({
+    provider: federatedProviderSchema,
+    validateToken: z.string(),
+  })
+  .strict();
+export type AddFederatedIdentity = z.infer<typeof addFederatedIdentitySchema>;
+
+export const removeFederatedIdentitySchema = federatedIdentitySchema.strict();
+export type RemoveFederatedIdentity = z.infer<
+  typeof removeFederatedIdentitySchema
+>;
 
 export const userWithPasswordSchema = userSchema.extend({
   password: z.string(),
 });
 export type UserWithPassword = z.infer<typeof userWithPasswordSchema>;
-
-export const federatedGoogleAuthBodySchema = z.object({ token: z.string() });
-export type FederatedGoogleAuthBody = z.infer<
-  typeof federatedGoogleAuthBodySchema
->;
 
 export const authenticatedUserSchema = z.object({
   id: z.string(),
