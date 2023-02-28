@@ -13,6 +13,7 @@ export class SessionMiddlewareConfigurator {
 
   build() {
     const sessionOptions: session.SessionOptions = {
+      proxy: this.configuration.trustProxy,
       secret: this.configuration.sessionStoreSecret,
       resave: false,
       saveUninitialized: false,

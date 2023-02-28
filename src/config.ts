@@ -39,6 +39,11 @@ export class Configuration {
     !isDev
   );
 
+  public readonly trustProxy = parseBooleanWithDefault(
+    process.env.TRUST_PROXY,
+    false
+  );
+
   public readonly enableCors = parseBooleanWithDefault(
     process.env.ENABLE_CORS,
     false
