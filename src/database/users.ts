@@ -2,7 +2,7 @@ import { injectable } from "tsyringe";
 import { Database } from "./database";
 import { DbUser, dbUserSchema } from "./types";
 import { logger } from "../utils";
-import { FederatedIdentity, FederatedProvider } from "../routes/contract";
+import { FederatedId, FederatedProvider } from "../routes/contract";
 import { ObjectId } from "mongodb";
 
 @injectable()
@@ -77,7 +77,7 @@ export class UserModel {
     return this.findUserById(_id);
   };
 
-  connectFederatedProvider = async (_id: ObjectId, data: FederatedIdentity) => {
+  connectFederatedProvider = async (_id: ObjectId, data: FederatedId) => {
     await this.disconnectFederatedProvider(_id, data.provider);
     const value = await this.database.users.updateOne(
       { _id },

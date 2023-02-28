@@ -79,19 +79,19 @@ export const federatedLoginBodySchema = z.discriminatedUnion("provider", [
 ]);
 export type FederatedLoginBody = z.infer<typeof federatedLoginBodySchema>;
 
-export const federatedIdentitySchema = z.object({
+export const federatedIdSchema = z.object({
   provider: federatedProviderSchema,
 
   /** normally an email */
   federatedId: z.string(),
 });
-export type FederatedIdentity = z.infer<typeof federatedIdentitySchema>;
+export type FederatedId = z.infer<typeof federatedIdSchema>;
 
 export const userSchema = z.object({
   id: z.string(),
   username: z.string(),
   roles: z.string().array().default([]),
-  federated: federatedIdentitySchema.array().optional(),
+  federated: federatedIdSchema.array().optional(),
 });
 export type User = z.infer<typeof userSchema>;
 
@@ -103,13 +103,13 @@ export const changeUserPasswordSchema = z
   .strict();
 export type ChangeUserPassword = z.infer<typeof changeUserPasswordSchema>;
 
-export const addFederatedIdentitySchema = z
+export const addFederatedIdSchema = z
   .object({
     provider: federatedProviderSchema,
     validateToken: z.string(),
   })
   .strict();
-export type AddFederatedIdentity = z.infer<typeof addFederatedIdentitySchema>;
+export type AddFederatedId = z.infer<typeof addFederatedIdSchema>;
 
 export const userWithPasswordSchema = userSchema.extend({
   password: z.string(),
@@ -120,6 +120,6 @@ export const authenticatedUserSchema = z.object({
   id: z.string(),
   username: z.string(),
   roles: z.string().array().optional(),
-  federated: federatedIdentitySchema.array().optional(),
+  federated: federatedIdSchema.array().optional(),
 });
 export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;

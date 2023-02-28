@@ -1,9 +1,6 @@
 import { ObjectId } from "mongodb";
 import { z } from "zod";
-import {
-  bikeWeekEventSchema,
-  federatedIdentitySchema,
-} from "../routes/contract";
+import { bikeWeekEventSchema, federatedIdSchema } from "../routes/contract";
 
 export const dbStatusSchema = z.object({ lastSchedSync: z.date().optional() });
 export type DbStatus = z.infer<typeof dbStatusSchema>;
@@ -16,7 +13,7 @@ export const dbUserSchema = z.object({
   username: z.string(),
   hashed_password: z.string(),
   roles: z.string().array().optional().default([]),
-  federated: federatedIdentitySchema.array().optional(),
+  federated: federatedIdSchema.array().optional(),
 });
 
 export type DbUser = z.infer<typeof dbUserSchema>;

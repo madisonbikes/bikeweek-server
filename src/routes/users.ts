@@ -2,8 +2,8 @@ import express from "express";
 import { injectable } from "tsyringe";
 import { UserModel } from "../database/users";
 import {
-  AddFederatedIdentity,
-  addFederatedIdentitySchema,
+  AddFederatedId,
+  addFederatedIdSchema,
   AuthenticatedUser,
   ChangeUserPassword,
   changeUserPasswordSchema,
@@ -131,11 +131,11 @@ export class UserRoutes {
     .put(
       "/self/federated",
       validateAuthenticated(),
-      validateBodySchema({ schema: addFederatedIdentitySchema }),
+      validateBodySchema({ schema: addFederatedIdSchema }),
       asyncWrapper(async (request, response) => {
         const authUser = request.user as AuthenticatedUser;
         const dbId = new ObjectId(authUser.id);
-        const data = request.body as AddFederatedIdentity;
+        const data = request.body as AddFederatedId;
         const federatedId =
           await this.googleFederatedVerifier.verifyFederatedToken(
             data.validateToken
