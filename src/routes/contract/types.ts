@@ -111,11 +111,6 @@ export const addFederatedIdentitySchema = z
   .strict();
 export type AddFederatedIdentity = z.infer<typeof addFederatedIdentitySchema>;
 
-export const removeFederatedIdentitySchema = federatedIdentitySchema.strict();
-export type RemoveFederatedIdentity = z.infer<
-  typeof removeFederatedIdentitySchema
->;
-
 export const userWithPasswordSchema = userSchema.extend({
   password: z.string(),
 });
