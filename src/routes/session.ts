@@ -7,7 +7,7 @@ import {
   localMiddleware,
   finalizeAuthenticationMiddleware,
 } from "../security";
-import { loginBodySchema } from "./contract";
+import { authenticatedUserSchema, loginBodySchema } from "./contract";
 import { FederatedSecurityRoutes } from "./federated";
 
 @injectable()
@@ -36,6 +36,6 @@ export class SessionRoutes {
       }
     })
     .get("/info", validateAuthenticated(), (request, response) => {
-      response.send(request.user);
+      response.send(authenticatedUserSchema.parse(request.user));
     });
 }
