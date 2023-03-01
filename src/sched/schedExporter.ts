@@ -60,15 +60,14 @@ export class SchedExporter {
       });
 
     for (const event of events) {
-      for (const isoDay of event.eventDays) {
-        const dayAsDate = isoDay;
+      for (const eventDate of event.eventDays) {
         for (const timeNdx in event.eventTimes) {
           const time = event.eventTimes[timeNdx];
-          const dayOfYear = format(dayAsDate, "DDD");
+          const dayOfYear = format(eventDate, "DDD");
           const session_key = `${event.id}.${dayOfYear}.${timeNdx}`;
           const description = this.buildDescription(event);
 
-          const timeBase = isoDay;
+          const timeBase = format(eventDate, "yyyy-MM-dd");
           const session_start = `${timeBase} ${time.start}`;
           const session_end = `${timeBase} ${time.end}`;
           const session_type = sortEventTypes(event.eventTypes)
