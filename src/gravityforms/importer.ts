@@ -23,10 +23,14 @@ export class Importer {
       this.loadEntries(),
     ]);
     await this.database.gfFormFields.deleteMany({});
-    await this.database.gfFormFields.insertMany(formFields.fields);
+    if (formFields.fields.length > 0) {
+      await this.database.gfFormFields.insertMany(formFields.fields);
+    }
 
     await this.database.gfResponses.deleteMany({});
-    await this.database.gfResponses.insertMany(responses.entries);
+    if (responses.entries.length > 0) {
+      await this.database.gfResponses.insertMany(responses.entries);
+    }
   }
 
   isEnabled() {
