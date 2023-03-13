@@ -26,7 +26,9 @@ export class EventModel {
 
   setAllEvents = async (events: DbBikeWeekEvent[]) => {
     await this.database.events.deleteMany({});
-    await this.database.events.insertMany(events);
+    if (events.length > 0) {
+      await this.database.events.insertMany(events);
+    }
   };
 
   events = async () => {
