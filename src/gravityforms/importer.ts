@@ -1,11 +1,12 @@
 import superagent from "superagent";
 
-import { entryResponseSchema, FormResponseSchema } from "./types";
+import { entryResponseSchema, Field, FormResponseSchema } from "./types";
 
 import { injectable } from "tsyringe";
 import { Configuration } from "../config";
 import { Database } from "../database/database";
 import { logger } from "../utils";
+import { locations } from "../locations";
 
 /** pull data out of GF REST service and dump into mongo */
 @injectable()
@@ -26,6 +27,7 @@ export class Importer {
     if (formFields.fields.length > 0) {
       await this.database.gfFormFields.insertMany(formFields.fields);
     }
+    this.runLocationLint(formFields.fields);
 
     await this.database.gfResponses.deleteMany({});
     if (responses.entries.length > 0) {
@@ -35,6 +37,45 @@ export class Importer {
 
   isEnabled() {
     return this.config.gravityFormsUri;
+  }
+
+  private runLocationLint(fields: Field[]) {
+    const location = fields.find((f) => f.adminLabel === "location_first");
+    if (!location) {
+      logger.warn("no location field found in form data");
+      return;
+    }
+    const choices = location.choices;
+    if (choices == null) {
+      logger.warn("location choices are unexpectedly null");
+      return;
+    }
+    if (!Array.isArray(choices)) {
+      logger.warn("location choices are unexpectedly a string");
+      return;
+    }
+
+    // look through our server location list and make sure they all exist in the form
+    for (const localLocation of locations) {
+      const found =
+        choices.findIndex((c) => c.text === localLocation.name) !== -1;
+      if (!found) {
+        logger.warn(
+          `Local location ${localLocation.name} not found in form choices`
+        );
+      }
+    }
+
+    // look through form choices and make sure they all exist in our server location list
+    for (const formChoice of choices) {
+      const found =
+        locations.findIndex((l) => l.name === formChoice.text) !== -1;
+      if (!found) {
+        logger.warn(
+          `Form location choice ${formChoice.text} not found in local location list`
+        );
+      }
+    }
   }
 
   // FIXME support pagination for > 100 entries

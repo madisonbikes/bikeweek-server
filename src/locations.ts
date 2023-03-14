@@ -31,15 +31,10 @@ export const locations: EventLocation[] = [
     maps_query: "43.1330677130937, -89.37302929269123",
   },
   {
-    name: "Fire Station #9 Lawn (ask Madison Bikes for assistance)",
+    name: "Fire Station #9 Lawn (please ask Madison Bikes for assistance)",
     sched_venue: "Fire Station #9",
     sched_address: "201 N Midvale Blvd, Madison, WI 53705",
     maps_query: "43.06825658346771, -89.45017880206065",
-  },
-  {
-    name: "Olin Park @ Cap City Trail",
-    sched_address: "1156 Olin-Turville Ct, Madison, WI 53715",
-    maps_query: "43.05142232402517, -89.37755525648618",
   },
   {
     name: "The Velo UnderRound",
@@ -48,36 +43,36 @@ export const locations: EventLocation[] = [
     maps_placeid: "ChIJtTh2R_GtB4gR3FXbJot9IvU",
   },
   {
-    name: "Capital City Path @ Jackson St.",
+    name: "Capital City Path @ Jackson St",
     maps_query: "43.09362734540651, -89.3487495229572",
   },
   {
-    name: "Cap City @ E Wilson/Ingersoll",
+    name: "Capital City Path @ E Wilson/Ingersoll",
     maps_query: "43.08226898474152, -89.36764332963402",
   },
   {
-    name: "Cap City @ South Dickinson Street",
+    name: "Capital City Path @ Dickinson St",
     maps_query: "43.08649669029604, -89.36153934123017",
   },
   {
-    name: "Crazylegs Plaza",
+    name: "Southwest Path @ Crazylegs Plaza",
     sched_address: "1605 Regent St, Madison, WI 53726",
     maps_query: "43.067625512497706, -89.41344863570794",
   },
   {
-    name: "Cap City @ First St",
+    name: "Capital City Path @ First St",
     maps_query: "43.0897922154192, -89.35602172894029",
   },
   {
-    name: "Garver Feed Mill @ Cap City",
+    name: "Capital City Path @ Garver Feed Mill",
     maps_query: "43.09434025402559, -89.33485600010425",
   },
   {
-    name: "Cap City @ Monona Terrace",
+    name: "Capital City Path @ Law Park",
     maps_query: "43.068865430910314, -89.38371336452231",
   },
   {
-    name: "Yahara River Path @ Tenney Park (parking lot)",
+    name: "Yahara River Path @ Tenney Park",
     maps_query: "43.09247834276359, -89.36698561492226",
   },
   {
@@ -91,16 +86,16 @@ export const locations: EventLocation[] = [
     maps_query: "43.06333805116272, -89.39780739339082",
   },
   {
-    name: "Starkweather Creek Path @ Commercial Avenue",
+    name: "Starkweather Creek Path @ Commercial Ave",
     maps_query: "43.106834977626036, -89.34179850073251",
     sched_address: "2994 Commercial Ave, Madison, WI",
   },
   {
-    name: "Cap City @ Dempsey Road",
+    name: "Capital City Path @ Dempsey Rd",
     maps_query: "43.08618421761168, -89.31618731793283",
   },
   {
-    name: "SW Commuter Path @ Spring/Charter",
+    name: "Southwest Path @ Spring St/Charter St",
     maps_query: "43.06949884864831, -89.40600454474001",
   },
   {
@@ -109,7 +104,7 @@ export const locations: EventLocation[] = [
     sched_address: "55 S Gammon Rd, Madison, WI 53717",
   },
   {
-    name: "North Paterson Street & East Mifflin Street (Reynolds Park)",
+    name: "Reynolds Park: N Paterson St @ E Mifflin St",
     maps_query: "43.08293952681019, -89.37557016431424",
   },
   {
@@ -117,15 +112,15 @@ export const locations: EventLocation[] = [
     maps_query: "43.08433667433231, -89.31788920164708",
   },
   {
-    name: "Burrows Park @ Harbort Dr.",
+    name: "Burrows Park @ Harbort Dr",
     maps_query: "43.10167389021605, -89.36549950940855",
   },
   {
-    name: "Cannonball Path @ Leopold School",
-    maps_query: "43.02998555178269, -89.42103494908382",
+    name: "Cannonball Path @ Leopold Park",
+    maps_query: "43.03022867622936, -89.41983600253485",
   },
   {
-    name: "William Slater Park (Tokay @ Segoe)",
+    name: "William Slater Park @ Segoe Rd/Tokay Blvd",
     maps_query: "43.053816772589244, -89.46474118090218",
   },
   {
@@ -134,20 +129,20 @@ export const locations: EventLocation[] = [
     maps_query: "43.09104576170086, -89.35365142809567",
   },
   {
-    name: "SW Commuter Path @ Midvale",
+    name: "Southwest Path @ Midvale Blvd",
     maps_query: "43.04631890556104, -89.4515052750167",
   },
   {
-    name: "SW Commuter Path @ Hammersley (Beltline)",
+    name: "Southwest Path @ Hammersley Rd/Beltline",
     sched_address: "4717 Hammersley Rd, Madison, WI 53711, USA",
     maps_query: "43.03931326289994, -89.45981443133269",
   },
   {
-    name: "SW Commuter Path @ Carling Dr.",
+    name: "Southwest Path @ Carling Dr",
     maps_query: "43.03089706471058, -89.46009832971829",
   },
   {
-    name: "Wingra Creek Path @ Fish Hatchery",
+    name: "Wingra Creek Path @ Fish Hatchery Rd",
     maps_query: "43.0501333497925, -89.39995404541845",
   },
   {
@@ -159,7 +154,7 @@ export const locations: EventLocation[] = [
     maps_query: "43.05692598905787, -89.40408758819244",
   },
   {
-    name: "Starkweather Creek Path @ Darbo",
+    name: "Starkweather Creek Path @ Darbo Dr",
     maps_query: "43.10366513048974, -89.34094395101857",
   },
   {
@@ -167,30 +162,28 @@ export const locations: EventLocation[] = [
     maps_query: "43.05688298752837, -89.38944696431811",
   },
   {
-    name: "Penn Park @ Fisher St.",
+    name: "Penn Park @ Fisher St",
     maps_query: "43.04254401115383, -89.39168911041875",
   },
-  {
-    name: "Slow Street: Sherman Ave",
-    maps_query: "43.089750,-89.3745",
-  },
-  {
-    name: "Slow Street: W/S Shore Blvd",
-    maps_query: "43.056919, -89.396572",
-  },
-  {
-    name: "Slow Street: E Mifflin St",
-    maps_query: "43.081279, -89.377122",
-  },
-  {
-    name: "Slow Street: Fisher St",
-    maps_query: "43.044754, -89.391824",
-  },
-  {
-    name: "Slow Street: Darbo Dr",
-    maps_query: "43.103530, -89.340504",
-  },
+  { name: "City-wide" },
   {
     name: "Other (describe below)",
+  },
+  {
+    name: "Capital City Path @ Turville Park",
+    sched_address: "1156 Olin-Turville Ct, Madison, WI 53715",
+    maps_query: "43.05147728947594, -89.37757670676658",
+  },
+  {
+    name: "Demetral Park: Scofield @ 8th St",
+    maps_query: "43.10530918724534, -89.35279222722049",
+  },
+  {
+    name: "Centro Hispano",
+    maps_query: "43.03893771123766, -89.39540020253453",
+  },
+  {
+    name: "Northside Farmers Market",
+    maps_query: "43.12870776104843, -89.36315171787501",
   },
 ];
