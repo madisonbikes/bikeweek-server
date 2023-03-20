@@ -11,7 +11,7 @@ export class RedisConnection {
 
   constructor(private config: Configuration) {
     if (this.isEnabled()) {
-      this.client = createClient({ legacyMode: true, url: config.redisUri });
+      this.client = createClient({ url: config.redisUri });
       this.client.on("error", (err) => logger.warn(err, "Redis Client Error"));
     } else {
       logger.info("Redis disabled");
