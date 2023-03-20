@@ -1,9 +1,8 @@
 import { injectable, singleton } from "tsyringe";
 import { Configuration } from "./config";
-import connectRedis from "connect-redis";
+import RedisStore from "connect-redis";
 import { createClient, RedisClientType } from "redis";
 import { logger, maskUriPassword } from "./utils";
-import session from "express-session";
 
 @injectable()
 @singleton()
@@ -40,7 +39,6 @@ export class RedisConnection {
   }
 
   createStore() {
-    const rs = connectRedis(session);
-    return new rs({ client: this.client });
+    return new RedisStore({ client: this.client });
   }
 }
