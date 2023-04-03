@@ -73,7 +73,7 @@
     "@types/superagent": "^4.1.16",
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.56.0",
-    "@typescript-eslint/parser": "^5.56.0",
+    "@typescript-eslint/parser": "^5.57.0",
     "eslint": "^8.37.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-import-resolver-typescript": "^3.5.4",
