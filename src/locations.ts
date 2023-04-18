@@ -69,6 +69,7 @@ export const locations: EventLocation[] = [
   },
   {
     name: "Capital City Path @ Law Park",
+    sched_address: "410 S Blair St, Madison, WI 53703",
     maps_query: "43.068865430910314, -89.38371336452231",
   },
   {

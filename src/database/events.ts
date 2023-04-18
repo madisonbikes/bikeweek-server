@@ -9,7 +9,10 @@ export const isDiscountEvent = (event: DbBikeWeekEvent) => {
 };
 
 export const isEndOfWeekParty = (event: DbBikeWeekEvent) => {
-  return event.eventTypes.includes(EventTypes.ENDOFWEEKPARTY);
+  return (
+    event.eventTypes.includes(EventTypes.ENDOFWEEKPARTY) &&
+    event.eventTypes.length === 1
+  );
 };
 
 export const isAllDayEvent = (event: DbBikeWeekEvent) => {
