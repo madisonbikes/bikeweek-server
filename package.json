@@ -46,7 +46,7 @@
     "passport-local": "^1.0.0",
     "pino": "^8.11.0",
     "pino-pretty": "^10.0.0",
-    "redis": "^4.6.5",
+    "redis": "^4.6.6",
     "reflect-metadata": "^0.1.13",
     "set-interval-async": "^3.0.3",
     "superagent": "^8.0.9",
