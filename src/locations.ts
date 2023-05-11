@@ -49,10 +49,12 @@ export const locations: EventLocation[] = [
   {
     name: "Capital City Path @ E Wilson/Ingersoll",
     maps_query: "43.08226898474152, -89.36764332963402",
+    sched_address: "1050 Capital City Trail, Madison, WI 53703",
   },
   {
     name: "Capital City Path @ Dickinson St",
     maps_query: "43.08649669029604, -89.36153934123017",
+    sched_address: "301 S Dickinson St, Madison, WI 53703, USA",
   },
   {
     name: "Southwest Path @ Crazylegs Plaza",
@@ -66,6 +68,7 @@ export const locations: EventLocation[] = [
   {
     name: "Capital City Path @ Garver Feed Mill",
     maps_query: "43.09434025402559, -89.33485600010425",
+    sched_address: "3241 Garver Green, Madison, WI 53704",
   },
   {
     name: "Capital City Path @ Law Park",
