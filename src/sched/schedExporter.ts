@@ -147,7 +147,7 @@ export class SchedExporter {
 
     description += modified;
 
-    if (event.eventUrl?.trim() === "") {
+    if (event.eventUrl?.trim() !== "") {
       description += `\n<br><a href="${event.eventUrl}" target="_blank">Learn more about this event here!</a>`;
     }
     return description;
