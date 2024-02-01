@@ -32,7 +32,7 @@
     "bcryptjs": "^2.4.3",
     "build-url": "^6.0.1",
     "connect-redis": "^7.1.1",
-    "connection-string": "^4.3.6",
+    "connection-string": "^4.4.0",
     "cors": "^2.8.5",
     "date-fns": "^2.30.0",
     "dotenv": "^16.0.3",
