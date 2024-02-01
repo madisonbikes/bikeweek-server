@@ -68,7 +68,7 @@
     "@types/jest": "^29.5.1",
     "@types/node": "^18.15.11",
     "@types/passport": "^1.0.12",
-    "@types/passport-local": "^1.0.35",
+    "@types/passport-local": "^1.0.38",
     "@types/set-interval-async": "^1.0.0",
     "@types/superagent": "^4.1.18",
     "@types/supertest": "^2.0.12",
