@@ -17,10 +17,10 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-    target-branch: "main"
+    target-branch: "develop"
     
     # temporarily disabled until 2024
-    open-pull-requests-limit: 0
+    open-pull-requests-limit: 5
     
     commit-message:
       prefix: "ci"
