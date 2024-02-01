@@ -7,7 +7,7 @@ updates:
     target-branch: "develop"
     
     # temporarily disabled until 2024
-    open-pull-requests-limit: 0
+    open-pull-requests-limit: 30
 
     commit-message:
       prefix: "fix"
