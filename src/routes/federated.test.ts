@@ -1,9 +1,10 @@
-import { loginTestUser, setupSuite, testRequest, TestRequest } from "../test";
+import { TestRequest, loginTestUser, setupSuite, testRequest } from "../test";
 import { createDuplicatedFederatedId, createTestUser } from "../test/data";
 import { injectable, Lifecycle } from "tsyringe";
 import { GoogleFederatedVerifier } from "../security/google";
 import { StatusCodes } from "http-status-codes";
 import { userSchema } from "./contract";
+import TestAgent from "supertest/lib/agent";
 
 describe("federated routes", () => {
   describe("google enabled", () => {
@@ -22,7 +23,7 @@ describe("federated routes", () => {
           {
             useClass: MockGoogleFederatedVerifier,
           },
-          { lifecycle: Lifecycle.ContainerScoped }
+          { lifecycle: Lifecycle.ContainerScoped },
         );
       },
     });

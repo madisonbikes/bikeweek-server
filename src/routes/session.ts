@@ -12,30 +12,33 @@ import { FederatedSecurityRoutes } from "./federated";
 
 @injectable()
 export class SessionRoutes {
-  constructor(private federatedRoutes: FederatedSecurityRoutes) {}
-  readonly routes = express
-    .Router()
-    .use(this.federatedRoutes.routes)
-    .post(
-      "/login",
-      validateBodySchema({ schema: loginBodySchema }),
-      localMiddleware,
-      finalizeAuthenticationMiddleware
-    )
-    .post("/logout", (request, response, next) => {
-      if (request.user == null) {
-        response.status(StatusCodes.UNAUTHORIZED).send("not logged in");
-      } else {
-        request.logout((err) => {
-          if (err !== undefined) {
-            return next(err);
-          } else {
-            response.send("logged out");
-          }
-        });
-      }
-    })
-    .get("/info", validateAuthenticated(), (request, response) => {
-      response.send(authenticatedUserSchema.parse(request.user));
-    });
+  readonly routes;
+
+  constructor(private federatedRoutes: FederatedSecurityRoutes) {
+    this.routes = express
+      .Router()
+      .use(this.federatedRoutes.routes)
+      .post(
+        "/login",
+        validateBodySchema({ schema: loginBodySchema }),
+        localMiddleware,
+        finalizeAuthenticationMiddleware,
+      )
+      .post("/logout", (request, response, next) => {
+        if (request.user == null) {
+          response.status(StatusCodes.UNAUTHORIZED).send("not logged in");
+        } else {
+          request.logout((err) => {
+            if (err !== undefined) {
+              return next(err);
+            } else {
+              response.send("logged out");
+            }
+          });
+        }
+      })
+      .get("/info", validateAuthenticated(), (request, response) => {
+        response.send(authenticatedUserSchema.parse(request.user));
+      });
+  }
 }
