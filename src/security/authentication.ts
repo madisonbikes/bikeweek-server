@@ -54,12 +54,10 @@ export const finalizeAuthenticationMiddleware: ExpressMiddleware = (
 @injectable()
 export class AuthenticationStrategies {
   constructor(
-    private localStrategy: LocalStrategy,
-    private federatedStrategy: FederatedStrategy
-  ) {}
-
-  private readonly local = this.localStrategy;
-  private readonly federated = this.federatedStrategy;
+    private local: LocalStrategy,
+    private federated: FederatedStrategy
+  ) {
+  }
 
   registerPassportStrategies = () => {
     // used for login method
