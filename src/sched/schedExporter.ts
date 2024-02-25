@@ -5,7 +5,7 @@ import { SchedApi } from "./api";
 import { buildMapsUrl } from "../locations";
 import { EventTypes } from "../gravityforms/processor";
 import { BikeWeekEvent, eventStatusSchema } from "../routes/contract";
-import { logger } from "../utils";
+import { Result, logger } from "../utils";
 
 @injectable()
 export class SchedExporter {
@@ -61,8 +61,9 @@ export class SchedExporter {
 
     for (const event of events) {
       for (const eventDate of event.eventDays) {
-        for (const timeNdx in event.eventTimes) {
-          const time = event.eventTimes[timeNdx];
+        let timeNdx = -1;
+        for (const time of event.eventTimes) {
+          timeNdx++;
           const dayOfYear = format(eventDate, "DDD");
           const session_key = `${event.id}.${dayOfYear}.${timeNdx}`;
           const description = this.buildDescription(event);
@@ -71,6 +72,7 @@ export class SchedExporter {
           const session_start = `${timeBase} ${time.start}`;
           const session_end = `${timeBase} ${time.end}`;
           const session_type = sortEventTypes(event.eventTypes)
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
             .filter((value) => value !== EventTypes.ENDOFWEEKPARTY)
             .join(",");
           const base = {
@@ -91,7 +93,7 @@ export class SchedExporter {
             rsvp_url: event.location ? buildMapsUrl(event.location) : "",
             media_url: event.eventGraphicUrl,
           };
-          let result;
+          let result: Result<string, string>;
           let action;
           if (relevantExistingKeys.indexOf(session_key) !== -1) {
             result = await this.sched.modifySession(base);
@@ -104,7 +106,7 @@ export class SchedExporter {
             logger.error(`${session_key} ${action} error: ${result.value}`);
           } else {
             logger.debug(
-              `${session_key} ${action} ok(${result.value}) status: ${event.status}`
+              `${session_key} ${action} ok(${result.value}) status: ${event.status}`,
             );
           }
           handledKeys.add(session_key);

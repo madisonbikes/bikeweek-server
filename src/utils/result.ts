@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-// noinspection JSUnusedGlobalSymbols
-
 /** adapted from https://medium.com/inato/expressive-error-handling-in-typescript-and-benefits-for-domain-driven-design-70726e061c86 */
 export type Result<K, E> = Ok<K, E> | Error<K, E>;
 
@@ -24,7 +21,7 @@ export class Ok<K, E> {
     return this;
   }
 
-  alsoOnError(func: (e: E) => void): Result<K, E> {
+  alsoOnError(_func: (e: E) => void): Result<K, E> {
     return this;
   }
 
@@ -32,7 +29,7 @@ export class Ok<K, E> {
     return func(this.value);
   }
 
-  mapError<B>(func: (e: E) => Result<K, B>): Result<K, B> {
+  mapError<B>(_func: (e: E) => Result<K, B>): Result<K, B> {
     return this as unknown as Error<K, B>;
   }
 }
@@ -52,7 +49,11 @@ export class Error<K, E> {
     return true;
   }
 
-  alsoOnOk(func: (k: K) => void): Result<K, E> {
+  alsoOnOkAsync(_func: (k: K) => Promise<void>): Promise<Result<K, E>> {
+    return Promise.resolve(this);
+  }
+
+  alsoOnOk(_func: (k: K) => void): Result<K, E> {
     return this;
   }
 
@@ -61,7 +62,7 @@ export class Error<K, E> {
     return this;
   }
 
-  mapOk<B>(func: (k: K) => Result<B, E>): Result<B, E> {
+  mapOk<B>(_func: (k: K) => Result<B, E>): Result<B, E> {
     return this as unknown as Error<B, E>;
   }
 

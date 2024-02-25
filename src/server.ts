@@ -17,7 +17,7 @@ export class ApiServer {
     private configuration: Configuration,
     private apiRoutes: ApiRoutes,
     private authenticationStrategies: AuthenticationStrategies,
-    private sessionMiddlewareConfigurator: SessionMiddlewareConfigurator
+    private sessionMiddlewareConfigurator: SessionMiddlewareConfigurator,
   ) {}
 
   server: Server | undefined;
@@ -52,7 +52,7 @@ export class ApiServer {
 
     passport.deserializeUser<string>((data, done) => {
       try {
-        const user = JSON.parse(data);
+        const user = JSON.parse(data) as unknown as Express.User;
         logger.trace(user, "deserialize user");
         done(null, user);
       } catch (err) {
@@ -66,7 +66,6 @@ export class ApiServer {
 
     app.use("/api/v1", this.apiRoutes.routes);
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
       logger.error(err, "Unhandled server error");
       res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
@@ -84,7 +83,7 @@ export class ApiServer {
     await this.create();
     this.server?.listen(this.configuration.serverPort, () => {
       logger.info(
-        `Server listening on http://localhost:${this.configuration.serverPort}`
+        `Server listening on http://localhost:${this.configuration.serverPort}`,
       );
     });
   }

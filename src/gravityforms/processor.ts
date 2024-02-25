@@ -32,7 +32,7 @@ const GF_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 export class Processor {
   constructor(
     private configuration: Configuration,
-    private database: Database
+    private database: Database,
   ) {}
 
   async extractEvents(): Promise<BikeWeekEvent[]> {
@@ -89,7 +89,10 @@ export class Processor {
 }
 
 class EventHelper {
-  constructor(private fields: Field[], private configuration: Configuration) {}
+  constructor(
+    private fields: Field[],
+    private configuration: Configuration,
+  ) {}
 
   getLocationInfo(entry: Entry): EventLocation | undefined {
     const firstChoice = this.lookupFieldValue(entry, "location_first");
@@ -104,7 +107,7 @@ class EventHelper {
     }
     mapped.detailed_location_description = this.lookupFieldValue(
       entry,
-      "location_other"
+      "location_other",
     );
     return eventLocationSchema.parse(mapped);
   }
@@ -132,7 +135,7 @@ class EventHelper {
     if (!eventEnd || !eventStart) {
       if (eventEnd || eventStart) {
         logger.warn(
-          "Event has a mismatched start/end time. Event will be assumed to all-day."
+          "Event has a mismatched start/end time. Event will be assumed to all-day.",
         );
       }
       return [];
@@ -149,15 +152,14 @@ class EventHelper {
       separator = ";";
     }
     const sponsors = baseSponsorText.split(separator).map((v) => v.trim());
-    const retval = new Array<EventSponsor>(sponsors.length);
-    for (const ndx in sponsors) {
-      const res = sponsors[ndx].match(/(.*)\((.+)\)/);
+    const retval = sponsors.map((sponsor) => {
+      const res = sponsor.match(/(.*)\((.+)\)/);
       if (!res) {
-        retval[ndx] = { name: sponsors[ndx], url: "" };
+        return { name: sponsor, url: "" };
       } else {
-        retval[ndx] = { name: res[1].trim(), url: res[2].trim() };
+        return { name: res[1].trim(), url: res[2].trim() };
       }
-    }
+    });
     return retval;
   }
 
@@ -179,13 +181,10 @@ class EventHelper {
 
   lookupMultiFieldValue(
     entry: Entry,
-    adminLabel: string
+    adminLabel: string,
   ): string[] | undefined {
     const fieldId = this.lookupFieldId(adminLabel);
     if (fieldId === undefined) return undefined;
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const adaptedEntry: any = entry;
 
     const rawInputs = this.fields.find((value) => value.id === fieldId)?.inputs;
     if (rawInputs == null) {
@@ -201,7 +200,7 @@ class EventHelper {
 
     const retval: string[] = [];
     for (const i of inputIds) {
-      const value = adaptedEntry[i];
+      const value = entry[i];
       if (typeof value === "string") {
         if (value && value.length > 0) {
           retval.push(value);
@@ -210,8 +209,9 @@ class EventHelper {
         logger.warn(
           {
             entry,
+            value,
           },
-          `Unexpected non-string value in field ${adminLabel}: ${value}`
+          `Unexpected non-string value in field ${adminLabel}`,
         );
       }
     }
@@ -222,14 +222,11 @@ class EventHelper {
     const fieldId = this.lookupFieldId(adminLabel);
     if (fieldId === undefined) return undefined;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const adaptedEntry: any = entry;
-
-    const value = adaptedEntry[`${fieldId}`];
+    const value = entry[`${fieldId}`];
     if (typeof value !== "string") {
       logger.warn(
-        { entry },
-        `Unexpected non-string value in field ${adminLabel}: ${value}`
+        { entry, value },
+        `Unexpected non-string value in field ${adminLabel}`,
       );
       return undefined;
     }

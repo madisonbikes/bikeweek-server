@@ -4,7 +4,6 @@ import { injectable, Lifecycle } from "tsyringe";
 import { GoogleFederatedVerifier } from "../security/google";
 import { StatusCodes } from "http-status-codes";
 import { userSchema } from "./contract";
-import TestAgent from "supertest/lib/agent";
 
 describe("federated routes", () => {
   describe("google enabled", () => {

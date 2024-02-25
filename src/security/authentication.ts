@@ -15,7 +15,7 @@ export type AuthenticatedExpressUser = Express.User & AuthenticatedUser;
 export type ExpressMiddleware = (
   request: Request,
   response: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => void;
 
 export enum Roles {
@@ -32,20 +32,20 @@ export const localMiddleware: ExpressMiddleware = passport.authenticate(
   {
     session: true,
     failWithError: false,
-  }
-);
+  },
+) as unknown as ExpressMiddleware;
 
 export const federatedMiddleware: ExpressMiddleware = passport.authenticate(
   FEDERATED_STRATEGY_NAME,
   {
     session: true,
     failWithError: false,
-  }
-);
+  },
+) as unknown as ExpressMiddleware;
 
 export const finalizeAuthenticationMiddleware: ExpressMiddleware = (
   request,
-  response
+  response,
 ) => {
   const user = request.user as AuthenticatedUser;
   response.send(user);
@@ -55,9 +55,8 @@ export const finalizeAuthenticationMiddleware: ExpressMiddleware = (
 export class AuthenticationStrategies {
   constructor(
     private local: LocalStrategy,
-    private federated: FederatedStrategy
-  ) {
-  }
+    private federated: FederatedStrategy,
+  ) {}
 
   registerPassportStrategies = () => {
     // used for login method

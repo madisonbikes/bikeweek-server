@@ -8,7 +8,7 @@
     "dev": "ts-node-dev --inspect -- src/index.ts",
     "pm2-start": "npx --yes pm2 startOrRestart ecosystem.config.js",
     "pm2-stop": "npx --yes pm2 stop ecosystem.config.js",
-    "lint": "eslint '**/*.ts'",
+    "lint": "eslint .",
     "check-package-updates": "npx npm-check-updates",
     "test": "NODE_ENV=test npx jest --maxWorkers=50%",
     "test-watch": "NODE_ENV=test npx jest --maxWorkers=25% --watch",

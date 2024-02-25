@@ -11,7 +11,10 @@ import { locations } from "../locations";
 /** pull data out of GF REST service and dump into mongo */
 @injectable()
 export class Importer {
-  constructor(private config: Configuration, private database: Database) {}
+  constructor(
+    private config: Configuration,
+    private database: Database,
+  ) {}
 
   async import(): Promise<void> {
     if (!this.isEnabled()) {
@@ -61,7 +64,7 @@ export class Importer {
         choices.findIndex((c) => c.text === localLocation.name) !== -1;
       if (!found) {
         logger.warn(
-          `Local location ${localLocation.name} not found in form choices`
+          `Local location ${localLocation.name} not found in form choices`,
         );
       }
     }
@@ -72,7 +75,7 @@ export class Importer {
         locations.findIndex((l) => l.name === formChoice.text) !== -1;
       if (!found) {
         logger.warn(
-          `Form location choice ${formChoice.text} not found in local location list`
+          `Form location choice ${formChoice.text} not found in local location list`,
         );
       }
     }
@@ -80,19 +83,19 @@ export class Importer {
 
   // FIXME support pagination for > 100 entries
   private async loadEntries() {
-    const { body } = await superagent
+    const response = await superagent
       .get(`${this.config.gravityFormsUri}/entries`)
       .query({ form_ids: this.config.gravityFormsId })
       .query("paging[page_size]=100")
       .auth(
         this.config.gravityFormsConsumerApiKey,
-        this.config.gravityFormsConsumerSecret
+        this.config.gravityFormsConsumerSecret,
       );
-    const result = entryResponseSchema.safeParse(body);
+    const result = entryResponseSchema.safeParse(response.body);
     if (!result.success) {
       logger.error(
-        { responses: body, error: result.error },
-        "Error parsing form responses"
+        { responses: response.text, error: result.error },
+        "Error parsing form responses",
       );
       throw new Error("error parsing form responses");
     }
@@ -100,17 +103,17 @@ export class Importer {
   }
 
   private async loadForms() {
-    const { body } = await superagent
+    const response = await superagent
       .get(`${this.config.gravityFormsUri}/forms/${this.config.gravityFormsId}`)
       .auth(
         this.config.gravityFormsConsumerApiKey,
-        this.config.gravityFormsConsumerSecret
+        this.config.gravityFormsConsumerSecret,
       );
-    const result = FormResponseSchema.safeParse(body);
+    const result = FormResponseSchema.safeParse(response.body);
     if (!result.success) {
       logger.error(
-        { forms: body, error: result.error },
-        "Error parsing form definitions"
+        { forms: response.text, error: result.error },
+        "Error parsing form definitions",
       );
       throw new Error("error parsing form definitions");
     }

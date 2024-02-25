@@ -7,7 +7,7 @@ module.exports = {
   },
   extends: [
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-type-checked",
     "plugin:promise/recommended",
     "plugin:import/recommended",
     "plugin:import/typescript",
@@ -22,6 +22,14 @@ module.exports = {
   reportUnusedDisableDirectives: true,
   rules: {
     eqeqeq: ["warn", "smart"],
+    "@typescript-eslint/no-unused-vars": [
+      "warn", // or error
+      {
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^_",
+        caughtErrorsIgnorePattern: "^_",
+      },
+    ],
     "func-style": ["warn"],
     "require-await": ["error"],
     "@typescript-eslint/no-floating-promises": "error",

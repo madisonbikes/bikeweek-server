@@ -19,11 +19,11 @@ export class SchedApi {
   constructor(private configuration: Configuration) {}
 
   async addSession(
-    session: AddSessionRequest
-  ): Promise<Result<unknown, string>> {
+    session: AddSessionRequest,
+  ): Promise<Result<string, string>> {
     const { response, isError } = await this.postRequest(
       "session/add",
-      session
+      session,
     );
     if (isError) {
       return error(response.text);
@@ -33,11 +33,11 @@ export class SchedApi {
   }
 
   async modifySession(
-    session: ModifySessionRequest
-  ): Promise<Result<unknown, string>> {
+    session: ModifySessionRequest,
+  ): Promise<Result<string, string>> {
     const { response, isError } = await this.postRequest(
       "session/mod",
-      session
+      session,
     );
     if (isError) {
       return error(response.text);
@@ -47,43 +47,43 @@ export class SchedApi {
   }
 
   async listSessions(
-    query?: SessionListRequest
+    query?: SessionListRequest,
   ): Promise<Result<SessionListResponse[], string>> {
     const newQuery = { format: "json", ...query };
     const { response, isError } = await this.postRequest(
       "session/list",
-      newQuery
+      newQuery,
     );
     if (isError) {
       return error(response.text);
     } else {
-      const body = response.body;
+      const body: unknown = response.body;
       return ok(body as SessionListResponse[]);
     }
   }
 
   async exportSessions(
-    query?: SessionExportRequest
+    query?: SessionExportRequest,
   ): Promise<Result<SessionExportResponse[], string>> {
     const newQuery = { format: "json", ...query };
     const { response, isError } = await this.postRequest(
       "session/export",
-      newQuery
+      newQuery,
     );
     if (isError) {
       return error(response.text);
     } else {
-      const body = response.body;
+      const body: unknown = response.body;
       return ok(body as SessionExportResponse[]);
     }
   }
 
   async deleteSession(
-    session: DeleteSessionRequest
+    session: DeleteSessionRequest,
   ): Promise<Result<unknown, string>> {
     const { response, isError } = await this.postRequest(
       "session/del",
-      session
+      session,
     );
     if (isError) {
       return error(response.text);
@@ -94,7 +94,7 @@ export class SchedApi {
 
   private async postRequest(
     endpoint: string,
-    requestData: Record<string, unknown>
+    requestData: Record<string, unknown>,
   ) {
     await this.checkThrottle();
 
