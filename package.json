@@ -52,7 +52,7 @@
     "superagent": "^8.0.9",
     "ts-node": "^10.9.1",
     "tsyringe": "^4.7.0",
-    "zod": "^3.21.4"
+    "zod": "^3.22.3"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.6.1",
