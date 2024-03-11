@@ -2,16 +2,16 @@ import { injectable, singleton } from "tsyringe";
 import { Configuration } from "../config";
 import { Collection, Db, MongoClient } from "mongodb";
 import { logger, maskUriPassword } from "../utils";
-import { DbStatus, dbStatusSchema } from "./types";
+import { DbBikeWeekEvent, DbStatus, DbUser, dbStatusSchema } from "./types";
 
 @injectable()
 @singleton()
 export class Database {
-  private _users!: Collection;
+  private _users!: Collection<Omit<DbUser, "_id">>;
   private _gfFormFields!: Collection;
   private _gfResponses!: Collection;
-  private _events!: Collection;
-  private _status!: Collection;
+  private _events!: Collection<Omit<DbBikeWeekEvent, "_id">>;
+  private _status!: Collection<Omit<DbStatus, "_id">>;
 
   private client?: MongoClient;
   private database?: Db;
@@ -46,7 +46,7 @@ export class Database {
 
   async start() {
     logger.info(
-      `Connecting to ${maskUriPassword(this.configuration.mongoDbUri)}`
+      `Connecting to ${maskUriPassword(this.configuration.mongoDbUri)}`,
     );
     this.client = new MongoClient(this.configuration.mongoDbUri, {});
     await this.client.connect();

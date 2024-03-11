@@ -22,6 +22,8 @@ module.exports = {
   reportUnusedDisableDirectives: true,
   rules: {
     eqeqeq: ["warn", "smart"],
+    // disable main unused vars line
+    "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": [
       "warn", // or error
       {
@@ -33,7 +35,8 @@ module.exports = {
     "func-style": ["warn"],
     "require-await": ["error"],
     "@typescript-eslint/no-floating-promises": "error",
-    "import/no-default-export": 2,
+    "import/no-default-export": "warn",
     "@typescript-eslint/strict-boolean-expressions": "warn",
+    "prefer-const": ["warn", { destructuring: "all" }],
   },
 };

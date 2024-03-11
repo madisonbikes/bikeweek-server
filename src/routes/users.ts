@@ -28,7 +28,7 @@ import { GoogleFederatedVerifier } from "../security/google";
 export class UserRoutes {
   constructor(
     private userModel: UserModel,
-    private googleFederatedVerifier: GoogleFederatedVerifier
+    private googleFederatedVerifier: GoogleFederatedVerifier,
   ) {}
 
   readonly routes = express
@@ -65,7 +65,7 @@ export class UserRoutes {
         const mappedUsers = users.map(mapDbUserToExternalUser);
         const adaptedUsers = userSchema.array().parse(mappedUsers);
         response.send(adaptedUsers);
-      })
+      }),
     )
 
     /** return current user info (similar to /session/info but reflects database values not session structure) */
@@ -75,7 +75,7 @@ export class UserRoutes {
       asyncWrapper(async (request, response) => {
         const authUser = request.user as AuthenticatedUser;
         const dbUser = await this.userModel.findUserById(
-          new ObjectId(authUser.id)
+          new ObjectId(authUser.id),
         );
         if (!dbUser) {
           // something's wrong if can't find id because it's an authenticated session
@@ -86,7 +86,7 @@ export class UserRoutes {
         const mapped = mapDbUserToExternalUser(dbUser);
         const adaptedUser = userSchema.parse(mapped);
         response.send(adaptedUser);
-      })
+      }),
     )
 
     /** update current user info */
@@ -126,7 +126,7 @@ export class UserRoutes {
         const returnMap = mapDbUserToExternalUser(newUser);
         const adaptedUser = userSchema.parse(returnMap);
         response.send(adaptedUser);
-      })
+      }),
     )
     .put(
       "/self/federated",
@@ -138,7 +138,7 @@ export class UserRoutes {
         const data = request.body as AddFederatedId;
         const federatedId =
           await this.googleFederatedVerifier.verifyFederatedToken(
-            data.validateToken
+            data.validateToken,
           );
         if (federatedId === undefined) {
           response.sendStatus(StatusCodes.FORBIDDEN);
@@ -155,7 +155,7 @@ export class UserRoutes {
           const adaptedUser = userSchema.parse(returnMap);
           response.send(adaptedUser);
         }
-      })
+      }),
     )
     .delete(
       "/self/federated/:provider",
@@ -166,7 +166,7 @@ export class UserRoutes {
         const provider = federatedProviderSchema.parse(request.params.provider);
         const result = await this.userModel.disconnectFederatedProvider(
           dbId,
-          provider
+          provider,
         );
         if (!result) {
           response.sendStatus(StatusCodes.NOT_FOUND);
@@ -175,12 +175,13 @@ export class UserRoutes {
           const adaptedUser = userSchema.parse(returnMap);
           response.send(adaptedUser);
         }
-      })
+      }),
     );
 }
 
 /** for now, just converts _id ObjectId to id string */
 const mapDbUserToExternalUser = (user: DbUser): User => {
-  const { _id, ...rest } = user;
-  return { id: _id.toString(), ...rest };
+  let { _id, roles, ...rest } = user;
+  if (roles === undefined) roles = [];
+  return { id: _id.toString(), roles, ...rest };
 };

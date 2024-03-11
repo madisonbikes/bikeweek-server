@@ -12,7 +12,7 @@ export const dbUserSchema = z.object({
   _id: z.instanceof(ObjectId),
   username: z.string(),
   hashed_password: z.string(),
-  roles: z.string().array().optional().default([]),
+  roles: z.string().array().default([]).optional(),
   federated: federatedIdSchema.array().optional(),
 });
 

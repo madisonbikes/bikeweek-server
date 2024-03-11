@@ -119,7 +119,7 @@ export type UserWithPassword = z.infer<typeof userWithPasswordSchema>;
 export const authenticatedUserSchema = z.object({
   id: z.string(),
   username: z.string(),
-  roles: z.string().array().optional(),
+  roles: z.string().array().default([]),
   federated: federatedIdSchema.array().optional(),
 });
 export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;

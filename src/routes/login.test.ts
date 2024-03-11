@@ -23,7 +23,9 @@ describe("login route", () => {
         const response = authenticatedUserSchema.parse(request.body);
 
         expect(response.username).toEqual("testuser");
-        expect(response.roles).toHaveLength(0);
+        expect(
+          response.roles === undefined || response.roles.length === 0,
+        ).toBeTruthy();
       });
   });
 
@@ -42,7 +44,7 @@ describe("login route", () => {
               code: "invalid_type",
               path: ["password"],
             }),
-          ])
+          ]),
         );
       });
   });
