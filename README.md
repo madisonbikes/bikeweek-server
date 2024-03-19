@@ -9,7 +9,7 @@ It also provides APIs for use in the administration web UI.
 
 The Sched components will automatically throttle API calls to meet [limits defined in their API documentation](https://sched.com/api) (30 calls/minute).
 
-Uses Node 16 LTS, Typescript, superagent for HTTP/REST, tsyringe for dependency injection, pm2 for daemon/process management
+Uses Node 20 LTS, Typescript, superagent for HTTP/REST, tsyringe for dependency injection, pm2 for daemon/process management
 
 ## Command line
 
