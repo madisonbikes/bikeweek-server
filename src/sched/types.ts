@@ -1,75 +1,77 @@
 /** schema for sched responses */
+import { z } from "zod";
 
-export type BaseRequest = {
-  [key: string]: unknown;
-};
+export const sessionListRequestSchema = z.object({
+  since: z.number().optional(),
+  format: z.string().optional(),
+  status: z.string().optional(),
+  custom_data: z.string().optional(),
+});
 
-export type SessionListRequest = BaseRequest & {
-  since?: number;
-  format?: string;
-  status?: string;
-  custom_data?: string;
-};
+export type SessionListRequest = z.infer<typeof sessionListRequestSchema>;
 
-export type SessionExportRequest = BaseRequest & {
-  since?: number;
-  format?: string;
-  status?: string;
-  custom_data?: string;
-};
+export const sessionExportRequestSchema = z.object({
+  since: z.number().optional(),
+  format: z.string().optional(),
+  status: z.string().optional(),
+  custom_data: z.string().optional(),
+});
 
-export type DeleteSessionRequest = BaseRequest & {
-  session_key: string;
-};
+export type SessionExportRequest = z.infer<typeof sessionExportRequestSchema>;
 
-export type AddSessionRequest = BaseRequest & {
-  session_key: string;
-  name: string;
-  session_start: string;
-  session_end: string;
-  session_type: string;
-  session_subtype?: string;
-  description?: string;
-  media_url?: string;
-  venue?: string;
-  address?: string;
-  tags?: string;
-  seats?: string;
-  rsvp_url?: string;
-  ticket_message?: string;
-  active?: string;
-};
+export const deleteSessionRequestSchema = z.object({ session_key: z.string() });
+export type DeleteSessionRequest = z.infer<typeof deleteSessionRequestSchema>;
 
-export type ModifySessionRequest = BaseRequest & {
-  session_key: string;
-  name?: string;
+export const addSessionRequestSchema = z.object({
+  session_key: z.string(),
+  name: z.string(),
+  session_start: z.string(),
+  session_end: z.string(),
+  session_type: z.string(),
+  session_subtype: z.string().optional(),
+  description: z.string().optional(),
+  media_url: z.string().optional(),
+  venue: z.string().optional(),
+  address: z.string().optional(),
+  tags: z.string().optional(),
+  seats: z.string().optional(),
+  rsvp_url: z.string().optional(),
+  ticket_message: z.string().optional(),
+  active: z.string().optional(),
+});
+
+export type AddSessionRequest = z.infer<typeof addSessionRequestSchema>;
+
+const modifySessionRequestSchema = z.object({
+  session_key: z.string(),
+  name: z.string().optional(),
+
   // format: YYYY-MM-DD HH:MM
-  session_start?: string;
+  session_start: z.string().optional(),
 
   // format: YYYY-MM-DD HH:MM
-  session_end?: string;
-  session_type?: string;
-  session_subtype?: string;
-  description?: string;
-  media_url?: string;
-  venue?: string;
-  address?: string;
-  tags?: string;
-  seats?: string;
-  rsvp_url?: string;
-  ticket_message?: string;
-  active?: string;
-};
+  session_end: z.string().optional(),
+  session_type: z.string().optional(),
+  session_subtype: z.string().optional(),
+  description: z.string().optional(),
+  media_url: z.string().optional(),
+  venue: z.string().optional(),
+  address: z.string().optional(),
+  tags: z.string().optional(),
+  seats: z.string().optional(),
+  rsvp_url: z.string().optional(),
+  ticket_message: z.string().optional(),
+  active: z.string().optional(),
+});
+export type ModifySessionRequest = z.infer<typeof modifySessionRequestSchema>;
 
-export type BaseResponse = {
-  [key: string]: unknown;
-};
+export const sessionListResponseSchema = z.object({
+  event_key: z.string(),
+});
+export type SessionListResponse = z.infer<typeof sessionListResponseSchema>;
 
-export type SessionListResponse = BaseResponse & {
-  event_key: string;
-};
-
-export type SessionExportResponse = BaseResponse & {
-  event_key: string;
-  active: string;
-};
+export const sessionExportResponseSchema = z.object({
+  event_key: z.string(),
+  active: z.string(),
+});
+export type SessionExportResponse = z.infer<typeof sessionExportResponseSchema>;

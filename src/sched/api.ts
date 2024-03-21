@@ -6,6 +6,8 @@ import {
   SessionExportResponse,
   SessionListRequest,
   SessionListResponse,
+  sessionListResponseSchema,
+  sessionExportResponseSchema,
 } from "./types";
 import superagent from "superagent";
 import { error, ok, Result } from "../utils/result";
@@ -58,7 +60,7 @@ export class SchedApi {
       return error(response.text);
     } else {
       const body: unknown = response.body;
-      return ok(body as SessionListResponse[]);
+      return ok(sessionListResponseSchema.array().parse(body));
     }
   }
 
@@ -74,7 +76,7 @@ export class SchedApi {
       return error(response.text);
     } else {
       const body: unknown = response.body;
-      return ok(body as SessionExportResponse[]);
+      return ok(sessionExportResponseSchema.array().parse(body));
     }
   }
 
