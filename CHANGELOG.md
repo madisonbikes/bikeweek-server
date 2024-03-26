@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.0](https://github.com/madisonbikes/bikeweek-backend/compare/bikeweek-backend-v0.4.1...bikeweek-backend-v1.0.0) (2024-03-26)
+
+
+### Features
+
+* release 1.0 ([a5a66ae](https://github.com/madisonbikes/bikeweek-backend/commit/a5a66ae6f850b51d1868723ec5229433261f76f7))
+
+
+### Miscellaneous Chores
+
+* release 1.0.0 ([6a372f4](https://github.com/madisonbikes/bikeweek-backend/commit/6a372f4f93296ee003082ff417b56e590e7b2739))
+
 ## [0.4.1](https://github.com/madisonbikes/bikeweek-backend/compare/bikeweek-backend-v0.4.0...bikeweek-backend-v0.4.1) (2024-03-26)
 
 
