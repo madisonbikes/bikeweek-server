@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/madisonbikes/bikeweek-backend/compare/bikeweek-backend-v0.4.0...bikeweek-backend-v0.4.1) (2024-03-26)
+
+
+### Bug Fixes
+
+* deployment should use node, not ts-node ([1197c1e](https://github.com/madisonbikes/bikeweek-backend/commit/1197c1edd6bdaa953d6ed2a61ec1d9e9193fd638))
+
 ## [0.4.0](https://github.com/madisonbikes/bikeweek-backend/compare/bikeweek-backend-v0.3.0...bikeweek-backend-v0.4.0) (2024-03-21)
 
 
