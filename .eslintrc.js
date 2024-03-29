@@ -32,7 +32,6 @@ module.exports = {
         caughtErrorsIgnorePattern: "^_",
       },
     ],
-    "func-style": ["warn"],
     "require-await": ["error"],
     "@typescript-eslint/no-floating-promises": "error",
     "@typescript-eslint/strict-boolean-expressions": "warn",
