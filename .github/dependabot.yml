@@ -4,7 +4,7 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-    target-branch: "develop"
+    target-branch: "main"
     open-pull-requests-limit: 20
     commit-message:
       prefix: "fix"
@@ -14,7 +14,7 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-    target-branch: "develop"
+    target-branch: "main"
 
     # temporarily disabled until 2024
     open-pull-requests-limit: 5
