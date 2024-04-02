@@ -3,7 +3,7 @@ module.exports = {
     {
       name: "bikeweek-backend",
       script: "node",
-      args: "dist/index.js",
+      args: "dist/src/index.js",
       log_date_format: "YYYY-MM-DD HH:mm Z",
     },
   ],
