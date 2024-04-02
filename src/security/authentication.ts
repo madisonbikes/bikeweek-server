@@ -33,7 +33,7 @@ export const localMiddleware: ExpressMiddleware = passport.authenticate(
     session: true,
     failWithError: false,
   },
-) as unknown as ExpressMiddleware;
+) as ExpressMiddleware;
 
 export const federatedMiddleware: ExpressMiddleware = passport.authenticate(
   FEDERATED_STRATEGY_NAME,
@@ -41,7 +41,7 @@ export const federatedMiddleware: ExpressMiddleware = passport.authenticate(
     session: true,
     failWithError: false,
   },
-) as unknown as ExpressMiddleware;
+) as ExpressMiddleware;
 
 export const finalizeAuthenticationMiddleware: ExpressMiddleware = (
   request,

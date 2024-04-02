@@ -36,7 +36,7 @@ if (process.env.NODE_ENV === "test") {
         options: { destination: 1 }, // stdout
       },
     ],
-  }) as unknown as DestinationStream;
+  }) as DestinationStream;
   newLogger = pino({ level: testLogLevel, serializers }, transport);
 } else {
   const targets: TransportTargetOptions[] = [
@@ -54,7 +54,7 @@ if (process.env.NODE_ENV === "test") {
 
   const transport = pino.transport({
     targets,
-  }) as unknown as DestinationStream;
+  }) as DestinationStream;
 
   // ensure pino base logger level is set to minimum of the transports
   const levels = [consoleLogLevel, logLevel].map((l) => pino.levels.values[l]);

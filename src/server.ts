@@ -52,7 +52,7 @@ export class ApiServer {
 
     passport.deserializeUser<string>((data, done) => {
       try {
-        const user = JSON.parse(data) as unknown as Express.User;
+        const user = JSON.parse(data) as Express.User;
         logger.trace(user, "deserialize user");
         done(null, user);
       } catch (err) {
