@@ -8,7 +8,7 @@
     "compile": "tsc --noEmit",
     "dist": "tsc",
     "dev": "ts-node-dev --inspect -- src/index.ts",
-    "pm2-start": "npx --yes pm2 startOrRestart ecosystem.config.js",
+    "pm2-start": "npx --yes pm2 startOrRestart ecosystem.config.js --update-env",
     "pm2-stop": "npx --yes pm2 stop ecosystem.config.js",
     "lint": "eslint . --max-warnings=0",
     "check-package-updates": "npx npm-check-updates",
