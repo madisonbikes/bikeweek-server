@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.0](https://github.com/madisonbikes/bikeweek-backend/compare/bikeweek-backend-v1.0.0...bikeweek-backend-v1.1.0) (2024-04-04)
+
+
+### Features
+
+* add version number to api surface ([54474e7](https://github.com/madisonbikes/bikeweek-backend/commit/54474e7c4c5001b0da82dd6d91a7e4c9ec30dfd0))
+
+
+### Bug Fixes
+
+* bump pino-pretty from 10.3.1 to 11.0.0 ([d8dbcd3](https://github.com/madisonbikes/bikeweek-backend/commit/d8dbcd33989a99155b21245a180806b94f12d8c1))
+* bump reflect-metadata from 0.2.1 to 0.2.2 ([a398a63](https://github.com/madisonbikes/bikeweek-backend/commit/a398a63825c7e00cddd172458e53d1ae5bbde495))
+* ecosystem config uses wrong startup path ([45d1696](https://github.com/madisonbikes/bikeweek-backend/commit/45d1696d89af704fdf0684183dbaa5f9a75fd983))
+
 ## [1.0.0](https://github.com/madisonbikes/bikeweek-backend/compare/bikeweek-backend-v0.4.1...bikeweek-backend-v1.0.0) (2024-03-26)
 
 
