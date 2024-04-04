@@ -123,3 +123,8 @@ export const authenticatedUserSchema = z.object({
   federated: federatedIdSchema.array().optional(),
 });
 export type AuthenticatedUser = z.infer<typeof authenticatedUserSchema>;
+
+export const getInfoSchema = z.object({
+  version: z.string(),
+});
+export type GetInfo = z.infer<typeof getInfoSchema>;
