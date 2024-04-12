@@ -1,30 +1,23 @@
 import express from "express";
-import { injectable } from "tsyringe";
 import { MutateBikeWeekEvent, mutateBikeWeekEventSchema } from "./contract";
-import { EventModel } from "../database/events";
-import { EventSync } from "../sched/sync";
+import { eventModel } from "../database/events";
+import { eventSync } from "../sched/sync";
 import { validateAdmin } from "../security/validateAdmin";
 import { logger } from "../utils";
 import { validateBodySchema } from "../security/validateSchema";
 import { asyncWrapper } from "./async";
 import { StatusCodes } from "http-status-codes";
 
-@injectable()
-export class EventRoutes {
-  constructor(
-    private eventModel: EventModel,
-    private eventExporter: EventSync
-  ) {}
-
-  readonly routes = express
+function routes() {
+  return express
     .Router()
     .get(
       "/",
       validateAdmin(),
       asyncWrapper(async (_request, response) => {
-        const events = await this.eventModel.events();
+        const events = await eventModel.events();
         response.send(events);
-      })
+      }),
     )
     .get(
       "/:eventId",
@@ -32,7 +25,7 @@ export class EventRoutes {
       asyncWrapper(async (request, response) => {
         try {
           const id = parseInt(request.params.eventId);
-          const event = await this.eventModel.findEvent(id);
+          const event = await eventModel.findEvent(id);
           if (!event) {
             response.status(StatusCodes.NOT_FOUND).send("not found");
           } else {
@@ -42,7 +35,7 @@ export class EventRoutes {
           logger.error(err);
           response.status(StatusCodes.BAD_REQUEST).send("invalid request");
         }
-      })
+      }),
     )
     .put(
       "/:eventId",
@@ -51,31 +44,33 @@ export class EventRoutes {
       asyncWrapper(async (request, response) => {
         const eventData = request.validated as MutateBikeWeekEvent;
         const id = parseInt(request.params.eventId);
-        const event = await this.eventModel.updateEvent(id, eventData);
+        const event = await eventModel.updateEvent(id, eventData);
         if (!event) {
           response.status(StatusCodes.NOT_FOUND).send("not found");
         } else {
           response.send(event);
 
           // trigger an export on any modification
-          this.eventExporter.trigger();
+          eventSync.trigger();
         }
-      })
+      }),
     )
     .delete(
       "/:eventId",
       validateAdmin(),
       asyncWrapper(async (request, response) => {
         const id = parseInt(request.params.eventId);
-        const event = await this.eventModel.deleteEvent(id);
+        const event = await eventModel.deleteEvent(id);
         if (!event) {
           response.status(StatusCodes.NOT_FOUND).send("not found");
         } else {
           response.send("ok");
 
           // trigger an export on any modification
-          this.eventExporter.trigger();
+          eventSync.trigger();
         }
-      })
+      }),
     );
 }
+
+export default { routes };

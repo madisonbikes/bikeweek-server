@@ -1,25 +1,16 @@
 import http, { Server } from "http";
-import { injectable } from "tsyringe";
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import passport from "passport";
 
-import { Configuration } from "./config";
+import { configuration } from "./config";
 import { logger } from "./utils";
-import { ApiRoutes } from "./routes";
-import { AuthenticationStrategies } from "./security";
-import { SessionMiddlewareConfigurator } from "./session";
+import routes from "./routes";
+import { authenticationStrategies } from "./security";
+import { sessionMiddlewareConfigurator } from "./session";
 import { StatusCodes } from "http-status-codes";
 
-@injectable()
 export class ApiServer {
-  constructor(
-    private configuration: Configuration,
-    private apiRoutes: ApiRoutes,
-    private authenticationStrategies: AuthenticationStrategies,
-    private sessionMiddlewareConfigurator: SessionMiddlewareConfigurator,
-  ) {}
-
   server: Server | undefined;
 
   create(): Promise<Server> {
@@ -30,16 +21,16 @@ export class ApiServer {
 
     app.use(express.json());
 
-    if (this.configuration.enableCors) {
+    if (configuration.enableCors) {
       // cors should only be used for development -- production serves from same server/port
       app.use(cors());
     }
 
-    if (this.configuration.reactStaticRootDir) {
-      app.use("/", express.static(this.configuration.reactStaticRootDir));
+    if (configuration.reactStaticRootDir) {
+      app.use("/", express.static(configuration.reactStaticRootDir));
     }
 
-    this.authenticationStrategies.registerPassportStrategies();
+    authenticationStrategies.registerPassportStrategies();
     passport.serializeUser<string>((user, done) => {
       try {
         logger.trace(user, "serialize user");
@@ -60,11 +51,11 @@ export class ApiServer {
       }
     });
 
-    app.use(this.sessionMiddlewareConfigurator.build());
+    app.use(sessionMiddlewareConfigurator.build());
     app.use(passport.initialize());
     app.use(passport.session());
 
-    app.use("/api/v1", this.apiRoutes.routes);
+    app.use("/api/v1", routes.routes());
 
     app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
       logger.error(err, "Unhandled server error");
@@ -81,9 +72,9 @@ export class ApiServer {
 
   async start(): Promise<void> {
     await this.create();
-    this.server?.listen(this.configuration.serverPort, () => {
+    this.server?.listen(configuration.serverPort, () => {
       logger.info(
-        `Server listening on http://localhost:${this.configuration.serverPort}`,
+        `Server listening on http://localhost:${configuration.serverPort}`,
       );
     });
   }

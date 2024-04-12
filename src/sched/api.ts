@@ -12,14 +12,10 @@ import {
 import superagent from "superagent";
 import { error, ok, Result } from "../utils/result";
 import { sleep } from "../utils/await-sleep";
-import { injectable } from "tsyringe";
-import { Configuration } from "../config";
+import { configuration } from "../config";
 import { logger } from "../utils";
 
-@injectable()
-export class SchedApi {
-  constructor(private configuration: Configuration) {}
-
+class SchedApi {
   async addSession(
     session: AddSessionRequest,
   ): Promise<Result<string, string>> {
@@ -102,9 +98,9 @@ export class SchedApi {
 
     const newRequestData = {
       ...requestData,
-      api_key: this.configuration.schedApiKey,
+      api_key: configuration.schedApiKey,
     };
-    const fullEndpoint = this.configuration.schedUri + endpoint;
+    const fullEndpoint = configuration.schedUri + endpoint;
     const response = await superagent
       .post(fullEndpoint)
       .set("User-Agent", "madisonbikeweek-importer/1.0.0")
@@ -137,3 +133,5 @@ export class SchedApi {
     }
   }
 }
+
+export const schedApi = new SchedApi();

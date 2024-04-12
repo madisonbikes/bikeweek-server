@@ -1,9 +1,7 @@
-import { injectable } from "tsyringe";
-
 import bcrypt from "bcryptjs";
 import { Strategy } from "passport-local";
 import { logger } from "../utils";
-import { UserModel } from "../database/users";
+import { userModel } from "../database/users";
 import { DbUser } from "../database/types";
 import { buildAuthenticatedUser } from "./authentication";
 
@@ -13,9 +11,8 @@ const BCRYPT_HASH_SIZE = 10;
 export const STRATEGY_NAME = "local";
 
 /** passport strategy implementation for username/pw against mongodb */
-@injectable()
-export class LocalStrategy extends Strategy {
-  constructor(private users: UserModel) {
+class LocalStrategy extends Strategy {
+  constructor() {
     super(async (username, password, done) => {
       logger.trace({ username }, "local passport auth");
       let success = false;
@@ -24,7 +21,7 @@ export class LocalStrategy extends Strategy {
         return;
       }
       try {
-        const user = await this.users.findUserByUsername(username);
+        const user = await userModel.findUserByUsername(username);
         if (user) {
           success = await checkPassword(password, user);
         } else {
@@ -51,3 +48,5 @@ export const generateHashedPassword = (password: string) => {
 export const checkPassword = (password: string, user: DbUser) => {
   return bcrypt.compare(password, user.hashed_password);
 };
+
+export const localStrategy = new LocalStrategy();

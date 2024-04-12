@@ -1,4 +1,3 @@
-import "reflect-metadata";
 import { sortEventTypes } from "./schedExporter";
 
 describe("event type sort function", () => {

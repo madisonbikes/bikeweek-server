@@ -32,7 +32,11 @@ module.exports = {
         caughtErrorsIgnorePattern: "^_",
       },
     ],
-    "require-await": ["error"],
+
+    // Note: you must disable the base rule as it can report incorrect errors
+    "require-await": "off",
+    "@typescript-eslint/require-await": "error",
+
     "@typescript-eslint/no-floating-promises": "error",
     "@typescript-eslint/strict-boolean-expressions": "warn",
     "prefer-const": ["warn", { destructuring: "all" }],

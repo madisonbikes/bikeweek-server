@@ -1,10 +1,8 @@
 import { Field, Entry, entrySchema, fieldSchema } from "./types";
 import { parse } from "date-fns";
 
-import { Configuration } from "../config";
 import { locations } from "../locations";
-import { injectable } from "tsyringe";
-import { Database } from "../database/database";
+import { database } from "../database/database";
 import {
   bikeWeekEventSchema,
   BikeWeekEvent,
@@ -28,23 +26,17 @@ export enum EventTypes {
 const GF_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 /** take data from mongo GF dump and load into structured event info */
-@injectable()
-export class Processor {
-  constructor(
-    private configuration: Configuration,
-    private database: Database,
-  ) {}
-
+class Processor {
   async extractEvents(): Promise<BikeWeekEvent[]> {
     const fields = fieldSchema
       .array()
-      .parse(await this.database.gfFormFields.find().toArray());
+      .parse(await database.gfFormFields.find().toArray());
 
     const responses = entrySchema
       .array()
-      .parse(await this.database.gfResponses.find().toArray());
+      .parse(await database.gfResponses.find().toArray());
 
-    const eventHelper = new EventHelper(fields, this.configuration);
+    const eventHelper = new EventHelper(fields);
 
     const retval = Array<BikeWeekEvent>();
     for (const entry of responses) {
@@ -87,12 +79,10 @@ export class Processor {
     return retval;
   }
 }
+export const processor = new Processor();
 
 class EventHelper {
-  constructor(
-    private fields: Field[],
-    private configuration: Configuration,
-  ) {}
+  constructor(private fields: Field[]) {}
 
   getLocationInfo(entry: Entry): EventLocation | undefined {
     const firstChoice = this.lookupFieldValue(entry, "location_first");

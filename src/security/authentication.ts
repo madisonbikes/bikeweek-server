@@ -1,12 +1,10 @@
-import "reflect-metadata";
-import { injectable } from "tsyringe";
 import passport from "passport";
 import { Request, Response, NextFunction } from "express";
 import { AuthenticatedUser, authenticatedUserSchema } from "../routes/contract";
 import { DbUser } from "../database/types";
-import { STRATEGY_NAME as LOCAL_STRATEGY_NAME, LocalStrategy } from "./local";
+import { STRATEGY_NAME as LOCAL_STRATEGY_NAME, localStrategy } from "./local";
 import {
-  FederatedStrategy,
+  federatedStrategy,
   STRATEGY_NAME as FEDERATED_STRATEGY_NAME,
 } from "./federated";
 
@@ -51,21 +49,16 @@ export const finalizeAuthenticationMiddleware: ExpressMiddleware = (
   response.send(user);
 };
 
-@injectable()
-export class AuthenticationStrategies {
-  constructor(
-    private local: LocalStrategy,
-    private federated: FederatedStrategy,
-  ) {}
-
+class AuthenticationStrategies {
   registerPassportStrategies = () => {
     // used for login method
-    passport.use(this.local);
-    if (this.federated.enabled) {
-      passport.use(this.federated);
+    passport.use(localStrategy);
+    if (federatedStrategy.enabled) {
+      passport.use(federatedStrategy);
     }
   };
 }
+export const authenticationStrategies = new AuthenticationStrategies();
 
 /** sanitizes user info for export to passport and into request object */
 export const buildAuthenticatedUser = (user: DbUser) => {

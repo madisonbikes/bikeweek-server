@@ -1,10 +1,8 @@
-import { injectable } from "tsyringe";
 import { isAllDayEvent, isDiscountEvent } from "./database/events";
 import fs from "fs/promises";
 import { BikeWeekEvent } from "./routes/contract";
 
-@injectable()
-export class DiscountExporter {
+class DiscountExporter {
   async start(allEvents: BikeWeekEvent[]): Promise<void> {
     const events = [...allEvents]
       .sort((a, b) => a.name.localeCompare(b.name))
@@ -26,6 +24,7 @@ export class DiscountExporter {
     await fs.writeFile("output/discounts.html", buffer);
   }
 }
+export const discountExporter = new DiscountExporter();
 
 const createLink = (text: string, url: string | undefined) => {
   if (url?.trim() === "") {

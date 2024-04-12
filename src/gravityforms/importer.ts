@@ -2,20 +2,13 @@ import superagent from "superagent";
 
 import { entryResponseSchema, Field, FormResponseSchema } from "./types";
 
-import { injectable } from "tsyringe";
-import { Configuration } from "../config";
-import { Database } from "../database/database";
+import { configuration } from "../config";
+import { database } from "../database/database";
 import { logger } from "../utils";
 import { locations } from "../locations";
 
 /** pull data out of GF REST service and dump into mongo */
-@injectable()
-export class Importer {
-  constructor(
-    private config: Configuration,
-    private database: Database,
-  ) {}
-
+class Importer {
   async import(): Promise<void> {
     if (!this.isEnabled()) {
       logger.info("Gravity forms URI not provided, no form data importing");
@@ -26,20 +19,20 @@ export class Importer {
       this.loadForms(),
       this.loadEntries(),
     ]);
-    await this.database.gfFormFields.deleteMany({});
+    await database.gfFormFields.deleteMany({});
     if (formFields.fields.length > 0) {
-      await this.database.gfFormFields.insertMany(formFields.fields);
+      await database.gfFormFields.insertMany(formFields.fields);
     }
     this.runLocationLint(formFields.fields);
 
-    await this.database.gfResponses.deleteMany({});
+    await database.gfResponses.deleteMany({});
     if (responses.entries.length > 0) {
-      await this.database.gfResponses.insertMany(responses.entries);
+      await database.gfResponses.insertMany(responses.entries);
     }
   }
 
   isEnabled() {
-    return this.config.gravityFormsUri;
+    return configuration.gravityFormsUri;
   }
 
   private runLocationLint(fields: Field[]) {
@@ -84,12 +77,12 @@ export class Importer {
   // FIXME support pagination for > 100 entries
   private async loadEntries() {
     const response = await superagent
-      .get(`${this.config.gravityFormsUri}/entries`)
-      .query({ form_ids: this.config.gravityFormsId })
+      .get(`${configuration.gravityFormsUri}/entries`)
+      .query({ form_ids: configuration.gravityFormsId })
       .query("paging[page_size]=100")
       .auth(
-        this.config.gravityFormsConsumerApiKey,
-        this.config.gravityFormsConsumerSecret,
+        configuration.gravityFormsConsumerApiKey,
+        configuration.gravityFormsConsumerSecret,
       );
     const result = entryResponseSchema.safeParse(response.body);
     if (!result.success) {
@@ -104,10 +97,12 @@ export class Importer {
 
   private async loadForms() {
     const response = await superagent
-      .get(`${this.config.gravityFormsUri}/forms/${this.config.gravityFormsId}`)
+      .get(
+        `${configuration.gravityFormsUri}/forms/${configuration.gravityFormsId}`,
+      )
       .auth(
-        this.config.gravityFormsConsumerApiKey,
-        this.config.gravityFormsConsumerSecret,
+        configuration.gravityFormsConsumerApiKey,
+        configuration.gravityFormsConsumerSecret,
       );
     const result = FormResponseSchema.safeParse(response.body);
     if (!result.success) {
@@ -120,3 +115,5 @@ export class Importer {
     return result.data;
   }
 }
+
+export const importer = new Importer();

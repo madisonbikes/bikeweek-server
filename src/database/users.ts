@@ -1,16 +1,12 @@
-import { injectable } from "tsyringe";
-import { Database } from "./database";
+import { database } from "./database";
 import { DbUser, dbUserSchema } from "./types";
 import { logger } from "../utils";
 import { FederatedId, FederatedProvider } from "../routes/contract";
 import { ObjectId } from "mongodb";
 
-@injectable()
-export class UserModel {
-  constructor(private database: Database) {}
-
+class UserModel {
   findUserByUsername = async (username: string) => {
-    const value = await this.database.users.findOne({
+    const value = await database.users.findOne({
       username,
     });
     if (!value) {
@@ -20,7 +16,7 @@ export class UserModel {
   };
 
   findUserById = async (_id: ObjectId) => {
-    const value = await this.database.users.findOne({ _id });
+    const value = await database.users.findOne({ _id });
     if (!value) {
       return undefined;
     }
@@ -30,9 +26,9 @@ export class UserModel {
 
   findFederatedUser = async (
     provider: FederatedProvider,
-    federatedId: string
+    federatedId: string,
   ) => {
-    const value = await this.database.users
+    const value = await database.users
       .find({
         federated: { provider, federatedId },
       })
@@ -50,13 +46,11 @@ export class UserModel {
   };
 
   users = async () => {
-    return dbUserSchema
-      .array()
-      .parse(await this.database.users.find({}).toArray());
+    return dbUserSchema.array().parse(await database.users.find({}).toArray());
   };
 
   modifyUser = async (_id: ObjectId, user: Partial<Omit<DbUser, "_id">>) => {
-    const value = await this.database.users.updateOne({ _id }, { $set: user });
+    const value = await database.users.updateOne({ _id }, { $set: user });
     if (value.modifiedCount !== 1) {
       return Promise.resolve(undefined);
     }
@@ -65,11 +59,11 @@ export class UserModel {
 
   disconnectFederatedProvider = async (
     _id: ObjectId,
-    provider: FederatedProvider
+    provider: FederatedProvider,
   ) => {
-    const value = await this.database.users.updateOne(
+    const value = await database.users.updateOne(
       { _id },
-      { $pull: { federated: { provider: { $eq: provider } } } }
+      { $pull: { federated: { provider: { $eq: provider } } } },
     );
     if (value.modifiedCount !== 1) {
       return Promise.resolve(undefined);
@@ -79,9 +73,9 @@ export class UserModel {
 
   connectFederatedProvider = async (_id: ObjectId, data: FederatedId) => {
     await this.disconnectFederatedProvider(_id, data.provider);
-    const value = await this.database.users.updateOne(
+    const value = await database.users.updateOne(
       { _id },
-      { $push: { federated: data } }
+      { $push: { federated: data } },
     );
 
     if (value.modifiedCount !== 1) {
@@ -97,3 +91,5 @@ export class UserModel {
   };
   */
 }
+
+export const userModel = new UserModel();

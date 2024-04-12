@@ -1,59 +1,49 @@
-import { injectable } from "tsyringe";
 import { setIntervalAsync } from "set-interval-async/dynamic";
-import { Configuration } from "../config";
-import { Importer } from "./importer";
-import { Processor } from "./processor";
+import { configuration } from "../config";
+import { importer } from "./importer";
+import { processor } from "./processor";
 import { createHash } from "crypto";
-import { EventModel } from "../database/events";
+import { eventModel } from "../database/events";
 import { BikeWeekEvent } from "../routes/contract";
 import { logger } from "../utils";
 
-@injectable()
-export class RemoteEventPoller {
-  constructor(
-    private configuration: Configuration,
-    private importer: Importer,
-    private processor: Processor,
-    private eventModel: EventModel
-  ) {}
-
+class RemoteEventPoller {
   async start() {
-    await this.importer.import();
+    await importer.import();
 
     // defaults to every hour
     logger.info(
       `Scheduling poll of form data for every ${
-        this.configuration.pollInterval / 1000
-      } seconds`
+        configuration.pollInterval / 1000
+      } seconds`,
     );
     await this.doImport();
-    setIntervalAsync(() => this.doImport(), this.configuration.pollInterval);
+    setIntervalAsync(() => this.doImport(), configuration.pollInterval);
   }
 
   /** perform the import if form data has been updated or if it's the first execution */
   private async doImport(): Promise<void> {
     logger.debug("running remote forms import");
-    await this.importer.import();
+    await importer.import();
 
-    const importedEvents = await this.processor.extractEvents();
+    const importedEvents = await processor.extractEvents();
     let skipCount = 0,
       addCount = 0;
     for (const event of importedEvents) {
-      const eventExists =
-        (await this.eventModel.findEvent(event.id)) !== undefined;
+      const eventExists = (await eventModel.findEvent(event.id)) !== undefined;
       if (!eventExists) {
         addCount++;
         logger.debug(
-          `Importing new event ${event.id}: "${event.name}" from remote forms`
+          `Importing new event ${event.id}: "${event.name}" from remote forms`,
         );
         logger.trace({ event });
-        await this.eventModel.addEvent(event);
+        await eventModel.addEvent(event);
       } else {
         skipCount++;
       }
     }
     logger.info(
-      `Finished remote forms import, skipped ${skipCount} added ${addCount}`
+      `Finished remote forms import, skipped ${skipCount} added ${addCount}`,
     );
   }
 
@@ -74,3 +64,5 @@ export class RemoteEventPoller {
     return updated;
   }
 }
+
+export const poller = new RemoteEventPoller();

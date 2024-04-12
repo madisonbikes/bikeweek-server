@@ -12,15 +12,6 @@
       "runtimeExecutable": "npm",
       "skipFiles": ["<node_internals>/**"],
       "type": "node"
-    },
-    {
-      "name": "Run test via NPM",
-      "request": "launch",
-      "console": "integratedTerminal",
-      "runtimeArgs": ["run", "test", "--", "-t", "FLURF"],
-      "runtimeExecutable": "npm",
-      "skipFiles": ["<node_internals>/**"],
-      "type": "node"
     }
   ]
 }

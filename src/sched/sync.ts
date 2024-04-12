@@ -1,25 +1,13 @@
-import { injectable, singleton } from "tsyringe";
-import { EventModel } from "../database/events";
-import { Database } from "../database/database";
-import { SchedExporter } from "./schedExporter";
-import { DiscountExporter } from "../discountExporter";
+import { eventModel } from "../database/events";
+import { database } from "../database/database";
+import { schedExporter } from "./schedExporter";
+import { discountExporter } from "../discountExporter";
 import { setTimeout, clearTimeout } from "timers";
-import { Configuration } from "../config";
+import { configuration } from "../config";
 import { logger } from "../utils";
 
 /** handles sync to sched */
-
-@injectable()
-@singleton()
-export class EventSync {
-  constructor(
-    private database: Database,
-    private schedExporter: SchedExporter,
-    private discountExporter: DiscountExporter,
-    private eventModel: EventModel,
-    private configuration: Configuration
-  ) {}
-
+class EventSync {
   private cancelTimeout: NodeJS.Timeout | undefined;
 
   start(): Promise<void> {
@@ -42,7 +30,7 @@ export class EventSync {
 
   // bridge gap to async safely
   private syncDoExport() {
-    if (!this.configuration.schedUri || !this.configuration.schedApiKey) {
+    if (!configuration.schedUri || !configuration.schedApiKey) {
       logger.warn("Skipping sched sync without URI and/or API key");
       return;
     }
@@ -53,8 +41,8 @@ export class EventSync {
 
   private async doExport(): Promise<void> {
     const [status, allEvents] = await Promise.all([
-      await this.database.getStatus(),
-      await this.eventModel.events(),
+      await database.getStatus(),
+      await eventModel.events(),
     ]);
 
     // get list of events that need to be synced
@@ -67,10 +55,11 @@ export class EventSync {
     });
 
     await Promise.all([
-      this.schedExporter.start(filteredEvents),
-      this.discountExporter.start(allEvents),
+      schedExporter.start(filteredEvents),
+      discountExporter.start(allEvents),
     ]);
 
-    await this.database.setStatus({ lastSchedSync: new Date() });
+    await database.setStatus({ lastSchedSync: new Date() });
   }
 }
+export const eventSync = new EventSync();

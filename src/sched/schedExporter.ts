@@ -1,19 +1,15 @@
-import { injectable } from "tsyringe";
 import { format } from "date-fns";
 import { isAllDayEvent, isEndOfWeekParty } from "../database/events";
-import { SchedApi } from "./api";
+import { schedApi } from "./api";
 import { buildMapsUrl } from "../locations";
 import { EventTypes } from "../gravityforms/processor";
 import { BikeWeekEvent, eventStatusSchema } from "../routes/contract";
 import { Result, logger } from "../utils";
 
-@injectable()
-export class SchedExporter {
-  constructor(private sched: SchedApi) {}
-
+class SchedExporter {
   async start(updatedEvents: BikeWeekEvent[]): Promise<void> {
     // get complete session list so we can build a complete key list
-    const sessionsResponse = await this.sched.exportSessions();
+    const sessionsResponse = await schedApi.exportSessions();
     if (sessionsResponse.isError()) {
       throw new Error(sessionsResponse.value);
     }
@@ -96,10 +92,10 @@ export class SchedExporter {
           let result: Result<string, string>;
           let action;
           if (relevantExistingKeys.indexOf(session_key) !== -1) {
-            result = await this.sched.modifySession(base);
+            result = await schedApi.modifySession(base);
             action = "modified";
           } else {
-            result = await this.sched.addSession(base);
+            result = await schedApi.addSession(base);
             action = "added";
           }
           if (result.isError()) {
@@ -123,7 +119,7 @@ export class SchedExporter {
 
     // remaining keys should be unpublished
     for (const key of unpublishCandidates) {
-      const result = await this.sched.deleteSession({
+      const result = await schedApi.deleteSession({
         session_key: key.toString(),
       });
       if (result.isError()) {
@@ -199,3 +195,5 @@ const eventTypeSortable = (type: string) => {
   }
   return type;
 };
+
+export const schedExporter = new SchedExporter();

@@ -1,26 +1,21 @@
-import { injectable } from "tsyringe";
 import { Request } from "express";
 import { buildAuthenticatedUser } from "../security";
-import { UserModel } from "../database/users";
+import { userModel } from "../database/users";
 import { logger } from "../utils";
 import { Strategy } from "passport";
-import { GoogleFederatedVerifier } from "./google";
+import googleFederatedVerifier from "./google";
 import { FederatedLoginBody } from "../routes/contract";
 
 export const STRATEGY_NAME = "federated";
 
-@injectable()
-export class FederatedStrategy extends Strategy {
-  constructor(
-    private users: UserModel,
-    private googleVerifier: GoogleFederatedVerifier
-  ) {
+class FederatedStrategy extends Strategy {
+  constructor() {
     super();
     this.name = STRATEGY_NAME;
   }
 
   get enabled() {
-    return this.googleVerifier.enabled;
+    return googleFederatedVerifier.enabled();
   }
 
   override async authenticate(req: Request) {
@@ -31,13 +26,15 @@ export class FederatedStrategy extends Strategy {
         return;
       }
 
-      const email = await this.googleVerifier.verifyFederatedToken(auth.token);
+      const email = await googleFederatedVerifier.verifyFederatedToken(
+        auth.token,
+      );
 
       let ok = false;
       if (email !== undefined) {
-        const user = await this.users.findFederatedUser(
-          this.googleVerifier.name,
-          email
+        const user = await userModel.findFederatedUser(
+          googleFederatedVerifier.name(),
+          email,
         );
         if (user !== undefined) {
           ok = true;
@@ -53,3 +50,4 @@ export class FederatedStrategy extends Strategy {
     }
   }
 }
+export const federatedStrategy = new FederatedStrategy();

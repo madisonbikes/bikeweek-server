@@ -1,12 +1,9 @@
-import { injectable, singleton } from "tsyringe";
-import { Configuration } from "../config";
+import { configuration } from "../config";
 import { Collection, Db, MongoClient } from "mongodb";
 import { logger, maskUriPassword } from "../utils";
 import { DbBikeWeekEvent, DbStatus, DbUser, dbStatusSchema } from "./types";
 
-@injectable()
-@singleton()
-export class Database {
+class Database {
   private _users!: Collection<Omit<DbUser, "_id">>;
   private _gfFormFields!: Collection;
   private _gfResponses!: Collection;
@@ -42,13 +39,9 @@ export class Database {
     await this._status.insertOne(status);
   }
 
-  constructor(private configuration: Configuration) {}
-
   async start() {
-    logger.info(
-      `Connecting to ${maskUriPassword(this.configuration.mongoDbUri)}`,
-    );
-    this.client = new MongoClient(this.configuration.mongoDbUri, {});
+    logger.info(`Connecting to ${maskUriPassword(configuration.mongoDbUri)}`);
+    this.client = new MongoClient(configuration.mongoDbUri, {});
     await this.client.connect();
 
     this.database = this.client.db();
@@ -71,3 +64,5 @@ export class Database {
     this.client = undefined;
   }
 }
+
+export const database = new Database();
