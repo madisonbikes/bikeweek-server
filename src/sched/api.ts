@@ -134,4 +134,4 @@ class SchedApi {
   }
 }
 
-export const schedApi = new SchedApi();
+export default new SchedApi();

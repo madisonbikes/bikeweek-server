@@ -1,5 +1,5 @@
 import supertest from "supertest";
-import { runningApiServer, Server } from ".";
+import { runningApiServer } from ".";
 import TestAgent from "supertest/lib/agent";
 export { Server } from "http";
 
@@ -7,7 +7,7 @@ export { Server } from "http";
 export type TestRequest = TestAgent;
 
 /** helper function to build a supertest test request from a server object */
-export const testRequest = (server?: Server) => {
-  const s = server ?? runningApiServer;
+export const testRequest = () => {
+  const s = runningApiServer;
   return supertest.agent(s);
 };

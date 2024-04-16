@@ -1,7 +1,7 @@
 {
   "name": "bikeweek-backend",
   "version": "1.1.0",
-  "description": "Imports events from CSV form data into Sched",
+  "description": "Imports events from Gravity Forms form data into Sched",
   "main": "src/index.ts",
   "scripts": {
     "start": "ts-node src/index.ts",

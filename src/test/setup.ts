@@ -1,10 +1,9 @@
 import { testConfiguration } from "../config";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { database } from "../database/database";
-import { ApiServer } from "../server";
+import apiServer from "../server";
 import { Server } from "./request";
 
-export let apiServer: ApiServer | undefined;
 export let runningApiServer: Server | undefined;
 
 export type SuiteOptions = {
@@ -46,7 +45,6 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
     }
 
     if (withApiServer) {
-      apiServer = new ApiServer();
       runningApiServer = await apiServer.create();
     }
   });
@@ -61,9 +59,8 @@ export const setupSuite = (options: Partial<SuiteOptions> = {}): void => {
 
   afterAll(async () => {
     if (withApiServer) {
+      await apiServer.stop();
       runningApiServer = undefined;
-      await apiServer?.stop();
-      apiServer = undefined;
     }
 
     if (withDatabase) {

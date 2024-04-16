@@ -1,7 +1,7 @@
 import express from "express";
 import { MutateBikeWeekEvent, mutateBikeWeekEventSchema } from "./contract";
 import { eventModel } from "../database/events";
-import { eventSync } from "../sched/sync";
+import eventSync from "../sched/sync";
 import { validateAdmin } from "../security/validateAdmin";
 import { logger } from "../utils";
 import { validateBodySchema } from "../security/validateSchema";
