@@ -61,7 +61,9 @@ export async function exportToSched(
       let timeNdx = -1;
       for (const time of event.eventTimes) {
         timeNdx++;
-        const dayOfYear = format(eventDate, "DDD");
+        const dayOfYear = format(eventDate, "DDD", {
+          useAdditionalDayOfYearTokens: true,
+        });
         const session_key = `${event.id}.${dayOfYear}.${timeNdx}`;
         const description = buildDescription(event);
 
