@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.1](https://github.com/madisonbikes/bikeweek-backend/compare/bikeweek-backend-v1.1.0...bikeweek-backend-v1.1.1) (2024-05-13)
+
+
+### Bug Fixes
+
+* bump google-auth-library from 9.7.0 to 9.9.0 ([bb608de](https://github.com/madisonbikes/bikeweek-backend/commit/bb608de740d777375c598c9269b150246cbc7fd4))
+* bump pino from 8.19.0 to 9.0.0 ([e9a7ba5](https://github.com/madisonbikes/bikeweek-backend/commit/e9a7ba5c3821c391b66fe9887ffcd33d27d8d486))
+* bump superagent from 8.1.2 to 9.0.2 ([980ce40](https://github.com/madisonbikes/bikeweek-backend/commit/980ce401e32f9d9d995a31ddf66ef65f89c1cf5b))
+* bump zod from 3.22.4 to 3.23.5 ([905d491](https://github.com/madisonbikes/bikeweek-backend/commit/905d49106b1dbf592af81553153240e24a45080c))
+* remove use of tsyringe DI ([4ad2f5a](https://github.com/madisonbikes/bikeweek-backend/commit/4ad2f5a9b34aa5c0a2879f8b0e0c416e6a94454a))
+* warning in call to date-fns with DDD ([c67cf7d](https://github.com/madisonbikes/bikeweek-backend/commit/c67cf7d118bbb9d979cfb08d1a8c17f15dadd3fd))
+
 ## [1.1.0](https://github.com/madisonbikes/bikeweek-backend/compare/bikeweek-backend-v1.0.0...bikeweek-backend-v1.1.0) (2024-04-04)
 
 
