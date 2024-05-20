@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/madisonbikes/bikeweek-backend/compare/bikeweek-backend-v1.1.1...bikeweek-backend-v1.1.2) (2024-05-20)
+
+
+### Bug Fixes
+
+* blank location name should result in no location in sched ([e8a538d](https://github.com/madisonbikes/bikeweek-backend/commit/e8a538df91dd6f0ea454689c89d0546550ae2024))
+
 ## [1.1.1](https://github.com/madisonbikes/bikeweek-backend/compare/bikeweek-backend-v1.1.0...bikeweek-backend-v1.1.1) (2024-05-13)
 
 
