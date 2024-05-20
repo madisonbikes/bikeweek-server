@@ -2,6 +2,9 @@ import buildUrl from "build-url";
 import { EventLocation } from "./routes/contract";
 
 export const buildMapsUrl = (location: EventLocation): string => {
+  // translate blank name to no location in sched
+  if (location.name === "") return "";
+
   let params: { [name: string]: string | string[] } = {
     api: "1",
   };
