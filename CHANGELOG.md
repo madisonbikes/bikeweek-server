@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.1.3](https://github.com/madisonbikes/bikeweek-backend/compare/bikeweek-backend-v1.1.2...bikeweek-backend-v1.1.3) (2024-07-01)
+
+
+### Bug Fixes
+
+* bump google-auth-library from 9.10.0 to 9.11.0 ([8e5e1d7](https://github.com/madisonbikes/bikeweek-backend/commit/8e5e1d78f571a98e984147e5862186935f2380b2))
+* bump google-auth-library from 9.9.0 to 9.10.0 ([8b0bdce](https://github.com/madisonbikes/bikeweek-backend/commit/8b0bdceba09a98c07c8889f8839286d7aa76c019))
+* bump mongodb from 6.5.0 to 6.7.0 ([c28dc56](https://github.com/madisonbikes/bikeweek-backend/commit/c28dc56960d72ad8dd03932eefe7bbb6e850e3af))
+* bump mongodb from 6.7.0 to 6.8.0 ([bb14362](https://github.com/madisonbikes/bikeweek-backend/commit/bb14362ea7903577560331feb8f58a2535a0380b))
+* bump pino from 9.0.0 to 9.1.0 ([295f606](https://github.com/madisonbikes/bikeweek-backend/commit/295f606cd1fa8f66ce209df387644c17bd8210d5))
+* bump pino from 9.1.0 to 9.2.0 ([4bde289](https://github.com/madisonbikes/bikeweek-backend/commit/4bde289fd5966214628498e36ea9a45763372f3c))
+* bump pino-pretty from 11.0.0 to 11.1.0 ([b667564](https://github.com/madisonbikes/bikeweek-backend/commit/b667564b26cf6b1a4fb9e93d0f19422803ed316a))
+* bump pino-pretty from 11.1.0 to 11.2.1 ([932e44c](https://github.com/madisonbikes/bikeweek-backend/commit/932e44c9abe2014b7aed800fca9c16d966b11681))
+* bump redis from 4.6.13 to 4.6.14 ([f6b7cb1](https://github.com/madisonbikes/bikeweek-backend/commit/f6b7cb1a2016b65474ac3d0d047a55d14054ad88))
+* bump zod from 3.23.5 to 3.23.8 ([211a50a](https://github.com/madisonbikes/bikeweek-backend/commit/211a50a3df5b6f9a6402cd8b3f76cc6a87e2866c))
+
 ## [1.1.2](https://github.com/madisonbikes/bikeweek-backend/compare/bikeweek-backend-v1.1.1...bikeweek-backend-v1.1.2) (2024-05-20)
 
 
